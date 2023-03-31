@@ -13,7 +13,7 @@
 import axios from "axios";;
 axios.defaults.withCredentials = true;
 const api = axios.create({
-  baseURL: 'http://54.91.211.222:4000/auth',
+  baseURL: 'https://test.emailgravely.com:4000/auth',
 });
 
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A

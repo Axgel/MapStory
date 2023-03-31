@@ -13,7 +13,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL_DEV],
+    origin: [process.env.CLIENT_URL_PROD],
     credentials: true,
   })
 );
