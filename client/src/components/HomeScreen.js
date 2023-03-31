@@ -24,8 +24,9 @@ export default function HomeScreen() {
 
       <input id="name" type="text" />
       <button type="button" onClick={handleClick}>
-        Click Me!
-      </button>
+        Add Name!
+      </button><br></br>
+      <a href='/'>BACK TO MAIN</a>
     </div>
   );
 }

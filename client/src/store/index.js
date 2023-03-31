@@ -34,11 +34,15 @@ function GlobalStoreContextProvider(props) {
   store.loadDemo = function () {
     async function asyncLoadDemo() {
       const response = await api.getDemo();
-      console.log(response);
       if (response) {
+        let newDemo = [];
+        if(response.data.data){
+          newDemo = response.data.data
+        }
+
         storeReducer({
           type: GlobalStoreActionType.DEMO,
-          payload: response.data.data,
+          payload: newDemo,
         });
       }
     }
