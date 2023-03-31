@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
 import AuthContext from "../auth";
@@ -16,7 +16,7 @@ const tps = new jsTPS();
 function GlobalStoreContextProvider(props) {
   const { auth } = useContext(AuthContext);
   const [store, setStore] = useState({
-    demo : "demo"
+    demo: [],
   });
   const history = useNavigate();
 
@@ -25,14 +25,39 @@ function GlobalStoreContextProvider(props) {
     switch (type) {
       case GlobalStoreActionType.DEMO: {
         return setStore({
-          demo: "demo"
+          demo: payload,
         });
       }
     }
   };
 
+  store.loadDemo = function () {
+    async function asyncLoadDemo() {
+      const response = await api.getDemo();
+      console.log(response);
+      if (response) {
+        storeReducer({
+          type: GlobalStoreActionType.DEMO,
+          payload: response.data.data,
+        });
+      }
+    }
+    asyncLoadDemo();
+  };
+
+  store.writeDemo = function (name) {
+    async function asyncWriteDemo() {
+      const response = await api.writeDemo(name);
+      console.log(response);
+      if (response) {
+        store.loadDemo();
+      }
+    }
+    asyncWriteDemo();
+  };
+
   return (
-    <GlobalStoreContext.Provider value={{store}}>
+    <GlobalStoreContext.Provider value={{ store }}>
       {props.children}
     </GlobalStoreContext.Provider>
   );
