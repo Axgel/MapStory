@@ -11,6 +11,7 @@ node_modules/
 # production
 /build
 config.json
+!/client/src/config.json
 
 # misc
 .DS_Store
