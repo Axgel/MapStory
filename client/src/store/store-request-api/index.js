@@ -1,8 +1,9 @@
 import axios from "axios";
+import config from "../../config.json"
+
 axios.defaults.withCredentials = true;
 const api = axios.create({
-  baseURL: 'https://test.emailgravely.com/api',
-  // baseURL: 'http://localhost:4000/api', 
+  baseURL: config[config.ENVIRONMENT].store,
 });
 
 export const getDemo = () => api.get(`/demo/`);

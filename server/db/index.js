@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-dotenv.config();
+const config = require("../../config.json");
 
 mongoose
-  .connect(process.env.DB_CONNECT, {
+  .connect(config.DB_CONNECT, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: "MapStory",

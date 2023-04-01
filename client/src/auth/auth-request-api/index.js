@@ -11,9 +11,11 @@
 */
 
 import axios from "axios";;
+const config = require("../../config.json");
+
 axios.defaults.withCredentials = true;
 const api = axios.create({
-  baseURL: 'https://test.emailgravely.com/auth',
+  baseURL: config[config.ENVIRONMENT].auth,
 });
 
 // THESE ARE ALL THE REQUESTS WE`LL BE MAKING, ALL REQUESTS HAVE A
