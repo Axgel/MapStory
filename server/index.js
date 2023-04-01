@@ -44,7 +44,7 @@ httpServer.listen(80, () => {
 })
 
 httpsServer.listen(443, () => {
-    console.log('HTTPS Server running on port 443');
+    console.log('HTTPS Server running on port 443!');
 })
 // PUT THE SERVER IN LISTENING MODE
 // app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
