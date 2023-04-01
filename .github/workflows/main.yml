@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/master'
+
+    strategy:
+      matrix:
+        node-version: [19.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: npm ci
+      - run: node index.js
+
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete
+          path: ./*
+          remote_path: /home/ubuntu/MapStory/server
+          remote_host: test.emailgravely.com
+          remote_user: ubuntu
+          remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
