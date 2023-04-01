@@ -27,7 +27,7 @@ jobs:
         with:
           switches: -avzr --delete
           path: ./server/*
-          remote_path: /home/ubuntu/MapStory/server
+          remote_path: /home/ubuntu/MapStory/server/
           remote_host: test.emailgravely.com
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
