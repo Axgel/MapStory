@@ -1,5 +1,5 @@
 {
-  "ENVIRONMENT": "DEVELOPMENT",
+  "ENVIRONMENT": "PRODUCTION",
   "DEVELOPMENT":{
     "auth": "http://localhost:4000/auth",
     "store": "http://localhost:4000/api"
