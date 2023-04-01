@@ -1,6 +1,9 @@
 const Demo = require("../models/demo-model");
 
 getDemo = async (req, res) => {
+  return res.status(200).json({
+    message: "test"
+  })
   await Demo.find({}, (err, items) => {
     if (err) {
       return res.status(400).json({ success: false, error: err });
