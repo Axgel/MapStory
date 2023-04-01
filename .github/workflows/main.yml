@@ -22,9 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: npm ci
-      - run: node index.js
-
       - name: rsync deployments
         uses: burnett01/rsync-deployments@5.1
         with:
