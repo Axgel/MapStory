@@ -17,9 +17,9 @@ jobs:
         with:
           node-version: "16"
 
-      - name: Install Dependencies
+      - name: Install Dependencies for Server Tests
         run: npm install
-        working-directory: ./server
+        working-directory: ./tests/server_tests
         
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v1.3
@@ -31,4 +31,4 @@ jobs:
         
       - name: Run Tests
         run: npm test
-        working-directory: ./server
+        working-directory: ./tests/server_tests
