@@ -1,11 +1,9 @@
-const {app, server} = require("../../../server/index");
+const {app, close_all_connections} = require("../../../server/index");
 const request = require("supertest");
-const db = require("../../../server/db");
 
 // console.log(server)
 afterAll(() => {
-    db.close()
-    server.close()
+    close_all_connections();
 })
 
 describe ("GET /demo", () => {

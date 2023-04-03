@@ -57,4 +57,9 @@ switch (process.env.ENVIRONMENT) {
     break;
 }
 
-module.exports = {app, server};
+function close_all_connections(){
+  db.close();
+  server.close();
+}
+
+module.exports = {app, close_all_connections};
