@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
-const config = require("../../config.json");
 
 mongoose
-  .connect(config.DB_CONNECT, {
+  .connect(process.env.DB_CONNECT, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     dbName: "MapStory",

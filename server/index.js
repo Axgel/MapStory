@@ -2,21 +2,25 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const db = require("./db");
 const http = require("http");
 const https = require("https");
 const fs = require("fs");
-const config = require("../config.json");
+
+const dotenv = require("dotenv");
+dotenv.config();
+const db = require("./db");
 
 // CREATE OUR SERVER
 const PORT = 4000;
 const app = express();
+const cors_url = (process.env.ENVIRONMENT == "DEVELOPMENT") ? process.env.DEV_CORS : process.env.PROD_CORS;
+let server;
 
 // SETUP THE MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: config[config.ENVIRONMENT].cors,
+    origin: cors_url,
     credentials: true,
   })
 );
@@ -33,7 +37,7 @@ app.use("/api", demoRouter);
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 
-switch (config.ENVIRONMENT) {
+switch (process.env.ENVIRONMENT) {
   case "PRODUCTION":
     const httpServer = http.createServer(app);
     const httpsServer = https.createServer(
@@ -49,6 +53,8 @@ switch (config.ENVIRONMENT) {
     );
     break;
   default:
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     break;
 }
+
+module.exports = {app, server};

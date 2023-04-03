@@ -1,0 +1,14 @@
+{
+  "name": "server_tests",
+  "version": "1.0.0",
+  "dependencies": {
+    "dotenv": "^10.0.0"
+  },
+  "scripts": {
+    "test": "jest --detectOpenHandles"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
+  }
+}

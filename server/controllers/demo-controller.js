@@ -12,25 +12,29 @@ getDemo = async (req, res) => {
   }).catch((err) => console.log(err));
 };
 
-writeDemo = (req, res) => {
-  const body = req.body;
-  console.log(body);
+writeDemo = async (req, res) => {
+  if(!req.body || !req.body.name) {
+    return res.sendStatus(400);
+  } else {
+    const demoItem = new Demo(req.body);
 
-  const demoItem = new Demo(body);
-
-  demoItem
-    .save()
-    .then(() => {
-      console.log("New item added to database successfully!");
-    })
-    .catch((error) => {
-      console.error("Error adding new item to database:", error);
-    });
-
-  return res.status(200).json({
-    success: true,
-  });
+    demoItem
+      .save()
+      .then(() => {
+        console.log("New item added to database successfully!");
+        return res.status(200).json({
+          success: true,
+        });
+      })
+      .catch((error) => {
+        console.error("Error adding new item to database:", error);
+        return res.status(404).json({
+          success: false,
+        });
+      });
+  }
 };
+
 module.exports = {
   getDemo,
   writeDemo,
