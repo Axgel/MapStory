@@ -22,6 +22,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_DEBUG: false
+          envkey_ENVIRONMENT: PRODUCTION
+          envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
+          envkey_DEV_CORS: http://localhost:3000
+          envkey_PROD_CORS: ${{ secrets.PROD_CORS }}
+          envkey_JWT_SCRET: ${{ secrets.JWT_SECRET }}
+          file_name: ./server/.env
+          fail_on_empty: true
+
       - name: rsync deployments
         uses: burnett01/rsync-deployments@5.1
         with:
@@ -31,3 +43,4 @@ jobs:
           remote_host: test.emailgravely.com
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
+      
