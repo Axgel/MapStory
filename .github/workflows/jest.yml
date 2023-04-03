@@ -17,9 +17,21 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Install Dependencies for Server
+        run: npm install
+        working-directory: ./server
+
       - name: Install Dependencies for Server Tests
         run: npm install
         working-directory: ./tests/server_tests
+
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_DEBUG: false
+          envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
+          file_name: ./server/.env
+          fail_on_empty: true
         
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v1.3
