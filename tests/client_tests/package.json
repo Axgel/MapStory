@@ -1,0 +1,8 @@
+{
+  "name": "client_tests",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "cypress": "^10.7.0"
+  }
+}
