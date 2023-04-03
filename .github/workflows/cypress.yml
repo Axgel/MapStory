@@ -13,7 +13,6 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v5.6.1 # use the explicit version number
         with:
-          project: ./client
-          working-directory: ./tests/client_tests
+          working-directory: ./client
           build: npm run build
           start: npm start
