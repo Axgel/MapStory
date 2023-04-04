@@ -1,9 +1,8 @@
 import axios from "axios";
-import config from "../../config.json"
 
 axios.defaults.withCredentials = true;
 const api = axios.create({
-  baseURL: config[config.ENVIRONMENT].store,
+  baseURL: process.env.REACT_APP_STORE,
 });
 
 export const getDemo = () => api.get(`/demo/`);
