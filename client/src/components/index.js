@@ -1,9 +1,5 @@
-import SplashScreen from './SplashScreen'
-import RegisterScreen from './RegisterScreen'
-import HomeScreen from './HomeScreen'
+import MenuBar from './MenuBar'
 
 export {
-  SplashScreen,
-  RegisterScreen,
-  HomeScreen
+  MenuBar
 }

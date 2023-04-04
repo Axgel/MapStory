@@ -2,7 +2,7 @@ import "./App.css";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { GlobalStoreContextProvider } from "./store";
-import { HomeScreen, RegisterScreen, SplashScreen } from "./components";
+import { HomeScreen, RegisterScreen, SplashScreen } from "./screens";
 import { AuthContextProvider } from "./auth";
 
 function App() {
