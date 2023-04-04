@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 // import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
@@ -17,6 +17,10 @@ function GlobalStoreContextProvider(props) {
   // const { auth } = useContext(AuthContext);
   const [store, setStore] = useState({
     demo: [],
+  });
+
+  useEffect(() => {
+    store.loadDemo();
   });
   // const history = useNavigate();
 
