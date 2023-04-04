@@ -1,11 +1,8 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { GlobalStoreContext } from "../store";
 
 export default function HomeScreen() {
   const { store } = useContext(GlobalStoreContext);
-  useEffect(() => {
-    store.loadDemo();
-  }, [store]);
 
   const handleClick = () => {
     const name = document.getElementById("name").value;
