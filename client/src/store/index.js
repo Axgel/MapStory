@@ -21,7 +21,7 @@ function GlobalStoreContextProvider(props) {
 
   useEffect(() => {
     store.loadDemo();
-  });
+  }, []);
   // const history = useNavigate();
 
   const storeReducer = (action) => {

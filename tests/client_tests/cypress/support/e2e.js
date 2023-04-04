@@ -18,3 +18,12 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+  if (err.message.includes('Warning:')) {
+    // Ignore React warnings
+    return false
+  }
+  // Let Cypress handle other errors
+  return true
+})
