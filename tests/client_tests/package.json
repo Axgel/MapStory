@@ -2,6 +2,9 @@
   "name": "client_tests",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start-client": "cd ../../client && npm ci && npm start"
+  },
   "devDependencies": {
     "cypress": "^10.7.0"
   }
