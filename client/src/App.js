@@ -2,7 +2,19 @@ import "./App.css";
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { GlobalStoreContextProvider } from "./store";
-import { HomeScreen, RegisterScreen, SplashScreen } from "./screens";
+import { 
+  SplashScreen,
+  RecoverPasswordScreen,
+  RegisterScreen,
+  ProfileScreen,
+  HomeScreen,
+  MapScreen
+ } from "./screens";
+
+import {
+  HomeWrapper
+} from './wrappers'
+
 import { AuthContextProvider } from "./auth";
 
 function App() {
@@ -11,9 +23,11 @@ function App() {
       <AuthContextProvider>
         <GlobalStoreContextProvider>
           <Routes>
-            <Route path="/" element={<SplashScreen />} />
+            <Route path="/" element={<HomeWrapper />} />
             <Route path="/register" element={<RegisterScreen />} />
-            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/recover" element={<RecoverPasswordScreen />} />
+            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/map" element={<MapScreen />} />
           </Routes>
         </GlobalStoreContextProvider>
       </AuthContextProvider>

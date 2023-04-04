@@ -11,6 +11,10 @@ export default function HomeScreen() {
     store.writeDemo(name);
   };
 
+  const handleLogOut = () => {
+    store.logOut();
+  };
+
   return (
     <div>
       <h1>HOME SCREEN HERE</h1>
@@ -23,7 +27,9 @@ export default function HomeScreen() {
       <button type="button" onClick={handleClick}>
         Add Name!
       </button><br></br>
-      <a href='/'>BACK TO MAIN</a>
+      <button type="button" onClick={handleLogOut}>
+        LogOut!
+      </button><br></br>
     </div>
   );
 }
