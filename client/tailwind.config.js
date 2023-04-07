@@ -10,7 +10,10 @@ module.exports = {
           100: '#E3DACE', // 100,200,500 used for bg gradient
           200: '#E1CDB1',
           500: '#AE887B',
-          600: '#6B4E36', // button color 
+          600: '#6B4E36', // button color
+          700: '#E8D5BD', //modal bg color
+          800: '#E1CDB1', //modal button fill 
+          850: '#D4B896', //modal button border
           900: '#8D6F65' //Header color
         },
         'periwinkle': '#CCCCFF', //Team color
