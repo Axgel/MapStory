@@ -1,10 +1,12 @@
 import React from "react";
+import Header from '../components/Header';
+import NavBar from "../components/NavBar";
 
 export default function MapScreen() {
   return (
     <div>
-      <h1>Map Screen</h1>
-      <a href="/">BACK TO MAIN</a>
+      <Header />
+      <NavBar />
     </div>
   );
 }
