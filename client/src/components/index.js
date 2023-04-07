@@ -1,7 +1,13 @@
-import MenuBar from './MenuBar'
-import SplashScreenButtons from './SplashScreenButtons'
+import MenuBar from './MenuBar';
+import SplashScreenButtons from './SplashScreenButtons';
+import Header from './Header';
+import NavBar from './NavBar';
+import Map from './Map';
 
 export {
   MenuBar,
-  SplashScreenButtons
+  SplashScreenButtons, 
+  Header, 
+  NavBar, 
+  Map
 }

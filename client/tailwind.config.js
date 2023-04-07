@@ -10,8 +10,10 @@ module.exports = {
           100: '#E3DACE',
           200: '#E1CDB1',
           500: '#AE887B',
-          600: '#6B4E36'
+          600: '#6B4E36', 
+          900: '#8D6F65' //Header color
         },
+        'periwinkle': '#CCCCFF', //Team color
         'lightransparent': '#ffffff'
       },
       container: {
