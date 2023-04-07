@@ -18,6 +18,7 @@ module.exports = {
         },
         'periwinkle': '#CCCCFF', //Team color
         'modalborder': '#3e3c3c',
+        'publishmodalsubtext': '#565656',
         'modalbgfill': '#E8D5BD'
       },
       container: {
