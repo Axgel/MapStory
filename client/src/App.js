@@ -8,7 +8,8 @@ import {
   RegisterScreen,
   ProfileScreen,
   HomeScreen,
-  MapScreen
+  MapScreen,
+  AllScreen
  } from "./screens";
 
 import {
@@ -23,11 +24,13 @@ function App() {
       <AuthContextProvider>
         <GlobalStoreContextProvider>
           <Routes>
-            <Route path="/" element={<HomeWrapper />} />
+            <Route path="/" element={<SplashScreen />} />
+            <Route path="/home" element={<HomeScreen />} />
             <Route path="/register" element={<RegisterScreen />} />
             <Route path="/recover" element={<RecoverPasswordScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
             <Route path="/map" element={<MapScreen />} />
+            <Route path="/all" element={<AllScreen />} />
           </Routes>
         </GlobalStoreContextProvider>
       </AuthContextProvider>

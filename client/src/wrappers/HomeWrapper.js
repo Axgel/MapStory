@@ -7,7 +7,7 @@ import {
 
 export default function HomeWrapper() {
   const { store } = useContext(GlobalStoreContext);
-
+  
   if (store.loggedIn)
     return <HomeScreen />
   else

@@ -1,26 +1,22 @@
 import React, { useContext } from "react";
 import { GlobalStoreContext } from "../store";
-import { MenuBar } from "../components";
+import { LogInForm } from "../forms";
+import BGImage from "../assets/BGImage.png"
+import { SplashScreenButtons } from "../components";
 
 export default function SplashScreen() {
   const { store } = useContext(GlobalStoreContext);
 
-  const handleClick = () => {
-    store.logIn();
-  };
-
   return (
-    <div>
-      <MenuBar />
-      <h1>SPLASH SCREEN HERE</h1>
-      <a href="/register">TO REGISTER SCREEN</a><br></br>
-      <a href="/recover">TO RECOVER PASSWORD SCREEN</a><br></br>
-      <a href="/profile">TO PROFILE SCREEN</a><br></br>
-      <a href="/map">TO MAP SCREEN</a><br></br>
-
-      <button type="button" onClick={handleClick}>
-        LogIn!
-      </button>
+    <div className="">
+      <div className="flex flex-col items-center gap-y-10">
+        <h1 className="text-white text-6xl my-20">
+          MapStory
+        </h1>
+        <img src={BGImage} alt=""/>
+        <LogInForm />
+        <SplashScreenButtons />
+      </div>
     </div>
   );
 }
