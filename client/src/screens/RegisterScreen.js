@@ -1,10 +1,12 @@
 import React from "react";
+import { Header } from "../components";
+import { CreateAccountForm } from "../forms";
 
 export default function RegisterScreen() {
   return (
     <div>
-      <h1>REGISTER SCREEN HERE</h1>
-      <a href="/">BACK TO MAIN</a>
+      <Header />
+      <CreateAccountForm />
     </div>
   );
 }
