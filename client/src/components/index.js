@@ -6,6 +6,7 @@ import Map from './Map';
 import ViewModeButtons from './ViewModeButtons';
 import SortBy from './SortBy';
 import SearchBy from './SearchBy';
+import MapCard from './MapCard';
 
 export {
   MenuBar,
@@ -15,5 +16,6 @@ export {
   Map,
   ViewModeButtons,
   SortBy,
-  SearchBy
+  SearchBy,
+  MapCard
 }

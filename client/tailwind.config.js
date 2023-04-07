@@ -18,7 +18,10 @@ module.exports = {
         },
         'periwinkle': '#CCCCFF', //Team color
         'modalborder': '#3e3c3c',
-        'modalbgfill': '#E8D5BD'
+        'modalbgfill': '#E8D5BD',
+        'publishfill': '#7ACD65', // publish button
+        'deletefill': '#CD6565',  // delete button
+        'forkfill': '#E2E471',  // fork button
       },
       container: {
         center: true,
