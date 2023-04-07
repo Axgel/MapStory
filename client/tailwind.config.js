@@ -22,6 +22,7 @@ module.exports = {
         'publishfill': '#7ACD65', // publish button
         'deletefill': '#CD6565',  // delete button
         'forkfill': '#E2E471',  // fork button
+        'publishmodalsubtext': '#565656',
       },
       container: {
         center: true,
