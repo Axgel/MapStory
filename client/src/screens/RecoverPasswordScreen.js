@@ -1,10 +1,12 @@
 import React from "react";
+import { Header } from "../components";
+import ResetPasswordForm from "../forms/ResetPasswordForm"
 
 export default function RecoverPasswordScreen() {
   return (
     <div>
-      <h1>Recover Password Screen</h1>
-      <a href="/">BACK TO MAIN</a>
+      <Header />
+      <ResetPasswordForm />
     </div>
   );
 }
