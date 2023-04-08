@@ -23,6 +23,7 @@ module.exports = {
         'deletefill': '#CD6565',  // delete button
         'forkfill': '#E2E471',  // fork button
         'publishmodalsubtext': '#565656',
+        'filebuttonfill': '#1973E8'
       },
       container: {
         center: true,

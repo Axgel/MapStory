@@ -10,6 +10,7 @@ import MapCard from './MapCard';
 import MapDetailCard from './MapDetailCard';
 import Comments from './Comments';
 import Properties from './Properties';
+import EditToolbar from './EditToolbar';
 
 export {
   MenuBar,
@@ -23,5 +24,6 @@ export {
   MapCard,
   MapDetailCard,
   Comments,
-  Properties
+  Properties,
+  EditToolbar
 }

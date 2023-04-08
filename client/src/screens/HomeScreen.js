@@ -1,35 +1,33 @@
-import React, { useContext } from "react";
-import { GlobalStoreContext } from "../store";
+import React from "react";
+import { MapCard, Header, NavBar, MapDetailCard } from "../components";
 
 export default function HomeScreen() {
-  const { store } = useContext(GlobalStoreContext);
-
-  const handleClick = () => {
-    const name = document.getElementById("name").value;
-    if (name.trim().length < 2) return;
-    // console.log(document.getElementById('name').value)
-    store.writeDemo(name);
-  };
-
-  const handleLogOut = () => {
-    store.logOut();
-  };
-
   return (
     <div>
-      <h1>HOME SCREEN HERE</h1>
+      <Header />
+      <NavBar />
+      {/* <div className="flex flex-row-reverse px-10 mt-8 min-w-[900px]">
+        
+      </div> */}
 
-      {store.demo.map((item, key) => (
-        <p key={key}>{item.name}</p>
-      ))}
+      <div className="flex mt-8">
 
-      <input id="name" type="text" />
-      <button type="button" onClick={handleClick}>
-        Add Name!
-      </button><br></br>
-      <button type="button" onClick={handleLogOut}>
-        LogOut!
-      </button><br></br>
+        <div className="px-10 flex flex-col gap-5 min-w-max flex-grow pb-5">
+          <div className="flex justify-between">
+            <p className="text-3xl font-bold">Maps</p>
+            <p className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto">
+              + Create Map
+            </p>
+          </div>
+          <MapCard />
+          <MapCard />
+          <MapCard />
+
+        </div>
+        <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
+          <MapDetailCard />
+        </div>
+      </div>
     </div>
   );
 }
