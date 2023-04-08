@@ -1,22 +1,22 @@
 import { createContext, useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import jsTPS from "../common/jsTPS";
+import { useNavigate } from "react-router-dom";
+import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
-// import AuthContext from "../auth";
+import AuthContext from "../auth";
+import { GlobalStoreActionType } from "../enums";
+
 
 export const GlobalStoreContext = createContext({});
 console.log("create GlobalStoreContext");
 
-export const GlobalStoreActionType = {
-  DEMO: "DEMO",
-};
 
-// const tps = new jsTPS();
+const tps = new jsTPS();
 
 function GlobalStoreContextProvider(props) {
   // const { auth } = useContext(AuthContext);
   const [store, setStore] = useState({
     demo: [],
+    loggedIn: false
   });
 
   useEffect(() => {
@@ -29,7 +29,20 @@ function GlobalStoreContextProvider(props) {
     switch (type) {
       case GlobalStoreActionType.DEMO: {
         return setStore({
+          ...store,
           demo: payload,
+        });
+      }
+      case GlobalStoreActionType.LOGIN: {
+        return setStore({
+          ...store,
+          loggedIn: true
+        });
+      }
+      case GlobalStoreActionType.LOGOUT: {
+        return setStore({
+          ...store,
+          loggedIn: false
         });
       }
       default:
@@ -65,6 +78,21 @@ function GlobalStoreContextProvider(props) {
     }
     asyncWriteDemo();
   };
+
+
+  store.logIn = function(){
+    storeReducer({
+      type: GlobalStoreActionType.LOGIN,
+      payload: null
+    });
+  }
+
+  store.logOut = function(){
+    storeReducer({
+      type: GlobalStoreActionType.LOGOUT,
+      payload: null
+    });
+  }
 
   return (
     <GlobalStoreContext.Provider value={{ store }}>
