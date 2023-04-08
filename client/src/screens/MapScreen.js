@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, EditToolbar, Map } from "../components";
+import { Header, EditToolbar, Map, MapProperties, MapDetailCard } from "../components";
 
 export default function MapScreen() {
   return (
@@ -7,6 +7,10 @@ export default function MapScreen() {
       <Header />
       <EditToolbar />
       <Map />
+      <MapDetailCard />
+      <br></br><br></br>
+      <MapProperties />
+      <br></br><b></b>
     </div>
   );
 }

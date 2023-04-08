@@ -11,6 +11,7 @@ import MapDetailCard from './MapDetailCard';
 import Comments from './Comments';
 import Properties from './Properties';
 import EditToolbar from './EditToolbar';
+import MapProperties from './MapProperties';
 
 export {
   MenuBar,
@@ -25,5 +26,6 @@ export {
   MapDetailCard,
   Comments,
   Properties,
-  EditToolbar
+  EditToolbar,
+  MapProperties
 }
