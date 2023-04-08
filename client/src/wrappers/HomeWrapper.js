@@ -8,8 +8,8 @@ import {
 export default function HomeWrapper() {
   const { store } = useContext(GlobalStoreContext);
   
-  if (store.loggedIn)
-    return <HomeScreen />
-  else
-    return <SplashScreen />
+  return <HomeScreen />
+  // if (store.loggedIn)
+  // else
+  //   return <SplashScreen />
 }

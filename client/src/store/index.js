@@ -1,19 +1,16 @@
 import { createContext, useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import jsTPS from "../common/jsTPS";
+import { useNavigate } from "react-router-dom";
+import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
-// import AuthContext from "../auth";
+import AuthContext from "../auth";
+import { GlobalStoreActionType } from "../enums";
+
 
 export const GlobalStoreContext = createContext({});
 console.log("create GlobalStoreContext");
 
-export const GlobalStoreActionType = {
-  DEMO: "DEMO",
-  LOGIN: "LOGIN",
-  LOGOUT: "LOGOUT"
-};
 
-// const tps = new jsTPS();
+const tps = new jsTPS();
 
 function GlobalStoreContextProvider(props) {
   // const { auth } = useContext(AuthContext);
