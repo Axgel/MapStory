@@ -7,6 +7,9 @@ import ViewModeButtons from './ViewModeButtons';
 import SortBy from './SortBy';
 import SearchBy from './SearchBy';
 import MapCard from './MapCard';
+import MapDetailCard from './MapDetailCard';
+import Comments from './Comments';
+import Properties from './Properties';
 
 export {
   MenuBar,
@@ -17,5 +20,8 @@ export {
   ViewModeButtons,
   SortBy,
   SearchBy,
-  MapCard
+  MapCard,
+  MapDetailCard,
+  Comments,
+  Properties
 }
