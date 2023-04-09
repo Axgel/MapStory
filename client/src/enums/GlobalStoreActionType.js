@@ -1,5 +1,5 @@
 export const GlobalStoreActionType = {
-  DEMO: "DEMO",
-  LOGIN: "LOGIN",
-  LOGOUT: "LOGOUT"
+  SET_VIEW_MODE: "SET_VIEW_MODE",
+  SET_SELECTED_MAP: "SET_SELECTED_MAP",
+  SET_DETAIL_VIEW: "SET_DETAIL_VIEW",
 };

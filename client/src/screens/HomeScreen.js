@@ -1,7 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
 import { MapCard, Header, NavBar, MapDetailCard } from "../components";
 
+import { GlobalStoreContext } from "../store";
+import AuthContext from "../auth";
+
 export default function HomeScreen() {
+  const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
+
+  let mapDetailCard = <div></div>;
+  if (store.selectedMap) {
+    let selectedMap;
+    for(let i=0; i<store.allMaps.length; i++){
+      if(store.allMaps[i].id == store.selectedMap){
+        selectedMap = store.allMaps[i];
+        break;
+      }
+    }
+
+    mapDetailCard = (
+      <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
+        <MapDetailCard mapDetails={selectedMap} />
+      </div>
+    );
+  }
+
   return (
     <div>
       <Header />
@@ -11,7 +34,6 @@ export default function HomeScreen() {
       </div> */}
 
       <div className="flex mt-8">
-
         <div className="px-10 flex flex-col gap-5 min-w-max flex-grow pb-5">
           <div className="flex justify-between">
             <p className="text-3xl font-bold">Maps</p>
@@ -19,14 +41,14 @@ export default function HomeScreen() {
               + Create Map
             </p>
           </div>
-          <MapCard />
-          <MapCard />
-          <MapCard />
 
+          {store.allMaps.map((map, index) => {
+            return <MapCard key={index} mapDetails={map} />;
+          })}
         </div>
-        <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
-          <MapDetailCard />
-        </div>
+        
+        {mapDetailCard}
+
       </div>
     </div>
   );
