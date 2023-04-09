@@ -1,10 +1,10 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
 import AuthContext from "../auth";
-import { GlobalStoreActionType } from "../enums";
-
+import { GlobalStoreActionType, ViewMode, DetailView, CurrentModal } from "../enums";
+import { tempData } from "../data/tempData";
 
 export const GlobalStoreContext = createContext({});
 console.log("create GlobalStoreContext");
@@ -13,86 +13,81 @@ console.log("create GlobalStoreContext");
 const tps = new jsTPS();
 
 function GlobalStoreContextProvider(props) {
-  // const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   const [store, setStore] = useState({
-    demo: [],
-    loggedIn: false
+    currentModal: CurrentModal.NONE,
+    viewMode: ViewMode.PERSONAL,
+    detailView: DetailView.NONE, 
+    allMaps: tempData,
+    selectedMap: null,
   });
 
-  useEffect(() => {
-    store.loadDemo();
-  }, []);
-  // const history = useNavigate();
+  const history = useNavigate();
 
   const storeReducer = (action) => {
     const { type, payload } = action;
     switch (type) {
-      case GlobalStoreActionType.DEMO: {
+      case GlobalStoreActionType.SET_VIEW_MODE: {
         return setStore({
           ...store,
-          demo: payload,
-        });
+          viewMode: payload.viewMode
+        })
       }
-      case GlobalStoreActionType.LOGIN: {
+      case GlobalStoreActionType.SET_SELECTED_MAP: {
         return setStore({
           ...store,
-          loggedIn: true
-        });
+          selectedMap: payload.selectedMap,
+          detailView: payload.detailView
+        })
       }
-      case GlobalStoreActionType.LOGOUT: {
+      case GlobalStoreActionType.SET_DETAIL_VIEW: {
         return setStore({
           ...store,
-          loggedIn: false
-        });
+          detailView: payload.detailView
+        })
+      }
+      case GlobalStoreActionType.SET_CURRENT_MODAL: {
+        return setStore({
+          ...store,
+          currentModal: payload.currentModal
+        })
       }
       default:
         return 0;
     }
   };
 
-  store.loadDemo = function () {
-    async function asyncLoadDemo() {
-      const response = await api.getDemo();
-      if (response) {
-        let newDemo = [];
-        if(response.data.data){
-          newDemo = response.data.data
-        }
 
-        storeReducer({
-          type: GlobalStoreActionType.DEMO,
-          payload: newDemo,
-        });
-      }
-    }
-    asyncLoadDemo();
-  };
-
-  store.writeDemo = function (name) {
-    async function asyncWriteDemo() {
-      const response = await api.writeDemo(name);
-      console.log(response);
-      if (response) {
-        store.loadDemo();
-      }
-    }
-    asyncWriteDemo();
-  };
-
-
-  store.logIn = function(){
+  // Sets the view mode to personal, shared, published
+  store.setViewMode = function (viewMode) {
     storeReducer({
-      type: GlobalStoreActionType.LOGIN,
-      payload: null
+      type: GlobalStoreActionType.SET_VIEW_MODE,
+      payload: {viewMode: viewMode},
     });
   }
 
-  store.logOut = function(){
+  store.setSelectedMap = function (mapId) {
+    const detailView = (mapId) ? DetailView.PROPERTIES : DetailView.NONE;
     storeReducer({
-      type: GlobalStoreActionType.LOGOUT,
-      payload: null
+      type: GlobalStoreActionType.SET_SELECTED_MAP,
+      payload: {selectedMap: mapId, detailView: detailView},
     });
   }
+
+  store.setDetailView = function (detailView) {
+    storeReducer({
+      type: GlobalStoreActionType.SET_DETAIL_VIEW,
+      payload: {detailView: detailView},
+    });
+  }
+
+  store.setCurrentModal = function (currentModal){
+    storeReducer({
+      type: GlobalStoreActionType.SET_CURRENT_MODAL,
+      payload: {currentModal: currentModal},
+    });
+  }
+
 
   return (
     <GlobalStoreContext.Provider value={{ store }}>

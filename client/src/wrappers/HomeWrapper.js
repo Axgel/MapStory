@@ -1,15 +1,17 @@
 import React, { useContext } from 'react';
-import { GlobalStoreContext } from "../store";
 import {
   HomeScreen,
   SplashScreen
 } from '../screens'
+import AuthContext from '../auth';
+
+
 
 export default function HomeWrapper() {
-  const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
   
   return <HomeScreen />
-  // if (store.loggedIn)
+  // if (auth.loggedIn)
   // else
-  //   return <SplashScreen />
+    // return <SplashScreen />
 }

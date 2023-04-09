@@ -12,6 +12,14 @@ import {
   AllScreen
  } from "./screens";
 
+ import {
+  PublishMapModal,
+  DeleteMapModal,
+  ShareMapModal,
+  ExportMapModal,
+  AccountFeedbackModal
+ } from "./modals"
+
 import {
   HomeWrapper
 } from './wrappers'
@@ -24,14 +32,19 @@ function App() {
       <AuthContextProvider>
         <GlobalStoreContextProvider>
           <Routes>
-            <Route path="/" element={<HomeWrapper />} />
-            {/* <Route path="/home" element={<HomeScreen />} /> */}
+            <Route path="/" element={<SplashScreen />} />
+            <Route path="/home" element={<HomeScreen />} />
             <Route path="/register" element={<RegisterScreen />} />
             <Route path="/recover" element={<RecoverPasswordScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
             <Route path="/map" element={<MapScreen />} />
             <Route path="/all" element={<AllScreen />} />
           </Routes>
+          <AccountFeedbackModal />
+          <PublishMapModal />
+          <DeleteMapModal />
+          <ShareMapModal />
+          <ExportMapModal />
         </GlobalStoreContextProvider>
       </AuthContextProvider>
     </BrowserRouter>
