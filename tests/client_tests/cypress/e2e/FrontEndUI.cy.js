@@ -73,6 +73,7 @@ describe('FrontEndUI', () => {
     cy.contains('Delete');
 
     //Sideview
+    cy.contains('Australia').click()
     cy.contains('Comments');
     cy.contains('Properties');
 
