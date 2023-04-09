@@ -69,6 +69,9 @@ export default function EditToolbar() {
 
       <div className="flex">
         <div className="w-[1px] bg-black h-full"></div>
+        <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.TAG)}>
+          Tags
+        </div>
         <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
           Share
         </div>
