@@ -15,6 +15,14 @@ describe('FrontEndUI', () => {
     cy.contains('Register');
     cy.contains('Continue as Guest');
     cy.contains('About');
+    //click register
+    cy.contains('Register').click();
+    cy.url().should('include', '/register')
+    //click login
+    cy.visit('/');
+    cy.contains('Log In').click();
+    cy.url().should('include', '/home')
+
   });
 
   //recover password screen
@@ -103,7 +111,7 @@ describe('FrontEndUI', () => {
     //Property Table
     cy.contains('New York');
     cy.contains('Population');
-    
+
   });
 
 
