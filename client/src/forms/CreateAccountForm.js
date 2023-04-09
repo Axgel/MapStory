@@ -31,7 +31,7 @@ export default function CreateAccountForm() {
           <div className="w-px h-[70px] bg-modalborder border-opacity-60"></div>
           <div>
             <label htmlFor="pwd"></label>
-            <input className="border-none bg-transparent outline-none h-12 w-[420px] text-xl" type="password" name="pwd" required></input>
+            <input className="border-none bg-transparent outline-none h-12 w-[420px] text-xl"id="pwd" type="password" name="pwd" required></input>
           </div>
         </div>
 
@@ -40,7 +40,7 @@ export default function CreateAccountForm() {
           <div className="w-px h-[70px] bg-modalborder border-opacity-60"></div>
           <div>
             <label htmlFor="pwd"></label>
-            <input className="border-none bg-transparent outline-none h-12 w-[330px] text-xl" type="password" name="pwd" required></input>
+            <input className="border-none bg-transparent outline-none h-12 w-[330px] text-xl" id="confirmPwd" type="password" name="pwd" required></input>
           </div>
         </div>
         
