@@ -12,6 +12,14 @@ import {
   AllScreen
  } from "./screens";
 
+ import {
+  PublishMapModal,
+  DeleteMapModal,
+  ShareMapModal,
+  ExportMapModal,
+  AccountFeedbackModal
+ } from "./modals"
+
 import {
   HomeWrapper
 } from './wrappers'
@@ -32,6 +40,11 @@ function App() {
             <Route path="/map" element={<MapScreen />} />
             <Route path="/all" element={<AllScreen />} />
           </Routes>
+          <AccountFeedbackModal />
+          <PublishMapModal />
+          <DeleteMapModal />
+          <ShareMapModal />
+          <ExportMapModal />
         </GlobalStoreContextProvider>
       </AuthContextProvider>
     </BrowserRouter>

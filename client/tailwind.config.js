@@ -25,7 +25,8 @@ module.exports = {
         'publishmodalsubtext': '#565656',
         'filebuttonfill': '#1973E8',
         'mapselectedfill': '#BCA17A',
-        'dropdownhover': "#DDD"
+        'dropdownhover': "#DDD",
+        'lightgrey': "#686868",
       },
       
       container: {

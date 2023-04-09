@@ -28,7 +28,6 @@ export default function HomeScreen() {
   }
 
   function handleCreateMap(e){
-    e.stopPropagation();
     navigate("/map");
   }
 

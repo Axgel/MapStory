@@ -1,6 +1,17 @@
-import React from "react";
+import React, {useContext} from "react";
+import { CurrentModal } from "../enums";
+import { GlobalStoreContext } from '../store'
+import AuthContext from "../auth";
 
 export default function CreateAccountForm() {
+  const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
+
+  function setCurrentModal(e, currentModal){
+    e.stopPropagation();
+    store.setCurrentModal(currentModal);
+  }
+
   return (
     <div className="border-none border-2 border-opacity-50	blur w-[600px] pl-8">
       <h1 className="text-white text-6xl my-16">
@@ -44,7 +55,7 @@ export default function CreateAccountForm() {
           </div>
         </div>
         
-        <input type="submit" className="h-16 w-[150px] bg-brownshade-500 mt-10" value="Create Account"></input>
+        <input className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" defaultValue="Create Account" onClick={(e) => setCurrentModal(e, CurrentModal.ACCOUNT_FEEDBACK)}></input>
       </form>
     </div>
   );

@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
+import { CurrentModal } from "../enums";
 
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
+
 
 export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
@@ -25,6 +27,11 @@ export default function MapCard(props) {
     else{
       store.setSelectedMap(mapDetails.id);
     }
+  }
+
+  function setCurrentModal(e, currentModal){
+    e.stopPropagation();
+    store.setCurrentModal(currentModal);
   }
 
   return (
@@ -51,16 +58,16 @@ export default function MapCard(props) {
       </div>
 
       {/* Section for publish, delete, fork buttons */}
-      <div className="flex px-8 gap-4 items-center">
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-publishfill">
+      <div className="flex px-8 gap-4 items-center cursor-pointer">
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-publishfill hover:bg-opacity-50" onClick={(e) => setCurrentModal(e, CurrentModal.PUBLISH_MAP)}>
           Publish
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-deletefill">
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-deletefill hover:bg-opacity-50" onClick={(e) => setCurrentModal(e, CurrentModal.DELETE_MAP)}>
           Delete
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill">
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50">
           Fork
         </div>
       </div>
