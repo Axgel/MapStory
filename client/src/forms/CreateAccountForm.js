@@ -55,7 +55,7 @@ export default function CreateAccountForm() {
           </div>
         </div>
         
-        <input className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" defaultValue="Create Account" onClick={(e) => setCurrentModal(e, CurrentModal.ACCOUNT_FEEDBACK)}></input>
+        <input className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" id="createAccBtn" defaultValue="Create Account" onClick={(e) => setCurrentModal(e, CurrentModal.ACCOUNT_FEEDBACK)}></input>
       </form>
     </div>
   );
