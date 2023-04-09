@@ -190,9 +190,47 @@ registerUser = async (req, res) => {
   }
 };
 
+//Sending password recovery email
+recoveryEmail = async(req, res) => {
+  //Todo: Sending email via nodemailer and need to install postmail on backend server
+  return res.status(200).json({
+    success: true
+  })
+}
+
+//Resetting password + Use for both recovering password 
+recoverPassword = async(req, res) => {
+  // Todo: Finding the account information via token on the URL then reset the password
+  // If the token expired then they would have to request another password reset
+  // Extract the password expiration time and check it with the current time to see if it already expired
+  return res.status(200).json({
+    success: true
+  })
+}
+
+//Changing username on profile screen
+changeUsername = async (req, res) => {
+  //Todo: Implement the username change via email passing
+  return res.status(200).json({
+    success: true
+  })
+}
+
+//Changing password on profile screen
+changePassword = async (req, res) => {
+  //Todo: Implement password change via email passing 
+  return res.status(200).json({
+    success: true
+  })
+}
+
 module.exports = {
   getLoggedIn,
   registerUser,
   loginUser,
   logoutUser,
+  recoveryEmail,
+  recoverPassword,
+  changeUsername,
+  changePassword,
 };
