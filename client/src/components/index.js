@@ -12,6 +12,7 @@ import Comments from './Comments';
 import Properties from './Properties';
 import EditToolbar from './EditToolbar';
 import MapProperties from './MapProperties';
+import CollaboratorCard from './CollaboratorCard';
 
 export {
   MenuBar,
@@ -27,5 +28,6 @@ export {
   Comments,
   Properties,
   EditToolbar,
-  MapProperties
+  MapProperties,
+  CollaboratorCard
 }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
 import AuthContext from "../auth";
-import { GlobalStoreActionType, ViewMode, DetailView } from "../enums";
+import { GlobalStoreActionType, ViewMode, DetailView, CurrentModal } from "../enums";
 import { tempData } from "../data/tempData";
 
 export const GlobalStoreContext = createContext({});
@@ -15,6 +15,7 @@ const tps = new jsTPS();
 function GlobalStoreContextProvider(props) {
   const { auth } = useContext(AuthContext);
   const [store, setStore] = useState({
+    currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
     detailView: DetailView.NONE, 
     allMaps: tempData,
@@ -45,6 +46,12 @@ function GlobalStoreContextProvider(props) {
           detailView: payload.detailView
         })
       }
+      case GlobalStoreActionType.SET_CURRENT_MODAL: {
+        return setStore({
+          ...store,
+          currentModal: payload.currentModal
+        })
+      }
       default:
         return 0;
     }
@@ -71,6 +78,13 @@ function GlobalStoreContextProvider(props) {
     storeReducer({
       type: GlobalStoreActionType.SET_DETAIL_VIEW,
       payload: {detailView: detailView},
+    });
+  }
+
+  store.setCurrentModal = function (currentModal){
+    storeReducer({
+      type: GlobalStoreActionType.SET_CURRENT_MODAL,
+      payload: {currentModal: currentModal},
     });
   }
 
