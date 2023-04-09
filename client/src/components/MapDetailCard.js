@@ -26,11 +26,13 @@ export default function MapDetailCard(props) {
     detailTab = <Comments />;
   }
 
-  function setDetailView(detailView){
+  function setDetailView(e, detailView){
+    e.stopPropagation();
     store.setDetailView(detailView);
   }
 
-  function closeDetailView(){
+  function closeDetailView(e){
+    e.stopPropagation();
     store.setSelectedMap(null);
   }
 
@@ -45,9 +47,9 @@ export default function MapDetailCard(props) {
       <div className="h-[1px] bg-black"></div>
 
       <div className="flex">
-        <p className={propertyTabCSS} onClick={() => setDetailView(DetailView.PROPERTIES)}>Properties</p>
+        <p className={propertyTabCSS} onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
         <div className="w-[1px] bg-black"></div>
-        <p className={commentTabCSS} onClick={() => setDetailView(DetailView.COMMENTS)}>Comments</p>
+        <p className={commentTabCSS} onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
       </div>
 
       <div className="h-[1px] bg-black"></div>

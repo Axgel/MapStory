@@ -41,21 +41,22 @@ export default function ViewModeButtons() {
   }
 
 
-  function setViewMode(e){
-    store.setViewMode(e);
+  function setViewMode(e, viewMode){
+    e.stopPropagation();
+    store.setViewMode(viewMode);
   }
 
   return (
     <div className="flex gap-x-4">
-      <div className={personalIconClassName} onClick={() => setViewMode(ViewMode.PERSONAL)}>
+      <div className={personalIconClassName} onClick={(e) => setViewMode(e, ViewMode.PERSONAL)}>
         <img className="p-1.5" src={PersonalIcon} alt=""></img>
       </div>
 
-      <div className={sharedIconClassName} onClick={() => setViewMode(ViewMode.SHARED)}>
+      <div className={sharedIconClassName} onClick={(e) => setViewMode(e, ViewMode.SHARED)}>
         <img className="p-1.5" src={SharedIcon} alt=""></img>
       </div>
       
-      <div className={publishedIconClassName} onClick={() => setViewMode(ViewMode.PUBLISHED)}>
+      <div className={publishedIconClassName} onClick={(e) => setViewMode(e, ViewMode.PUBLISHED)}>
         <img className="p-1.5" src={PublishedIcon} alt=""></img>
       </div>
     </div>

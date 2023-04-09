@@ -7,12 +7,21 @@ import SplitSubregionIcon from "../assets/SplitSubregionIcon.png"
 import MergeSubregionIcon from "../assets/MergeSubregionIcon.png"
 import AddSubregionIcon from "../assets/AddSubregionIcon.png"
 import RemoveSubregionIcon from "../assets/RemoveSubregionIcon.png"
+import closeIcon from "../assets/closeIcon.png"
+import { useNavigate } from "react-router-dom";
+
+export default function EditToolbar(e) {
+  e.stopPropagation();
+  const navigate = useNavigate();
+  function handleExitMap(){
+    navigate("/home");
+  }
 
 
-export default function EditToolbar() {
   return (
     <div className="flex border-solid border bg-modalbgfill justify-between">
       <div className="flex">
+        <img className="w-[40px] h-[40px] pt-2" src={closeIcon} alt="" onClick={handleExitMap}></img>
         <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center">
           File
         </div>

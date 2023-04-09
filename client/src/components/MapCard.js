@@ -17,7 +17,8 @@ export default function MapCard(props) {
     mapCardWrapper += "bg-brownshade-700"
   }
 
-  function setSelectedMap(){
+  function setSelectedMap(e){
+    e.stopPropagation();
     if(store.selectedMap == mapDetails.id){
       store.setSelectedMap(null);
     }

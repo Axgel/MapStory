@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { MapCard, Header, NavBar, MapDetailCard } from "../components";
+import { useNavigate } from "react-router-dom";
 
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
@@ -7,6 +8,7 @@ import AuthContext from "../auth";
 export default function HomeScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   let mapDetailCard = <div></div>;
   if (store.selectedMap) {
@@ -25,6 +27,11 @@ export default function HomeScreen() {
     );
   }
 
+  function handleCreateMap(e){
+    e.stopPropagation();
+    navigate("/map");
+  }
+
   return (
     <div>
       <Header />
@@ -37,7 +44,7 @@ export default function HomeScreen() {
         <div className="px-10 flex flex-col gap-5 min-w-max flex-grow pb-5">
           <div className="flex justify-between">
             <p className="text-3xl font-bold">Maps</p>
-            <p className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto">
+            <p className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto" onClick={handleCreateMap}>
               + Create Map
             </p>
           </div>

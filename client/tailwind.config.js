@@ -24,7 +24,8 @@ module.exports = {
         'forkfill': '#E2E471',  // fork button
         'publishmodalsubtext': '#565656',
         'filebuttonfill': '#1973E8',
-        'mapselectedfill': '#BCA17A'
+        'mapselectedfill': '#BCA17A',
+        'dropdownhover': "#DDD"
       },
       
       container: {
