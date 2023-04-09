@@ -17,7 +17,7 @@ export const AuthActionType = {
 function AuthContextProvider(props) {
   const [auth, setAuth] = useState({
     user: null,
-    loggedIn: false,
+    loggedIn: true,
     error: "",
     isGuest: false,
   });
