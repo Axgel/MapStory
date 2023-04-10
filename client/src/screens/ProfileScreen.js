@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Header } from "../components";
 import EditIcon from "../assets/EditIcon.png";
+import { GlobalStoreContext } from "../store";
+import AuthContext from "../auth";
+import { CurrentModal } from "../enums";
 
 export default function ProfileScreen() {
+  const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);  
+
+  function setCurrentModal(e, currentModal){
+    e.stopPropagation();
+    store.setCurrentModal(currentModal);
+  }
+
   return (
     <div>
       <Header />
@@ -24,7 +35,7 @@ export default function ProfileScreen() {
             <label htmlFor="username"></label>
             <input className="border-none bg-transparent outline-none h-12 w-[370px] text-xl" type="text" name="username" defaultValue="jSmith123"></input>
           </div>
-          <img className="" src={EditIcon} alt=""></img>
+          <img onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_USERNAME)} className="" src={EditIcon} alt=""></img>
         </div>
 
         <div className="flex gap-4 items-center border-solid border-modalborder border-opacity-60 bg-modalbgfill px-3.5 ">
@@ -34,7 +45,7 @@ export default function ProfileScreen() {
             <label htmlFor="pwd"></label>
             <input className="border-none bg-transparent outline-none h-12 w-[370px] text-xl" type="password" defaultValue="jSmith123" name="pwd"></input>
           </div>
-          <img className="" src={EditIcon} alt=""></img>
+          <img onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_PASSWORD)} className="" src={EditIcon} alt=""></img>
         </div>
 
     </div>

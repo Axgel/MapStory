@@ -11,6 +11,10 @@ export default function Header() {
     navigate("/")
   }
 
+  function handleHomeScreen(){
+    navigate("/home")
+  }
+
   function toggleMenuOpen(e){
     e.stopPropagation();
     document.getElementById("profile-dd").classList.toggle("hidden");
@@ -31,9 +35,9 @@ export default function Header() {
       <div className="w-[50px] h-[50px] mx-12 rounded-full bg-white flex flex-row-reverse">
         <img onClick={toggleMenuOpen} className="w-12 h-12" src={ProfileIcon} alt=""></img>
         <div id="profile-dd" className="absolute w-[150px] mt-[55px] rounded-lg bg-white hidden">
-          <p onClick={handleProfileScreen} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">Profile</p>
-          {/* <p onClick={toggleMenuOpen} className="text-center py-3 hover:bg-dropdownhover">Item 2</p> */}
-          <p onClick={handleSplashScreen} className="text-center py-3 hover:bg-dropdownhover rounded-bl-lg rounded-br-lg">Logout</p>
+          <p onClick={handleProfileScreen} className="text-left px-3 py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">Profile</p>
+          <p onClick={handleHomeScreen} className="text-left px-3 py-3 hover:bg-dropdownhover">Home</p>
+          <p onClick={handleSplashScreen} className="text-left px-3 py-3 hover:bg-dropdownhover rounded-bl-lg rounded-br-lg">Logout</p>
         </div>
       </div>
     </div>
