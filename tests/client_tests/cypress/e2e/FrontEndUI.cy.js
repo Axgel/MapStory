@@ -15,6 +15,14 @@ describe('FrontEndUI', () => {
     cy.contains('Register');
     cy.contains('Continue as Guest');
     cy.contains('About');
+    //click register
+    cy.contains('Register').click();
+    cy.url().should('include', '/register')
+    //click login
+    cy.visit('/');
+    cy.contains('Log In').click();
+    cy.url().should('include', '/home')
+
   });
 
   //recover password screen
@@ -41,11 +49,13 @@ describe('FrontEndUI', () => {
     cy.get('#pwd').type("Jsmith123") 
     cy.get('#confirmPwd').type("Jsmith123")
     //click submit and have typed text disappear
-    cy.get('input[type=submit').click()
-    cy.get('input[name=email]').should('have.value', '')
-    cy.get('input[name=username]').should('have.value', '')
-    cy.get('#pwd').should('have.value', '')
-    cy.get('#confirmPwd').should('have.value', '')
+    cy.get('#createAccBtn').click()
+    cy.contains('ACCOUNT CREATION ERROR HERE')
+    cy.contains('OK').click()
+    cy.get('input[name=email]').should('have.value', 'jsmith@gmail.com')
+    cy.get('input[name=username]').should('have.value', 'jsmithy1234')
+    cy.get('#pwd').should('have.value', 'Jsmith123')
+    cy.get('#confirmPwd').should('have.value', 'Jsmith123')
   });
 
   //profile screen
@@ -53,6 +63,8 @@ describe('FrontEndUI', () => {
     cy.visit('/profile')
     cy.contains('MapStory'); //make sure team name appears
     cy.contains('Email');
+    cy.get('input[name=email]').type("hello")
+    cy.get('input[name=email]').should('have.value', 'john.smith@gmail.comhello')
     cy.contains('Username');
     cy.contains('Password');
   });
@@ -72,7 +84,8 @@ describe('FrontEndUI', () => {
     cy.contains('Fork');
     cy.contains('Delete');
 
-    //Sideview
+    //Sideview appears when map is clicked
+    cy.contains('Australia').click()
     cy.contains('Comments');
     cy.contains('Properties');
 
@@ -84,7 +97,13 @@ describe('FrontEndUI', () => {
     cy.contains('MapStory'); //make sure team name appears
     cy.contains('File');
     cy.contains('Share');
+    cy.contains('Share').click();
+    cy.contains('People with access:');
+    cy.contains('Cancel').click();
     cy.contains('Export');
+    cy.contains('Export').click();
+    cy.contains('File Type');
+    cy.contains('Cancel').click();
 
     cy.contains('Comments');
     cy.contains('Properties');
@@ -92,6 +111,7 @@ describe('FrontEndUI', () => {
     //Property Table
     cy.contains('New York');
     cy.contains('Population');
+
   });
 
 
