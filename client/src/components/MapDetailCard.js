@@ -36,26 +36,30 @@ export default function MapDetailCard(props) {
     store.setSelectedMap(null);
   }
 
+  if(store.detailView != DetailView.NONE){
+    return (
+      <div className="w-[300px] h-[550px] border-solid border flex flex-col bg-brownshade-700">
+        <div className="h-12 flex items-center px-2 gap-10">
+          <img src={closeIcon} alt="" onClick={closeDetailView}></img>
+          <p className="text-2xl font-bold">{mapDetails.title}</p>
+        </div>
 
+        <div className="h-[1px] bg-black"></div>
+
+        <div className="flex">
+          <p className={propertyTabCSS} onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
+          <div className="w-[1px] bg-black"></div>
+          <p className={commentTabCSS} onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
+        </div>
+
+        <div className="h-[1px] bg-black"></div>
+
+        {detailTab}
+
+      </div>
+    );
+  }
   return (
-    <div className="w-[300px] h-[550px] border-solid border flex flex-col bg-brownshade-700">
-      <div className="h-12 flex items-center px-2 gap-10">
-        <img src={closeIcon} alt="" onClick={closeDetailView}></img>
-        <p className="text-2xl font-bold">{mapDetails.title}</p>
-      </div>
-
-      <div className="h-[1px] bg-black"></div>
-
-      <div className="flex">
-        <p className={propertyTabCSS} onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
-        <div className="w-[1px] bg-black"></div>
-        <p className={commentTabCSS} onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
-      </div>
-
-      <div className="h-[1px] bg-black"></div>
-
-      {detailTab}
-
-    </div>
-  );
+    <></>
+  )
 }

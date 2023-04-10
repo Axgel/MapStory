@@ -3,11 +3,17 @@ import DeleteMapModal from "./DeleteMapModal";
 import PublishMapModal from "./PublishMapModal";
 import ShareMapModal from "./ShareMapModal";
 import ExportMapModal from "./ExportMapModal";
+import AddTagModal from "./AddTagModal";
+import ChangeUsernameModal from "./ChangeUsernameModal";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 export {
   AccountFeedbackModal, 
   DeleteMapModal,
   PublishMapModal,
   ShareMapModal,
-  ExportMapModal
+  ExportMapModal,
+  AddTagModal,
+  ChangeUsernameModal,
+  ChangePasswordModal
 }

@@ -13,6 +13,8 @@ import Properties from './Properties';
 import EditToolbar from './EditToolbar';
 import MapProperties from './MapProperties';
 import CollaboratorCard from './CollaboratorCard';
+import TagCard from './TagCard';
+import FileButton from './FileButton';
 
 export {
   MenuBar,
@@ -29,5 +31,7 @@ export {
   Properties,
   EditToolbar,
   MapProperties,
-  CollaboratorCard
+  CollaboratorCard,
+  TagCard,
+  FileButton
 }

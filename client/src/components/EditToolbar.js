@@ -10,6 +10,7 @@ import RemoveSubregionIcon from "../assets/RemoveSubregionIcon.png"
 import closeIcon from "../assets/closeIcon.png"
 import { useNavigate } from "react-router-dom";
 import { CurrentModal } from "../enums";
+import FileButton from "./FileButton";
 
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
@@ -32,9 +33,8 @@ export default function EditToolbar() {
     <div className="flex border-solid border bg-modalbgfill justify-between">
       <div className="flex">
         <img className="w-[30px] h-[30px] pt-3.5 px-1" src={closeIcon} alt="" onClick={handleExitMap}></img>
-        <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center">
-          File
-        </div>
+        <FileButton />
+
 
         <div className="w-[1px] bg-black"></div>
 
@@ -69,6 +69,9 @@ export default function EditToolbar() {
 
       <div className="flex">
         <div className="w-[1px] bg-black h-full"></div>
+        <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.TAG)}>
+          Tags
+        </div>
         <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
           Share
         </div>
