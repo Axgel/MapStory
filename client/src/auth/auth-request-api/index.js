@@ -49,11 +49,48 @@ export const registerUser = (
     passwordVerify: passwordVerify,
   });
 };
+
+export const recoveryEmail = (email) => {
+  return api.post(`/recoveryEmail`, {
+    email: email,
+  });
+};
+
+export const recoverPassword = (
+  password,
+  passwordVerify 
+) => {
+  return api.post(`/recoveryPassword`, {
+    password: password,
+    passwordVerify: passwordVerify,
+  });
+};
+
+export const changeUsername = (userName) => {
+  return api.post(`/profile/username/`, {
+    userName: userName,
+  });
+};
+
+export const changePassword = (
+  password,
+  passwordVerify 
+  ) => {
+  return api.post(`/profile/password/`, {
+    password: password,
+    passwordVerify: passwordVerify,
+  });
+};
+
 const apis = {
   getLoggedIn,
   registerUser,
   loginUser,
   logoutUser,
+  recoveryEmail,
+  recoverPassword,
+  changeUsername,
+  changePassword,
 };
 
 export default apis;
