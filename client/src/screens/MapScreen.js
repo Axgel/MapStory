@@ -11,11 +11,11 @@ export default function MapScreen() {
     <div>
       <Header />
       <EditToolbar />
-      {/* <Map /> */}
-      <div className="flex flex-row-reverse">
+      <Map />
+      <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
         <MapDetailCard mapDetails={store.allMaps[0]}/>
       </div>
-      <div id="map-detail-view" className="m-3">
+      <div id="map-detail-view" className="absolute bottom-0 m-3">
         <MapProperties />
       </div>
       <br></br><b></b>
