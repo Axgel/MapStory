@@ -26,7 +26,7 @@ module.exports = {
         'filebuttonfill': '#1973E8',
         'mapselectedfill': '#BCA17A',
         'dropdownhover': "#DDD",
-        'lightgrey': "#686868",
+        'lightgrey': "#686868", 
       },
       
       container: {

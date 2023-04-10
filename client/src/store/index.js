@@ -22,7 +22,7 @@ function GlobalStoreContextProvider(props) {
     selectedMap: null,
   });
 
-  const history = useNavigate();
+  const navigate = useNavigate();
 
   const storeReducer = (action) => {
     const { type, payload } = action;

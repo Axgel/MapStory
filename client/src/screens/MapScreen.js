@@ -6,7 +6,7 @@ import AuthContext from "../auth";
 
 export default function MapScreen() {
   const { store } = useContext(GlobalStoreContext);
-
+  
   return (
     <div>
       <Header />
@@ -15,7 +15,7 @@ export default function MapScreen() {
       <div className="flex flex-row-reverse">
         <MapDetailCard mapDetails={store.allMaps[0]}/>
       </div>
-      <div className="m-3">
+      <div id="map-detail-view" className="m-3">
         <MapProperties />
       </div>
       <br></br><b></b>

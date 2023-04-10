@@ -1,7 +1,14 @@
 import React from "react";
 import closeIcon from "../assets/closeIcon.png"
 
+import { GlobalStoreContext } from "../store";
+import AuthContext from "../auth";
+
+
+
 export default function MapProperties() {
+
+  
   return (
     <div className="h-48 w-80 border-solid border bg-modalbgfill">
       <p className="text-center py-1 text-lg font-semibold ">New York</p>
