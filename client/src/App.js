@@ -36,7 +36,6 @@ function App() {
         <GlobalStoreContextProvider>
           <Routes>
             <Route path="/" element={<HomeWrapper />} />
-            {/* <Route path="/home" element={<HomeScreen />} /> */}
             <Route path="/register" element={<RegisterScreen />} />
             <Route path="/recover" element={<RecoverPasswordScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
