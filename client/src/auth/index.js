@@ -1,9 +1,8 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./auth-request-api";
 
 const AuthContext = createContext();
-console.log("create AuthContext: " + AuthContext);
 
 // THESE ARE ALL THE TYPES OF UPDATES TO OUR AUTH STATE THAT CAN BE PROCESSED
 export const AuthActionType = {
@@ -11,21 +10,19 @@ export const AuthActionType = {
   LOGIN_USER: "LOGIN_USER",
   LOGOUT_USER: "LOGOUT_USER",
   REGISTER_USER: "REGISTER_USER",
-  GUEST_ACCESS: "GUEST_ACCESS",
 };
 
 function AuthContextProvider(props) {
   const [auth, setAuth] = useState({
     user: null,
-    loggedIn: true,
-    error: "",
-    isGuest: false,
+    loggedIn: false,
+    error: ""
   });
-  const history = useNavigate();
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   auth.getLoggedIn();
-  // }, []);
+  useEffect(() => {
+    auth.getLoggedIn();
+  }, []);
 
   const authReducer = (action) => {
     const { type, payload } = action;
@@ -35,39 +32,27 @@ function AuthContextProvider(props) {
           user: payload.user,
           loggedIn: payload.loggedIn,
           error: payload.error,
-          isGuest: auth.isGuest,
         });
       }
       case AuthActionType.LOGIN_USER: {
         return setAuth({
           user: payload.user,
           loggedIn: payload.loggedIn,
-          error: payload.error,
-          isGuest: auth.isGuest,
+          error: payload.error
         });
       }
       case AuthActionType.LOGOUT_USER: {
         return setAuth({
           user: null,
           loggedIn: false,
-          error: payload.error,
-          isGuest: false,
+          error: payload.error
         });
       }
       case AuthActionType.REGISTER_USER: {
         return setAuth({
           user: payload.user,
           loggedIn: payload.loggedIn,
-          error: payload.error,
-          isGuest: auth.isGuest,
-        });
-      }
-      case AuthActionType.GUEST_ACCESS: {
-        return setAuth({
-          user: auth.user,
-          loggedIn: auth.loggedIn,
-          error: auth.error,
-          isGuest: payload,
+          error: payload.error
         });
       }
       default:
@@ -76,153 +61,108 @@ function AuthContextProvider(props) {
   };
 
   auth.getLoggedIn = async function () {
+    let loggedIn = false;
+    let user = null;
+    let error = "";
+
     try {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
-        authReducer({
-          type: AuthActionType.GET_LOGGED_IN,
-          payload: {
-            loggedIn: response.data.loggedIn,
-            user: response.data.user,
-            error: "",
-          },
-        });
+        loggedIn = response.data.loggedIn;
+        user = response.data.user;
       }
     } catch (err) {
-      authReducer({
-        type: AuthActionType.GET_LOGGED_IN,
-        payload: {
-          loggedIn: false,
-          user: null,
-          error: auth.error,
-        },
-      });
+      error = err.response.data.errorMessage;
     }
+
+    authReducer({
+      type: AuthActionType.GET_LOGGED_IN,
+      payload: {
+        loggedIn: loggedIn,
+        user: user,
+        error: error
+      }
+    })
   };
 
-  auth.registerUser = async function (
-    userName,
-    firstName,
-    lastName,
-    email,
-    password,
-    passwordVerify
-  ) {
+  auth.registerUser = async function (userName, email, password, passwordVerify){
+    let loggedIn = false;
+    let user = null;
+    let error = "";
+    let response;
+
     try {
-      const response = await api.registerUser(
-        userName,
-        firstName,
-        lastName,
-        email,
-        password,
-        passwordVerify
-      );
-      if (response.status === 200) {
-        authReducer({
-          type: AuthActionType.REGISTER_USER,
-          payload: {
-            loggedIn: false,
-            user: null,
-            error: "",
-          },
-        });
-        history.push("/login");
-      }
+      response = await api.registerUser(userName, email, password, passwordVerify);
     } catch (err) {
-      authReducer({
-        type: AuthActionType.REGISTER_USER,
-        payload: {
-          loggedIn: false,
-          user: null,
-          error: err.response.data.errorMessage,
-        },
-      });
+      error = err.response.data.errorMessage;
     }
+    
+    authReducer({
+      type: AuthActionType.REGISTER_USER,
+      payload: {
+        loggedIn: loggedIn,
+        user: user,
+        error: error,
+      },
+    });
+
+    if (response && response.status === 200) {
+      navigate("/");
+    } 
   };
 
   auth.loginUser = async function (email, password) {
+    let loggedIn = false;
+    let user = null;
+    let error = "";
+
     try {
       const response = await api.loginUser(email, password);
       if (response.status === 200) {
-        authReducer({
-          type: AuthActionType.LOGIN_USER,
-          payload: {
-            loggedIn: true,
-            user: response.data.user,
-            error: "",
-          },
-        });
-        history.push("/");
+        loggedIn = true;
+        user = response.data.user;
       }
     } catch (err) {
-      authReducer({
-        type: AuthActionType.LOGIN_USER,
-        payload: {
-          loggedIn: false,
-          user: null,
-          error: err.response.data.errorMessage,
-        },
-      });
+      error = err.response.data.errorMessage;
+    }
+    
+    authReducer({
+      type: AuthActionType.LOGIN_USER,
+      payload: {
+        loggedIn: loggedIn,
+        user: null,
+        error: error
+      },
+    });
+    if (loggedIn){
+      navigate("/");
     }
   };
 
   auth.logoutUser = async function () {
+    let error = "";
+    let response;
     try {
-      const response = await api.logoutUser();
-      if (response.status === 200) {
-        authReducer({
-          type: AuthActionType.LOGOUT_USER,
-          payload: {
-            error: "",
-          },
-        });
-        history.push("/");
-      }
+      response = await api.logoutUser();
     } catch (err) {
-      // console.log(err.response.data.errorMessage)
-      authReducer({
-        type: AuthActionType.LOGOUT_USER,
-        payload: {
-          error: err.response.data.errorMessage,
-        },
-      });
+      error = err.response.data.errorMessage;
     }
-  };
 
-  auth.getUserInitials = function () {
-    let initials = "";
-    if (auth.user) {
-      initials += auth.user.firstName.charAt(0);
-      initials += auth.user.lastName.charAt(0);
-    }
-    //console.log("user initials: " + initials);
-    return initials;
-  };
-
-  auth.closeError = async function () {
     authReducer({
-      type: AuthActionType.GET_LOGGED_IN,
+      type: AuthActionType.LOGOUT_USER,
       payload: {
-        user: null,
-        loggedIn: false,
-        errorMessage: "",
+        error: error
       },
     });
+
+    if(response && response.status === 200){
+      navigate("/");
+    }
   };
 
-  auth.guestAccess = function () {
-    authReducer({
-      type: AuthActionType.GUEST_ACCESS,
-      payload: true,
-    });
-  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        auth,
-      }}
-    >
+    <AuthContext.Provider value={{auth}}>
       {props.children}
     </AuthContext.Provider>
   );

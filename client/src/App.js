@@ -35,8 +35,7 @@ function App() {
       <AuthContextProvider>
         <GlobalStoreContextProvider>
           <Routes>
-            <Route path="/" element={<SplashScreen />} />
-            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/" element={<HomeWrapper />} />
             <Route path="/register" element={<RegisterScreen />} />
             <Route path="/recover" element={<RecoverPasswordScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />

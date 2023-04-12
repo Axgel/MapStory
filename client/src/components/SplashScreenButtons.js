@@ -9,7 +9,7 @@ export default function SplashScreenButtons() {
   }
 
   function handleHome(){
-    navigate("/home");
+    navigate("/");
   }
 
   return (

@@ -21,7 +21,7 @@ export default function EditToolbar() {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
   function handleExitMap(){
-    navigate("/home");
+    navigate("/");
   }
 
   function setCurrentModal(e, currentModal){
