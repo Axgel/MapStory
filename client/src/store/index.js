@@ -5,6 +5,7 @@ import api from "./store-request-api";
 import AuthContext from "../auth";
 import { GlobalStoreActionType, ViewMode, DetailView, CurrentModal } from "../enums";
 import { tempData } from "../data/tempData";
+import { parseFileUpload } from "../utils/ParseFileUpload";
 
 export const GlobalStoreContext = createContext({});
 console.log("create GlobalStoreContext");
@@ -86,6 +87,11 @@ function GlobalStoreContextProvider(props) {
       type: GlobalStoreActionType.SET_CURRENT_MODAL,
       payload: {currentModal: currentModal},
     });
+  }
+
+  store.parseFileUpload = async function(e) {
+    let featureList = await parseFileUpload(e);
+    console.log(featureList);
   }
 
 
