@@ -20,7 +20,8 @@ import {
   AccountFeedbackModal,
   AddTagModal,
   ChangeUsernameModal,
-  ChangePasswordModal
+  ChangePasswordModal,
+  CreateMapModal
  } from "./modals"
 
 import {
@@ -50,6 +51,7 @@ function App() {
           <AddTagModal />
           <ChangeUsernameModal />
           <ChangePasswordModal />
+          <CreateMapModal />
         </GlobalStoreContextProvider>
       </AuthContextProvider>
     </BrowserRouter>
