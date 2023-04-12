@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useContext} from "react";
 import MushroomLogo from '../assets/MushroomLogo.png'
 import ProfileIcon from '../assets/ProfileIcon.png'
 import { useNavigate } from "react-router-dom";
-
+import AuthContext from "../auth";
 
 export default function Header() {
+  const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
   function handleSplashScreen(){
@@ -12,7 +13,7 @@ export default function Header() {
   }
 
   function handleHomeScreen(){
-    navigate("/home")
+    navigate("/")
   }
 
   function toggleMenuOpen(e){
@@ -22,6 +23,10 @@ export default function Header() {
 
   function handleProfileScreen(){
     navigate("/profile")
+  }
+
+  function handleLogOut(){
+    auth.logoutUser();
   }
 
   return (
@@ -37,7 +42,7 @@ export default function Header() {
         <div id="profile-dd" className="absolute w-[150px] mt-[55px] rounded-lg bg-white hidden">
           <p onClick={handleProfileScreen} className="text-left px-3 py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">Profile</p>
           <p onClick={handleHomeScreen} className="text-left px-3 py-3 hover:bg-dropdownhover">Home</p>
-          <p onClick={handleSplashScreen} className="text-left px-3 py-3 hover:bg-dropdownhover rounded-bl-lg rounded-br-lg">Logout</p>
+          <p onClick={handleLogOut} className="text-left px-3 py-3 hover:bg-dropdownhover rounded-bl-lg rounded-br-lg">Logout</p>
         </div>
       </div>
     </div>

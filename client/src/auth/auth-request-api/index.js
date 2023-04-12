@@ -32,18 +32,9 @@ export const loginUser = (email, password) => {
   });
 };
 export const logoutUser = () => api.get(`/logout/`);
-export const registerUser = (
-  userName,
-  firstName,
-  lastName,
-  email,
-  password,
-  passwordVerify
-) => {
+export const registerUser = (userName, email, password, passwordVerify) => {
   return api.post(`/register/`, {
     userName: userName,
-    firstName: firstName,
-    lastName: lastName,
     email: email,
     password: password,
     passwordVerify: passwordVerify,

@@ -53,7 +53,7 @@ function GlobalStoreContextProvider(props) {
         })
       }
       default:
-        return 0;
+        return store;
     }
   };
 

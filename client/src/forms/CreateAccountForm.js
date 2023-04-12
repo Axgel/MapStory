@@ -9,7 +9,18 @@ export default function CreateAccountForm() {
 
   function setCurrentModal(e, currentModal){
     e.stopPropagation();
-    store.setCurrentModal(currentModal);
+    // store.setCurrentModal(currentModal);
+  }
+
+  function handleSubmit(event){
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    auth.registerUser(
+      formData.get('username'),
+      formData.get('email'),
+      formData.get('pwd'),
+      formData.get('cfmpwd')
+    );
   }
 
   return (
@@ -17,7 +28,7 @@ export default function CreateAccountForm() {
       <h1 className="text-white text-6xl my-16">
         Create Account
       </h1>
-      <form className="h-auto flex flex-col justify-center gap-10">
+      <form className="h-auto flex flex-col justify-center gap-10" onSubmit={handleSubmit}>
 
         <div className="flex gap-4 items-center border-solid border-modalborder border-opacity-60 bg-modalbgfill px-3.5 ">
           <p className="text-2xl">Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
@@ -50,12 +61,12 @@ export default function CreateAccountForm() {
           <p className="text-2xl">Confirm Password</p>
           <div className="w-px h-[70px] bg-modalborder border-opacity-60"></div>
           <div>
-            <label htmlFor="pwd"></label>
-            <input className="border-none bg-transparent outline-none h-12 w-[320px] text-xl" id="confirmPwd" type="password" name="pwd" required></input>
+            <label htmlFor="cfmpwd"></label>
+            <input className="border-none bg-transparent outline-none h-12 w-[320px] text-xl" id="confirmPwd" type="password" name="cfmpwd" required></input>
           </div>
         </div>
         
-        <input className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" id="createAccBtn" defaultValue="Create Account" onClick={(e) => setCurrentModal(e, CurrentModal.ACCOUNT_FEEDBACK)}></input>
+        <button className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" id="createAccBtn">Create Account</button>
       </form>
     </div>
   );

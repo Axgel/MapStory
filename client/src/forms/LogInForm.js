@@ -1,20 +1,27 @@
-import React from "react";
+import React, {useContext} from "react";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../auth";
 
 export default function LogInForm() {
+  const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  function handleLogIn(){
-    navigate("/home")
-  }
 
   function handleRecoverPassword(){
     navigate("/recover")
   }
 
+  function handleSubmit(event){
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    auth.loginUser(
+      formData.get('email'),
+      formData.get('pwd')
+    )
+  }
+
   return (
     <div className="border-none border-2 border-opacity-50	blur w-[600px]">
-      <form className="h-60 flex justify-center gap-10">
+      <form onSubmit={handleSubmit} className="h-60 flex justify-center gap-10">
 
         <div className="flex flex-col items-center justify-center gap-6">
           <div>
@@ -29,7 +36,7 @@ export default function LogInForm() {
         </div>
 
         <div className="flex flex-col items-center justify-center gap-6 mt-4">
-          <input onClick={handleLogIn} type="submit" className="h-12 w-[150px] bg-brownshade-500" value="Log In"></input>
+          <button type="submit" className="h-12 w-[150px] bg-brownshade-500">Log In</button>
           <input onClick={handleRecoverPassword} type="submit" className="h-12 w-[150px] bg-brownshade-500" value="Forgot Password"></input>
         </div>
       </form>

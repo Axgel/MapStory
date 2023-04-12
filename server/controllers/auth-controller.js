@@ -20,9 +20,8 @@ getLoggedIn = async (req, res) => {
       loggedIn: true,
       user: {
         userName: loggedInUser.userName,
-        firstName: loggedInUser.firstName,
-        lastName: loggedInUser.lastName,
         email: loggedInUser.email,
+        _id: loggedInUser._id
       },
     });
   } catch (err) {
@@ -77,9 +76,8 @@ loginUser = async (req, res) => {
         success: true,
         user: {
           userName: existingUser.userName,
-          firstName: existingUser.firstName,
-          lastName: existingUser.lastName,
           email: existingUser.email,
+          _id: existingUser._id
         },
       });
   } catch (err) {
@@ -101,17 +99,9 @@ logoutUser = async (req, res) => {
 
 registerUser = async (req, res) => {
   try {
-    const { userName, firstName, lastName, email, password, passwordVerify } =
-      req.body;
+    const { userName, email, password, passwordVerify } = req.body;
     // console.log("create user: " + userName + firstName + " " + lastName + " " + email + " " + password + " " + passwordVerify);
-    if (
-      !userName ||
-      !firstName ||
-      !lastName ||
-      !email ||
-      !password ||
-      !passwordVerify
-    ) {
+    if (!userName || !email || !password || !passwordVerify) {
       return res
         .status(400)
         .json({ errorMessage: "Please enter all required fields." });
@@ -153,14 +143,14 @@ registerUser = async (req, res) => {
     // console.log("passwordHash: " + passwordHash);
 
     const newUser = new User({
-      userName,
-      firstName,
-      lastName,
-      email,
-      passwordHash,
+      userName: userName,
+      email: email,
+      passwordHash: passwordHash,
+      personalMaps: [],
+      sharedMaps: []
     });
     const savedUser = await newUser.save();
-    // console.log("new user saved: " + savedUser._id);
+    console.log("new user saved: " + savedUser._id);
 
     // LOGIN THE USER
     const token = auth.signToken(savedUser._id);
@@ -177,9 +167,8 @@ registerUser = async (req, res) => {
         success: true,
         user: {
           userName: savedUser.userName,
-          firstName: savedUser.firstName,
-          lastName: savedUser.lastName,
           email: savedUser.email,
+          _id: savedUser._id
         },
       });
 
