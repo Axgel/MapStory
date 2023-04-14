@@ -49,7 +49,24 @@ createMap = (req, res) => {
   })
 }
 
+getPersonalAndSharedMaps = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    const personalMaps = await MapProject.find({ _id: { $in: user.personalMaps }}).exec();
+    const sharedMaps = await MapProject.find({ _id: { $in: user.sharedMaps }}).exec();
+    return res.status(200).json({
+      personalMaps: personalMaps,
+      sharedMaps: sharedMaps
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured loading personal and shared maps'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
-  createMap
+  createMap,
+  getPersonalAndSharedMaps
 };

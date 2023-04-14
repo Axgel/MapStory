@@ -5,16 +5,10 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_FILE,
 });
 
-export const createSubregion = (type, properties, coords) => {
-  return api.post(`/subregion`, {
-    type: type,
-    properties: properties,
-    coords: coords
-  })
-};
+export const getAllSubregions = (mapId) => api.get(`/subregion/${mapId}`);
 
 const apis = {
-  createSubregion
+  getAllSubregions
 };
 
 export default apis;

@@ -1,28 +1,22 @@
 const User = require("../models/user-model");
 const Subregion = require("../models/subregion-model");
+const MapProject = require("../models/mapproject-model");
 
-createSubregion = (req, res) => {
-  const body = req.body;
-
-  if(!body) {
+getAllSubregions = async (req, res) => {
+  try{
+    const mapProject = await MapProject.findById(req.params.mapId);
+    const subregions = await Subregion.find({ _id: { $in: mapProject.map}}).exec();
+    return res.status(200).json({
+      subregions: subregions
+    })
+  } catch (err) {
     return res.status(400).json({
-      success: false,
-      error: 'You must provide a subregion',
+      error: 'Error occured loading subregions'
     })
-  };
-
-  console.log(req);
-  const subregion = new Subregion(body.type, body.properties, body.coords);
-
-  subregion.save().then(() => {
-    return res.status(201).json({
-      subregion: subregion
-    })
-  });
+  }
 }
 
 
-
 module.exports = {
-  createSubregion
+  getAllSubregions
 };

@@ -3,8 +3,6 @@ const router = express.Router();
 const FileController = require("../controllers/file-controller");
 const auth = require('../auth');
 
-router.post('/subregion', auth.verify, FileController.createSubregion);
-
-
+router.get('/subregion/:mapId', FileController.getAllSubregions);
 
 module.exports = router;

@@ -21,7 +21,9 @@ function GlobalStoreContextProvider(props) {
     currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
     detailView: DetailView.NONE, 
-    allMaps: tempData,
+    publishedMaps: tempData,
+    personalMaps: null,
+    sharedMaps: null,
     selectedMap: null,
     openedMap: null,
   });
@@ -63,6 +65,13 @@ function GlobalStoreContextProvider(props) {
           currentModal: payload.currentModal
         })
       }
+      case GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS: {
+        return setStore({
+          ...store,
+          personalMaps: payload.personalMaps,
+          sharedMaps: payload.sharedMaps
+        })
+      }
       default:
         return store;
     }
@@ -77,11 +86,11 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
-  store.setSelectedMap = function (mapId) {
-    const detailView = (mapId) ? DetailView.PROPERTIES : DetailView.NONE;
+  store.setSelectedMap = function (map) {
+    const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
     storeReducer({
       type: GlobalStoreActionType.SET_SELECTED_MAP,
-      payload: {selectedMap: mapId, detailView: detailView},
+      payload: {selectedMap: map, detailView: detailView},
     });
   }
 
@@ -99,6 +108,15 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
+  store.setOpenedMap = function (mapId) {
+    storeReducer({
+      type: GlobalStoreActionType.SET_OPENED_MAP,
+      payload: { openedMap: mapId, currentModal: CurrentModal.NONE },
+    });
+
+    navigate("/map");
+  }
+
   store.parseFileUpload = async function(files) {
     let geojsonFile = await convertToGeojson(files);
     let subregions = await convertGeojsonToInternalFormat(geojsonFile);
@@ -114,7 +132,6 @@ function GlobalStoreContextProvider(props) {
 
     navigate("/map");
   }
-
 
   store.createMapSubregions = function(subregions){
     async function asyncCreateMapSubregions() {
@@ -136,6 +153,27 @@ function GlobalStoreContextProvider(props) {
     }
 
     return asyncCreateMapSubregions();
+  }
+
+  store.loadPersonalAndSharedMaps = function(){
+    async function asyncLoadPersonalAndSharedMaps(){
+      let personalMaps = [];
+      let sharedMaps = [];
+      if(auth.loggedIn){
+        let response = await api.getPersonalAndSharedMaps();     
+        if(response.status === 200){
+          personalMaps = response.data.personalMaps;
+          sharedMaps = response.data.sharedMaps;
+        }
+      }
+
+      storeReducer({
+        type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,
+        payload: {personalMaps: personalMaps, sharedMaps: sharedMaps},
+      });
+    }
+
+    asyncLoadPersonalAndSharedMaps();
   }
 
 

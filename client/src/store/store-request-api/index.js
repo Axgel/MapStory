@@ -28,9 +28,12 @@ export const createMap = (subregionIds, ownerId) => {
   })
 }
 
+export const getPersonalAndSharedMaps = () => api.get('/ownermaps');
+
 const apis = {
   createSubregion,
-  createMap
+  createMap,
+  getPersonalAndSharedMaps
 };
 
 export default apis;

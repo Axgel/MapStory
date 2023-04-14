@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css';
 import usastates from '../data/usastates.json'
+import { GlobalStoreContext } from '../store'
+import GlobalFileContext from "../file";
 
 export default function Map() {
+  const { store } = useContext(GlobalStoreContext);
+  const { file } = useContext(GlobalFileContext);
   const [mapRef, setMapRef] = useState("");
+  const [mapItem, setMapItem] = useState(null);
+
 
   useEffect(()=> {
     if(mapRef){
@@ -23,10 +29,20 @@ export default function Map() {
       const northEast = L.latLng(89.99346179538875, 180);
       const bounds = L.latLngBounds(southWest, northEast);
       map.setMaxBounds(bounds);
-      L.geoJSON(usastates).addTo(map);
+      // L.geoJSON(usastates).addTo(map);
+      setMapItem(map);
     }
   
   },[mapRef])
+
+  useEffect(()=>{
+    if(mapItem && file.subregions){
+      for(const region of file.subregions){
+        L.polygon(region.coordinates).addTo(mapItem);
+      }
+    }
+  }, [mapItem, file])
+
 
 
   function handleInitMapLoad(e){
@@ -34,7 +50,7 @@ export default function Map() {
   }
 
   return (
-    <div className="w-full h-[700px] z-[-1]" id="map" ref={handleInitMapLoad}>
+    <div className="w-full h-[700px]" id="map" ref={handleInitMapLoad}>
     </div>
   );
 }
