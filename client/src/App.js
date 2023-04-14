@@ -20,7 +20,8 @@ import {
   AccountFeedbackModal,
   AddTagModal,
   ChangeUsernameModal,
-  ChangePasswordModal
+  ChangePasswordModal,
+  CreateMapModal
  } from "./modals"
 
 import {
@@ -28,28 +29,32 @@ import {
 } from './wrappers'
 
 import { AuthContextProvider } from "./auth";
+import { GlobalFileContextProvider } from "./file";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthContextProvider>
         <GlobalStoreContextProvider>
-          <Routes>
-            <Route path="/" element={<HomeWrapper />} />
-            <Route path="/register" element={<RegisterScreen />} />
-            <Route path="/recover" element={<RecoverPasswordScreen />} />
-            <Route path="/profile" element={<ProfileScreen />} />
-            <Route path="/map" element={<MapScreen />} />
-            <Route path="/all" element={<AllScreen />} />
-          </Routes>
-          <AccountFeedbackModal />
-          <PublishMapModal />
-          <DeleteMapModal />
-          <ShareMapModal />
-          <ExportMapModal />
-          <AddTagModal />
-          <ChangeUsernameModal />
-          <ChangePasswordModal />
+          <GlobalFileContextProvider>
+            <Routes>
+              <Route path="/" element={<HomeWrapper />} />
+              <Route path="/register" element={<RegisterScreen />} />
+              <Route path="/recover" element={<RecoverPasswordScreen />} />
+              <Route path="/profile" element={<ProfileScreen />} />
+              <Route path="/map" element={<MapScreen />} />
+              <Route path="/all" element={<AllScreen />} />
+            </Routes>
+            <AccountFeedbackModal />
+            <PublishMapModal />
+            <DeleteMapModal />
+            <ShareMapModal />
+            <ExportMapModal />
+            <AddTagModal />
+            <ChangeUsernameModal />
+            <ChangePasswordModal />
+            <CreateMapModal />
+          </GlobalFileContextProvider>
         </GlobalStoreContextProvider>
       </AuthContextProvider>
     </BrowserRouter>

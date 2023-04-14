@@ -150,7 +150,7 @@ registerUser = async (req, res) => {
       sharedMaps: []
     });
     const savedUser = await newUser.save();
-    console.log("new user saved: " + savedUser._id);
+    // console.log("new user saved: " + savedUser._id);
 
     // LOGIN THE USER
     const token = auth.signToken(savedUser._id);

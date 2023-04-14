@@ -11,9 +11,9 @@ export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
-
+  
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
-  if(store.selectedMap == mapDetails.id){
+  if(store.selectedMap && store.selectedMap._id == mapDetails._id){
     mapCardWrapper += "bg-mapselectedfill"
   } else {
     mapCardWrapper += "bg-brownshade-700"
@@ -21,12 +21,17 @@ export default function MapCard(props) {
 
   function setSelectedMap(e){
     e.stopPropagation();
-    if(store.selectedMap == mapDetails.id){
+    if(store.selectedMap && (store.selectedMap._id == mapDetails._id)){
       store.setSelectedMap(null);
     }
     else{
-      store.setSelectedMap(mapDetails.id);
+      store.setSelectedMap(mapDetails);
     }
+  }
+
+  function setOpenedMap(e){
+    e.stopPropagation();
+    store.setOpenedMap(mapDetails);
   }
 
   function setCurrentModal(e, currentModal){
@@ -35,7 +40,7 @@ export default function MapCard(props) {
   }
 
   return (
-    <div className={mapCardWrapper} onClick={setSelectedMap}>
+    <div className={mapCardWrapper} onClick={setSelectedMap} onDoubleClick={setOpenedMap}>
       <div className="flex">
         {/* Section for upvote/downvote */}
         <div className="flex flex-col justify-center px-2">

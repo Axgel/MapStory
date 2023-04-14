@@ -25,7 +25,6 @@ export default function EditToolbar() {
   }
 
   function setCurrentModal(e, currentModal){
-    console.log("Asd")
     store.setCurrentModal(currentModal);
   }
 

@@ -5,13 +5,11 @@ export default function AllScreen() {
   const { store } = useContext(GlobalStoreContext);
 
   const handleClick = () => {
-    console.log("1", store.loggedIn);
     if (store.loggedIn) {
       store.logOut();
     } else {
       store.logIn();
     }
-    console.log("2", store.loggedIn)
   };
 
   return (

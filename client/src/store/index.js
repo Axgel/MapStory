@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
 import AuthContext from "../auth";
+import GlobalFileContext from "../file";
 import { GlobalStoreActionType, ViewMode, DetailView, CurrentModal } from "../enums";
 import { tempData } from "../data/tempData";
+import { convertToGeojson } from "../utils/geojsonConverter";
+import { convertGeojsonToInternalFormat } from "../utils/geojsonParser";
 
 export const GlobalStoreContext = createContext({});
 console.log("create GlobalStoreContext");
@@ -18,8 +21,11 @@ function GlobalStoreContextProvider(props) {
     currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
     detailView: DetailView.NONE, 
-    allMaps: tempData,
+    publishedMaps: tempData,
+    personalMaps: null,
+    sharedMaps: null,
     selectedMap: null,
+    openedMap: null,
   });
 
   const navigate = useNavigate();
@@ -52,6 +58,20 @@ function GlobalStoreContextProvider(props) {
           currentModal: payload.currentModal
         })
       }
+      case GlobalStoreActionType.SET_OPENED_MAP: {
+        return setStore({
+          ...store,
+          openedMap: payload.openedMap,
+          currentModal: payload.currentModal
+        })
+      }
+      case GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS: {
+        return setStore({
+          ...store,
+          personalMaps: payload.personalMaps,
+          sharedMaps: payload.sharedMaps
+        })
+      }
       default:
         return store;
     }
@@ -66,11 +86,11 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
-  store.setSelectedMap = function (mapId) {
-    const detailView = (mapId) ? DetailView.PROPERTIES : DetailView.NONE;
+  store.setSelectedMap = function (map) {
+    const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
     storeReducer({
       type: GlobalStoreActionType.SET_SELECTED_MAP,
-      payload: {selectedMap: mapId, detailView: detailView},
+      payload: {selectedMap: map, detailView: detailView},
     });
   }
 
@@ -86,6 +106,74 @@ function GlobalStoreContextProvider(props) {
       type: GlobalStoreActionType.SET_CURRENT_MODAL,
       payload: {currentModal: currentModal},
     });
+  }
+
+  store.setOpenedMap = function (mapId) {
+    storeReducer({
+      type: GlobalStoreActionType.SET_OPENED_MAP,
+      payload: { openedMap: mapId, currentModal: CurrentModal.NONE },
+    });
+
+    navigate("/map");
+  }
+
+  store.parseFileUpload = async function(files) {
+    let geojsonFile = await convertToGeojson(files);
+    let subregions = await convertGeojsonToInternalFormat(geojsonFile);
+    let subregionIds = await store.createMapSubregions(subregions);
+    let response = await api.createMap(subregionIds, auth.user._id);  
+    if(response.status === 201){
+
+      storeReducer({
+        type: GlobalStoreActionType.SET_OPENED_MAP,
+        payload: {openedMap: response.id, currentModal: CurrentModal.NONE},
+      });
+    }
+
+    navigate("/map");
+  }
+
+  store.createMapSubregions = function(subregions){
+    async function asyncCreateMapSubregions() {
+      const asyncSubregions = [];
+      for(let i=0; i<subregions.length; i++){
+        asyncSubregions.push(api.createSubregion(subregions[i].type, subregions[i].properties, subregions[i].coords));
+      }
+      const addedRegions = await Promise.all(asyncSubregions);
+      const ids = [];
+      
+      for(const region of addedRegions){
+        if(region.status !== 201){
+          console.log("failed to create all subregions");
+          return;
+        }
+        ids.push(region.data.id);
+      }
+      return ids;
+    }
+
+    return asyncCreateMapSubregions();
+  }
+
+  store.loadPersonalAndSharedMaps = function(){
+    async function asyncLoadPersonalAndSharedMaps(){
+      let personalMaps = [];
+      let sharedMaps = [];
+      if(auth.loggedIn){
+        let response = await api.getPersonalAndSharedMaps(auth.user._id);     
+        if(response.status === 200){
+          personalMaps = response.data.personalMaps;
+          sharedMaps = response.data.sharedMaps;
+        }
+      }
+
+      storeReducer({
+        type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,
+        payload: {personalMaps: personalMaps, sharedMaps: sharedMaps},
+      });
+    }
+
+    asyncLoadPersonalAndSharedMaps();
   }
 
 
