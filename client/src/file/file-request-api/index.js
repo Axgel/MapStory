@@ -5,10 +5,16 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_FILE,
 });
 
-export const getFile = () => api.get(`/file/`);
+export const createSubregion = (type, properties, coords) => {
+  return api.post(`/subregion`, {
+    type: type,
+    properties: properties,
+    coords: coords
+  })
+};
 
 const apis = {
-  getFile,
+  createSubregion
 };
 
 export default apis;

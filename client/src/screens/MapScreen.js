@@ -15,9 +15,9 @@ export default function MapScreen() {
       <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
         <MapDetailCard mapDetails={store.allMaps[0]}/>
       </div>
-      <div id="map-detail-view" className="absolute bottom-0 m-3">
+      {/* <div id="map-detail-view" className="absolute bottom-0 m-3">
         <MapProperties />
-      </div>
+      </div> */}
       <br></br><b></b>
     </div>
   );

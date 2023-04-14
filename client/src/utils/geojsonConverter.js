@@ -2,9 +2,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import { open } from 'shapefile';
 import { preBuild, simplify } from 'mapshaper-simplify'
 
-export async function parseFileUpload(e) {
-    const { files } = e.target;
-
+export async function convertToGeojson(files) {
     let fileOne = files[0]
     let fileTwo;
     if(files.length > 1) {
@@ -34,8 +32,8 @@ export async function parseFileUpload(e) {
 
     let idealNumPoints = 50000;
     let simplifyPercentage = idealNumPoints/JSON.stringify(geoJSONFile).length;
-    console.log(JSON.stringify(geoJSONFile).length);
-    console.log(simplifyPercentage);
+    // console.log(JSON.stringify(geoJSONFile).length);
+    // console.log(simplifyPercentage);
     if(simplifyPercentage >= 1)
         return geoJSONFile;
     // const simplifiedFile = await simplifyGeoJSON(geoJSONFile, simplifyPercentage);
@@ -126,23 +124,3 @@ async function parseGEO(file) {
     });
 }
 
-// returns list of features swapping coordinates
-// function rearrangeData(jsonFile){
-//     const featuresList = jsonFile.features;
-//     for(const feat of featuresList){
-//         swapCoords(feat.geometry.coordinates);
-//     }
-//     return featuresList;
-// }
-
-// function swapCoords(arr){
-//     if(arr.length == 2 && !Array.isArray(arr[0])){
-//         [arr[0], arr[1]] = [arr[1], arr[0]];
-//         return;
-//     }
-//     if(!Array.isArray(arr)) return;
-
-//     for(const item of arr){
-//         swapCoords(item);
-//     }
-// }

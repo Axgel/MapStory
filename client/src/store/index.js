@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
 import AuthContext from "../auth";
+import GlobalFileContext from "../file";
 import { GlobalStoreActionType, ViewMode, DetailView, CurrentModal } from "../enums";
 import { tempData } from "../data/tempData";
-import { parseFileUpload } from "../utils/ParseFileUpload";
+import { convertToGeojson } from "../utils/geojsonConverter";
+import { convertGeojsonToInternalFormat } from "../utils/geojsonParser";
 
 export const GlobalStoreContext = createContext({});
 console.log("create GlobalStoreContext");
@@ -21,6 +23,7 @@ function GlobalStoreContextProvider(props) {
     detailView: DetailView.NONE, 
     allMaps: tempData,
     selectedMap: null,
+    openedMap: null,
   });
 
   const navigate = useNavigate();
@@ -50,6 +53,13 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_CURRENT_MODAL: {
         return setStore({
           ...store,
+          currentModal: payload.currentModal
+        })
+      }
+      case GlobalStoreActionType.SET_OPENED_MAP: {
+        return setStore({
+          ...store,
+          openedMap: payload.openedMap,
           currentModal: payload.currentModal
         })
       }
@@ -89,9 +99,43 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
-  store.parseFileUpload = async function(e) {
-    let featureList = await parseFileUpload(e);
-    console.log(featureList);
+  store.parseFileUpload = async function(files) {
+    let geojsonFile = await convertToGeojson(files);
+    let subregions = await convertGeojsonToInternalFormat(geojsonFile);
+    let subregionIds = await store.createMapSubregions(subregions);
+    let response = await api.createMap(subregionIds, auth.user._id);  
+    if(response.status === 201){
+
+      storeReducer({
+        type: GlobalStoreActionType.SET_OPENED_MAP,
+        payload: {openedMap: response.id, currentModal: CurrentModal.NONE},
+      });
+    }
+
+    navigate("/map");
+  }
+
+
+  store.createMapSubregions = function(subregions){
+    async function asyncCreateMapSubregions() {
+      const asyncSubregions = [];
+      for(let i=0; i<subregions.length; i++){
+        asyncSubregions.push(api.createSubregion(subregions[i].type, subregions[i].properties, subregions[i].coords));
+      }
+      const addedRegions = await Promise.all(asyncSubregions);
+      const ids = [];
+      
+      for(const region of addedRegions){
+        if(region.status !== 201){
+          console.log("failed to create all subregions");
+          return;
+        }
+        ids.push(region.data.id);
+      }
+      return ids;
+    }
+
+    return asyncCreateMapSubregions();
   }
 
 
