@@ -130,7 +130,7 @@ function AuthContextProvider(props) {
       type: AuthActionType.LOGIN_USER,
       payload: {
         loggedIn: loggedIn,
-        user: null,
+        user: user,
         error: error
       },
     });
