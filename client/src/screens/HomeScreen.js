@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { MapCard, Header, NavBar, MapDetailCard } from "../components";
 import { useNavigate } from "react-router-dom";
-
+import { CurrentModal } from "../enums";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
@@ -10,16 +10,20 @@ export default function HomeScreen() {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    store.loadPersonalAndSharedMaps();
+  }, [])
+
   let mapDetailCard = <div></div>;
   if (store.selectedMap) {
     let selectedMap;
-    for(let i=0; i<store.allMaps.length; i++){
-      if(store.allMaps[i].id == store.selectedMap){
-        selectedMap = store.allMaps[i];
+    for(let i=0; i<store.personalMaps.length; i++){
+      if(store.personalMaps[i]._id == store.selectedMap._id){
+        selectedMap = store.personalMaps[i];
         break;
       }
     }
-
+    
     mapDetailCard = (
       <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
         <MapDetailCard mapDetails={selectedMap} />
@@ -27,8 +31,16 @@ export default function HomeScreen() {
     );
   }
 
-  function handleCreateMap(e){
-    navigate("/map");
+  let mapCards = <></>
+  if(store.personalMaps){
+    mapCards = store.personalMaps.map((map, index) => {
+      return <MapCard key={index} mapDetails={map} />;
+    })
+  }
+
+  function setCurrentModal(e, currentModal){
+    e.stopPropagation();
+    store.setCurrentModal(currentModal);
   }
 
   return (
@@ -43,14 +55,12 @@ export default function HomeScreen() {
         <div className="px-10 flex flex-col gap-5 min-w-max flex-grow pb-5">
           <div className="flex justify-between">
             <p className="text-3xl font-bold">Maps</p>
-            <p className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto" onClick={handleCreateMap}>
+            <p className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto" onClick={(e) => setCurrentModal(e, CurrentModal.CREATE_MAP)}>
               + Create Map
             </p>
           </div>
 
-          {store.allMaps.map((map, index) => {
-            return <MapCard key={index} mapDetails={map} />;
-          })}
+          {mapCards}
         </div>
         
         {mapDetailCard}

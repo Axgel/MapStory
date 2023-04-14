@@ -3,8 +3,9 @@ const Schema = mongoose.Schema
 
 const SubregionSchema = new Schema(
     {
+        type: {type: String, required: true},
         properties: {type: Map, of: String},
-        coordinates: { any: Object },
+        coordinates: { type: Schema.Types.Mixed},
     },
     { timestamps: true },
 )

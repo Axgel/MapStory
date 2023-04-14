@@ -30,8 +30,10 @@ app.use(cookieParser());
 // SETUP OUR OWN ROUTERS AS MIDDLEWARE
 const authRouter = require("./routes/auth-router");
 app.use("/auth", authRouter);
-const demoRouter = require("./routes/demo-router");
-app.use("/store", demoRouter);
+const storeRouter = require("./routes/store-router");
+app.use("/store", storeRouter);
+const fileRouter = require("./routes/file-router");
+app.use("/file", fileRouter);
 
 // INITIALIZE OUR DATABASE OBJECT
 db.on("error", console.error.bind(console, "MongoDB connection error:"));

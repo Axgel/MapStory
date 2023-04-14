@@ -5,12 +5,35 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_STORE,
 });
 
-export const getDemo = () => api.get(`/demo/`);
-export const writeDemo = (name) => api.post(`/demo/`, { name: name });
+export const createSubregion = (type, properties, coords) => {
+  return api.post(`/subregion`, {
+    type: type,
+    properties: properties,
+    coordinates: coords
+  })
+};
+
+export const createMap = (subregionIds, ownerId) => {
+  return api.post('/map', {
+    title: "Untitled",
+    map: subregionIds,
+    owner: ownerId,
+    collaborators: [],
+    upvotes: [],
+    downvotes: [],
+    comments: [],
+    tags: [],
+    isPublished: false,
+    publishedDate: Date.now()
+  })
+}
+
+export const getPersonalAndSharedMaps = () => api.get('/ownermaps');
 
 const apis = {
-  getDemo,
-  writeDemo,
+  createSubregion,
+  createMap,
+  getPersonalAndSharedMaps
 };
 
 export default apis;
