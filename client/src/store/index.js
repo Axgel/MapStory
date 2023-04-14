@@ -160,7 +160,7 @@ function GlobalStoreContextProvider(props) {
       let personalMaps = [];
       let sharedMaps = [];
       if(auth.loggedIn){
-        let response = await api.getPersonalAndSharedMaps();     
+        let response = await api.getPersonalAndSharedMaps(auth.user._id);     
         if(response.status === 200){
           personalMaps = response.data.personalMaps;
           sharedMaps = response.data.sharedMaps;
