@@ -39,13 +39,13 @@ export async function convertToGeojson(files) {
 
     let idealNumPoints = 50000;
     let simplifyPercentage = idealNumPoints/JSON.stringify(reducedPrecision).length;
-    // console.log(JSON.stringify(geoJSONFile).length);
-    // console.log(simplifyPercentage);
+    console.log(JSON.stringify(reducedPrecision).length);
+    console.log(simplifyPercentage);
     if(simplifyPercentage >= 1 || JSON.stringify(reducedPrecision).length < 2000000)
-        return geoJSONFile;
+        return reducedPrecision;
     const simplifiedFile = await simplifyGeoJSON(reducedPrecision, simplifyPercentage);
+    console.log("simplified: " + JSON.stringify(geoJSONFile).length)
     return simplifiedFile;
-    // return geoJSONFile;
 }
 
 async function simplifyGeoJSON(file, simplifyPercentage) {
