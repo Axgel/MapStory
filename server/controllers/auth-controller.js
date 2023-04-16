@@ -199,10 +199,35 @@ recoverPassword = async(req, res) => {
 
 //Changing username on profile screen
 changeUsername = async (req, res) => {
-  //Todo: Implement the username change via email passing
-  return res.status(200).json({
-    success: true
-  })
+  try {
+    const { email, userName } = req.body;
+
+    if (!userName) {
+      return res
+        .status(400)
+        .json({ errorMessage: "Please enter all required fields." });
+    }
+
+    const existingUser = await User.findOne({ email: email });
+    if (!existingUser) {
+      return res.status(401).json({
+        errorMessage: "Wrong email provided.",
+      });
+    }
+
+    const newUser = await User.findOneAndUpdate({ email: email } , {userName: userName});
+    return res.status(200).json({
+      success: true,
+      user: {
+        userName: newUser.userName,
+        email: newUser.email,
+        _id: newUser._id
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
 }
 
 //Changing password on profile screen
