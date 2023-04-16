@@ -57,17 +57,20 @@ export const recoverPassword = (
   });
 };
 
-export const changeUsername = (userName) => {
-  return api.post(`/profile/username/`, {
+export const changeUsername = (email, userName) => {
+  return api.post(`/profile/username`, {
+    email: email,
     userName: userName,
   });
 };
 
 export const changePassword = (
+  email,
   password,
   passwordVerify 
   ) => {
-  return api.post(`/profile/password/`, {
+  return api.post(`/profile/password`, {
+    email: email,
     password: password,
     passwordVerify: passwordVerify,
   });
