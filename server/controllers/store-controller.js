@@ -40,7 +40,7 @@ createMap = (req, res) => {
     user.save().then(() => {
       mapproject.save().then((map) => {
         return res.status(201).json({
-          id: map._id
+          id: mapproject
         })
       }).catch((err) => {
         return res.status(400).json({errpr: "Map not saved"});
