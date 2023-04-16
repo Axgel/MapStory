@@ -17,14 +17,14 @@ const cors_url = (process.env.ENVIRONMENT == "DEVELOPMENT") ? process.env.DEV_CO
 let server;
 
 // SETUP THE MIDDLEWARE
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(
   cors({
     origin: cors_url,
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
 // SETUP OUR OWN ROUTERS AS MIDDLEWARE

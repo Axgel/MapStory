@@ -123,10 +123,10 @@ function GlobalStoreContextProvider(props) {
     let subregionIds = await store.createMapSubregions(subregions);
     let response = await api.createMap(subregionIds, auth.user._id);  
     if(response.status === 201){
-
+      
       storeReducer({
         type: GlobalStoreActionType.SET_OPENED_MAP,
-        payload: {openedMap: response.id, currentModal: CurrentModal.NONE},
+        payload: {openedMap: response.data.id, currentModal: CurrentModal.NONE},
       });
     }
 
