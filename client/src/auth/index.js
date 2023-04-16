@@ -160,6 +160,21 @@ function AuthContextProvider(props) {
     }
   };
 
+  auth.recoveryEmail = async function (email) {
+    let error = "";
+    try {
+      const response = await api.recoveryEmail(email);
+      if (response.status === 200) {
+        console.log("Email SENT!")
+      }
+    } catch (err) {
+      error = err.response.data.errorMessage;
+      console.log(error)
+    }
+    
+  
+  };
+
 
   return (
     <AuthContext.Provider value={{auth}}>

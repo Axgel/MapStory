@@ -1,6 +1,20 @@
 const auth = require("../auth");
 const User = require("../models/user-model");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.sendinblue.com",
+  port: 587,
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_KEY,
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+});
 
 getLoggedIn = async (req, res) => {
   try {
@@ -181,10 +195,37 @@ registerUser = async (req, res) => {
 
 //Sending password recovery email
 recoveryEmail = async(req, res) => {
+  try{
+    let message_body = ""
+    const {email} = req.body
+    const user = await User.findOne({email: email})
+    const token = crypto.randomBytes(32).toString("hex");
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const resetToken = await bcrypt.hash(token, salt);
+    if (process.env.ENVIRONMENT === "DEVELOPMENT"){
+      // message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
+      message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+    } else {
+      // message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
+      message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+    }
+    const message = await transporter.sendMail({
+      from: process.env.SMTP_SENDEMAIL,
+      to: email,
+      subject: "Password Reset Notice", 
+      text: message_body,
+    })
+    return res.status(200).json({
+      success: true
+    })
+  }catch(err){
+    return res.status(401).json({
+      errorMessage: "Unable to send email",
+    });
+  }
   //Todo: Sending email via nodemailer and need to install postmail on backend server
-  return res.status(200).json({
-    success: true
-  })
+  
 }
 
 //Resetting password + Use for both recovering password 

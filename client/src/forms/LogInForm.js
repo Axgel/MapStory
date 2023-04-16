@@ -6,16 +6,25 @@ export default function LogInForm() {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  function handleRecoverPassword(){
-    navigate("/recover")
+  function handleRecoverPassword(event){
+    // navigate("/recover")
+    // event.preventDefault();
+    // const formData = new FormData(event.currentTarget);
+    // auth.recoveryEmail(
+    //   formData.get('email'),
+    // )
+    console.log("Hello")
   }
 
   function handleSubmit(event){
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    auth.loginUser(
+    // auth.loginUser(
+    //   formData.get('email'),
+    //   formData.get('pwd')
+    // )
+    auth.recoveryEmail(
       formData.get('email'),
-      formData.get('pwd')
     )
   }
 
