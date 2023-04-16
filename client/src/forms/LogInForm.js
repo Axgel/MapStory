@@ -8,24 +8,22 @@ export default function LogInForm() {
 
   function handleRecoverPassword(event){
     // navigate("/recover")
-    // event.preventDefault();
     // const formData = new FormData(event.currentTarget);
     // auth.recoveryEmail(
     //   formData.get('email'),
     // )
-    console.log("Hello")
   }
 
   function handleSubmit(event){
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    // auth.loginUser(
-    //   formData.get('email'),
-    //   formData.get('pwd')
-    // )
-    auth.recoveryEmail(
+    auth.loginUser(
       formData.get('email'),
+      formData.get('pwd')
     )
+    // auth.recoveryEmail(
+    //   formData.get('email'),
+    // )
   }
 
   return (

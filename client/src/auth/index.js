@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "./auth-request-api";
 
 const AuthContext = createContext();
@@ -19,6 +19,7 @@ function AuthContextProvider(props) {
     error: ""
   });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     auth.getLoggedIn();
@@ -171,10 +172,31 @@ function AuthContextProvider(props) {
       error = err.response.data.errorMessage;
       console.log(error)
     }
-    
-  
   };
 
+
+  auth.recoverPassword = async function (password, passwordVerify) {
+    let error = "";
+    let response;
+    
+    
+    try {
+      const userName = searchParams.get("userName");
+      const token = searchParams.get("token");
+      response = await api.recoverPassword(userName, token, password, passwordVerify);
+      if (response && response.status === 200) {
+        console.log("Password Resetted!")
+      } 
+    } catch (err) {
+      console.log(err.response)
+      error = err.response.errorMessage;
+      console.log(error)
+    }
+
+    if (response && response.status === 200) {
+      navigate('/')
+    } 
+  };
 
   return (
     <AuthContext.Provider value={{auth}}>
