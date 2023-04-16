@@ -14,7 +14,7 @@ export default function LogInForm() {
     // )
   }
 
-  function handleSubmit(event){
+  function handleLogin(event){
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     auth.loginUser(
@@ -24,6 +24,23 @@ export default function LogInForm() {
     // auth.recoveryEmail(
     //   formData.get('email'),
     // )
+  }
+
+  function handleSubmit(event){
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    if (event.nativeEvent.submitter.name === "Log In"){
+      console.log("Logging User")
+      auth.loginUser(
+        formData.get('email'),
+        formData.get('pwd')
+      )
+    }else {
+      console.log("Sending Recovery Email")
+      auth.recoveryEmail(
+        formData.get('email'),
+      )
+    }
   }
 
   return (
@@ -43,8 +60,8 @@ export default function LogInForm() {
         </div>
 
         <div className="flex flex-col items-center justify-center gap-6 mt-4">
-          <button type="submit" className="h-12 w-[150px] bg-brownshade-500">Log In</button>
-          <input onClick={handleRecoverPassword} type="submit" className="h-12 w-[150px] bg-brownshade-500" value="Forgot Password"></input>
+          <button type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Log In" >Log In</button>
+          <button type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Forgot Password">Forgot Password</button>
         </div>
       </form>
     </div>
