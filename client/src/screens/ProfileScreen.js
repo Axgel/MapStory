@@ -36,7 +36,7 @@ export default function ProfileScreen() {
             <label htmlFor="username"></label>
             <input className="border-none bg-transparent outline-none h-12 w-[370px] text-xl" type="text" name="username" defaultValue={auth.user.userName} disabled></input>
           </div>
-          <img onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_USERNAME)} className="" src={EditIcon} alt=""></img>
+          <img id="editUsernameIcon" onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_USERNAME)} className="" src={EditIcon} alt=""></img>
         </div>
 
         <div className="flex gap-4 items-center border-solid border-modalborder border-opacity-60 bg-modalbgfill px-3.5 ">
@@ -46,7 +46,7 @@ export default function ProfileScreen() {
             <label htmlFor="pwd"></label>
             <input className="border-none bg-transparent outline-none h-12 w-[370px] text-xl" type="password" defaultValue="password" name="pwd" disabled></input>
           </div>
-          <img onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_PASSWORD)} className="" src={EditIcon} alt=""></img>
+          <img id="editPasswordIcon" onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_PASSWORD)} className="" src={EditIcon} alt=""></img>
         </div>
     </div>
     </div> : <></>
