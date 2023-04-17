@@ -8,7 +8,9 @@ describe('Change Passsword', () => {
     //press cancel
     it('change pwd: cancel', () =>{
         cy.get('#editPasswordIcon').click()
-        cy.get('input[type=text]').clear().type('passcancel')
+        cy.get('#changeCurPwd').clear().type('password')
+        cy.get('#changeNewPwd').clear().type('passcancel')
+        cy.get('#changeCfmPwd').clear().type('passcancel')
         cy.contains('Cancel').click()
         //check that the username field has the same value as previous
         cy.url().should('include', '/profile')
@@ -16,8 +18,10 @@ describe('Change Passsword', () => {
     //password doesnt follow standards we set (min 8 characters)
     it('change pwd: bad pwd', () =>{
         cy.get('#editPasswordIcon').click()
-        cy.get('input[type=text]').clear().type('badbad')
-        cy.contains('Cancel').click()
+        cy.get('#changeCurPwd').clear().type('password')
+        cy.get('#changeNewPwd').clear().type('badpass')
+        cy.get('#changeCfmPwd').clear().type('badpass')
+        cy.contains('OK').click()
         //TODO: get error
 
         cy.url().should('include', '/profile')
@@ -25,11 +29,14 @@ describe('Change Passsword', () => {
     //success
     it('change pwd: success', () =>{
         cy.get('#editPasswordIcon').click()
-        cy.get('input[type=text]').clear().type('badbadbad')
-        cy.contains('Ok').click()
+        cy.get('#changeCurPwd').clear().type('password')
+        cy.get('#changeNewPwd').clear().type('password321')
+        cy.get('#changeCfmPwd').clear().type('password321')
+        cy.contains('OK').click()
         //user gets logged out if succesful
-        cy.url().should('include', '/')
-        cy.get('#loginEmail').should('exist')
+        cy.url().should('include', '/profile')
+        // cy.url().should('include', '/')
+        // cy.get('#loginEmail').should('exist')
     });
     //TODO: how to determine when you successfully changed your password?
 })

@@ -9,7 +9,7 @@ describe('Change Username', () => {
     it('change username: cancel', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('#inputChangeUsername').clear().type('badbadbad') //TODO
+            cy.get('#inputNewUsername').clear().type('badbadbad') //TODO
             cy.contains('Cancel').click()
             //check that the username field has the same value as previous
             cy.get('#profileUsername').should((newUsername) => {
@@ -21,7 +21,7 @@ describe('Change Username', () => {
     it('change username: nonunique username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('#inputChangeUsername').clear().type('tray') //TODO
+            cy.get('#inputNewUsername').clear().type('tray') //TODO
             cy.contains('OK').click()
             //TODO: check error
 
@@ -34,8 +34,8 @@ describe('Change Username', () => {
     //success
     it('change username: success', () =>{
         cy.get('#editUsernameIcon').click()
-        cy.get('#profileUsername').clear().type("newUsername") //TODO
-        cy.contains('Ok').click()
+        cy.get('#inputNewUsername').clear().type("newUsername") 
+        cy.contains('OK').click()
         //check that the username field has the new value
         cy.get('#profileUsername').should('have.value', 'newUsername')
     });

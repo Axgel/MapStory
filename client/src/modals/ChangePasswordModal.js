@@ -44,13 +44,13 @@ export default function ChangePasswordModal(props) {
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[350px] text-left">
           <h1 className="text-xl text-center mt-4 mx-9">Change Your Password</h1>
           <h1 className="mx-6 my-1 text-start">Current Password</h1>
-          <input className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="Current Password" onChange={handleChange} name="old"></input>
+          <input id="changeCurPwd" className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="Current Password" onChange={handleChange} name="old"></input>
 
           <h1 className="mx-6 my-1 text-start">New Password</h1>
-          <input className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="New Password" onChange={handleChange} name="new"></input>
+          <input id="changeNewPwd" className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="New Password" onChange={handleChange} name="new"></input>
 
           <h1 className="mx-6 my-1 text-start">Confirm New Password</h1>
-          <input className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="Confirm New Pasword" onChange={handleChange} name="confirm"></input>
+          <input id="changeCfmPwd" className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="Confirm New Pasword" onChange={handleChange} name="confirm"></input>
           <br></br><br></br>
           <div className="flex flex-row-reverse mx-3">
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleChangePassword}>OK</button>
