@@ -23,6 +23,6 @@ describe('Login', () => {
         cy.contains('Search By:')
         cy.contains('Sort By:')
         cy.get('#profile-dd').should('exist');
-      });
+    });
 
 })
