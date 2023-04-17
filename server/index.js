@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const http = require("http");
 const https = require("https");
 const fs = require("fs");
+const session = require("express-session");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -26,6 +27,19 @@ app.use(
 );
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
+
+const sameSite = (process.env.ENVIRONMENT == "DEVELOPMENT") ? 'strict' : 'none';
+
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie:{ 
+    maxAge: 12 * 60 * 60 * 1000,
+    sameSite: sameSite,
+    secure: 'auto'
+  }
+}));
 
 // SETUP OUR OWN ROUTERS AS MIDDLEWARE
 const authRouter = require("./routes/auth-router");
