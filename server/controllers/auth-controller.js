@@ -199,6 +199,11 @@ recoveryEmail = async(req, res) => {
     let message_body = ""
     const {email} = req.body
     const user = await User.findOne({email: email})
+    if(!user){
+      return res.status(401).json({
+        errorMessage: "Account doesn't exist",
+      });
+    }
     const token = crypto.randomBytes(32).toString("hex");
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
