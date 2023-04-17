@@ -10,6 +10,8 @@ export const AuthActionType = {
   LOGIN_USER: "LOGIN_USER",
   LOGOUT_USER: "LOGOUT_USER",
   REGISTER_USER: "REGISTER_USER",
+  CHANGE_USERNAME: "CHANGE_USERNAME",
+  CHANGE_PASSWORD: "CHANGE_PASSWORD"
 };
 
 function AuthContextProvider(props) {
@@ -53,6 +55,13 @@ function AuthContextProvider(props) {
         return setAuth({
           user: payload.user,
           loggedIn: payload.loggedIn,
+          error: payload.error
+        });
+      }
+      case AuthActionType.CHANGE_USERNAME: {
+        return setAuth({
+          ...auth,
+          user: payload.user,
           error: payload.error
         });
       }
@@ -161,6 +170,49 @@ function AuthContextProvider(props) {
     }
   };
 
+  auth.changeUsername = async function (userName) {
+    let error = "";
+    let user = auth.user;
+    const email = user.email;
+    try {
+      const response = await api.changeUsername(email, userName);
+      if (response.status === 200) {
+        user = response.data.user;
+      }
+    } catch (err) {
+      error = err.response.data.errorMessage;
+    }
+
+    authReducer({
+      type: AuthActionType.CHANGE_USERNAME,
+      payload: {
+        user: user,
+        error: error
+      },
+    });
+  };
+
+  auth.changePassword = async function (oldPwd, newPwd, cfmPwd) {
+    let error = "";
+    let response;
+    const email = auth.user.email;
+    try {
+      response = await api.changePassword(email, oldPwd, newPwd, cfmPwd);
+    } catch (err) {
+      error = err.response.data.errorMessage;
+    }
+
+    if (response && response.status === 200) {
+      authReducer({
+        type: AuthActionType.LOGOUT_USER,
+        payload: {
+          error: error
+        },
+      });
+      navigate("/");
+    }
+  }
+
   auth.recoveryEmail = async function (email) {
     let error = "";
     let response; 
@@ -175,7 +227,6 @@ function AuthContextProvider(props) {
       navigate("/");
     }
   };
-
 
   auth.recoverPassword = async function (password, passwordVerify) {
     let error = "";

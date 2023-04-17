@@ -61,19 +61,19 @@ export const recoverPassword = (
   });
 };
 
-export const changeUsername = (userName) => {
-  return api.post(`/profile/username/`, {
+export const changeUsername = (email, userName) => {
+  return api.post(`/profile/username`, {
+    email: email,
     userName: userName,
   });
 };
 
-export const changePassword = (
-  password,
-  passwordVerify 
-  ) => {
-  return api.post(`/profile/password/`, {
-    password: password,
-    passwordVerify: passwordVerify,
+export const changePassword = (email, oldPwd, newPwd, cfmPwd) => {
+  return api.post(`/profile/password`, {
+    email: email,
+    oldPwd: oldPwd,
+    newPwd: newPwd,
+    cfmPwd: cfmPwd,
   });
 };
 
