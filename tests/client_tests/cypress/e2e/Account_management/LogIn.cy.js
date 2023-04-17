@@ -18,8 +18,12 @@ describe('Login', () => {
     });
     //success
     it('login: success', () => {
-        cy.login("test", "test")
-        cy.visit('/') 
+        cy.visit('/')
+        cy.get('#loginEmail').clear().type("testing123@gmail.com")
+        cy.get('#loginPwd').clear().type("password")
+        cy.contains('Log In').click()
+        cy.contains('Maps')
+        // cy.visit('/') 
         cy.contains('Search By:')
         cy.contains('Sort By:')
         cy.get('#profile-dd').should('exist');
