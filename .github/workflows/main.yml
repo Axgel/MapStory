@@ -30,9 +30,9 @@ jobs:
           envkey_DEV_CORS: ${{ vars.DEV_CORS }}
           envkey_PROD_CORS: ${{ secrets.PROD_CORS }}
           envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
-          SMTP_KEY: ${{ secrets.SMTP_KEY }}
-          SMTP_SENDEMAIL: ${{ secrets.SMTP_SENDEMAIL }}
+          envkey_SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+          envkey_SMTP_KEY: ${{ secrets.SMTP_KEY }}
+          envkey_SMTP_SENDEMAIL: ${{ secrets.SMTP_SENDEMAIL }}
           file_name: ./server/.env
           fail_on_empty: true
 
