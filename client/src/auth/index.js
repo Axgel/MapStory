@@ -174,7 +174,7 @@ function AuthContextProvider(props) {
     let user = auth.user;
     const email = user.email;
     try {
-      const response = await await api.changeUsername(email, userName);
+      const response = await api.changeUsername(email, userName);
       if (response.status === 200) {
         user = response.data.user;
       }
@@ -189,6 +189,27 @@ function AuthContextProvider(props) {
         error: error
       },
     });
+  };
+
+  auth.changePassword = async function (oldPwd, newPwd, cfmPwd) {
+    let error = "";
+    let response;
+    const email = auth.user.email;
+    try {
+      response = await api.changePassword(email, oldPwd, newPwd, cfmPwd);
+    } catch (err) {
+      error = err.response.data.errorMessage;
+    }
+
+    if (response && response.status === 200) {
+      authReducer({
+        type: AuthActionType.LOGOUT_USER,
+        payload: {
+          error: error
+        },
+      });
+      navigate("/");
+    } 
   };
 
   return (
