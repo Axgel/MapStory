@@ -9,6 +9,13 @@ export default function ProfileScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);  
 
+  let userName = "";
+  let userEmail = "";
+  if(auth.user){
+    userName = auth.user.userName;
+    userEmail = auth.user.email;
+  }
+
   function setCurrentModal(e, currentModal){
     e.stopPropagation();
     store.setCurrentModal(currentModal);
@@ -25,7 +32,7 @@ export default function ProfileScreen() {
           <div className="w-px h-[70px] bg-modalborder border-opacity-60"></div>
           <div>
             <label htmlFor="email"></label>
-            <input className="border-none bg-transparent outline-none h-12 w-[420px] text-xl" type="email" name="email" defaultValue={auth.user.email} disabled></input>
+            <input className="border-none bg-transparent outline-none h-12 w-[420px] text-xl" type="email" name="email" defaultValue={userEmail} disabled></input>
           </div>
         </div>
 
@@ -34,7 +41,7 @@ export default function ProfileScreen() {
           <div className="w-px h-[70px] bg-modalborder border-opacity-60"></div>
           <div>
             <label htmlFor="username"></label>
-            <input className="border-none bg-transparent outline-none h-12 w-[370px] text-xl" type="text" name="username" defaultValue={auth.user.userName} disabled></input>
+            <input className="border-none bg-transparent outline-none h-12 w-[370px] text-xl" type="text" name="username" defaultValue={userName} key={userName} disabled></input>
           </div>
           <img onClick={(e) => setCurrentModal(e, CurrentModal.CHANGE_USERNAME)} className="" src={EditIcon} alt=""></img>
         </div>

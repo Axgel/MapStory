@@ -166,9 +166,9 @@ registerUser = async (req, res) => {
     res.status(200).json({
       success: true,
       user: {
-        userName: existingUser.userName,
-        email: existingUser.email,
-        _id: existingUser._id
+        userName: savedUser.userName,
+        email: savedUser.email,
+        _id: savedUser._id
       },
     });
 
@@ -388,14 +388,10 @@ changePassword = async (req, res) => {
     // console.log("passwordHash: " + passwordHash);
 
     const updated = await User.updateOne({ email: email }, { passwordHash: passwordHash });
-    res.cookie("token", "", {
-      httpOnly: true,
-      expires: new Date(0),
-      secure: true,
-      sameSite: "none",
-    })
-    .status(200)
-    .json({ success: true });
+
+    // req.session.token = token;
+
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).send();

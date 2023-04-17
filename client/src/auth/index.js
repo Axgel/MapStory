@@ -65,6 +65,12 @@ function AuthContextProvider(props) {
           error: payload.error
         });
       }
+      case AuthActionType.CHANGE_PASSWORD: {
+        return setAuth({
+          ...auth,
+          error: payload.error
+        });
+      }
       default:
         return auth;
     }
@@ -171,6 +177,7 @@ function AuthContextProvider(props) {
   };
 
   auth.changeUsername = async function (userName) {
+    if(userName.length == 0 || userName == auth.user.userName) return;
     let error = "";
     let user = auth.user;
     const email = user.email;
@@ -204,12 +211,11 @@ function AuthContextProvider(props) {
 
     if (response && response.status === 200) {
       authReducer({
-        type: AuthActionType.LOGOUT_USER,
+        type: AuthActionType.CHANGE_PASSWORD,
         payload: {
           error: error
         },
       });
-      navigate("/");
     }
   }
 
