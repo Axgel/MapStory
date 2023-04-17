@@ -1,7 +1,8 @@
 const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
-  video: true,
+  video: false,
+  chromeWebSecurity: false,
   trashAssetsBeforeRuns: true,
   e2e: {
     baseUrl: 'http://localhost:3000/',
