@@ -28,13 +28,15 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
+const sameSite = (process.env.ENVIRONMENT == "DEVELOPMENT") ? 'strict' : 'none';
+
 app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: true,
   cookie:{ 
     maxAge: 12 * 60 * 60 * 1000,
-    sameSite: 'none',
+    sameSite: sameSite,
     secure: 'auto'
   }
 }));
