@@ -48,10 +48,14 @@ export const recoveryEmail = (email) => {
 };
 
 export const recoverPassword = (
+  userName,
+  token,
   password,
   passwordVerify 
 ) => {
-  return api.post(`/recoveryPassword`, {
+  return api.post(`/recoverPassword/`, {
+    userName: userName,
+    token: token,
     password: password,
     passwordVerify: passwordVerify,
   });
