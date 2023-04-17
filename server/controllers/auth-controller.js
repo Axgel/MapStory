@@ -65,21 +65,18 @@ loginUser = async (req, res) => {
     const token = auth.signToken(existingUser._id);
     // console.log(token);
 
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-      })
-      .status(200)
-      .json({
-        success: true,
-        user: {
-          userName: existingUser.userName,
-          email: existingUser.email,
-          _id: existingUser._id
-        },
-      });
+    req.session.token = token;
+    
+
+    res.status(200).json({
+      success: true,
+      user: {
+        userName: existingUser.userName,
+        email: existingUser.email,
+        _id: existingUser._id
+      },
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).send();
@@ -87,14 +84,8 @@ loginUser = async (req, res) => {
 };
 
 logoutUser = async (req, res) => {
-  res
-    .cookie("token", "", {
-      httpOnly: true,
-      expires: new Date(0),
-      secure: true,
-      sameSite: 'none',
-    })
-    .send();
+  req.session.destroy();
+  res.status(200).send();
 };
 
 registerUser = async (req, res) => {
@@ -156,21 +147,16 @@ registerUser = async (req, res) => {
     const token = auth.signToken(savedUser._id);
     // // console.log("token:" + token);
 
-    await res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      })
-      .status(200)
-      .json({
-        success: true,
-        user: {
-          userName: savedUser.userName,
-          email: savedUser.email,
-          _id: savedUser._id
-        },
-      });
+    req.session.token = token;
+
+    res.status(200).json({
+      success: true,
+      user: {
+        userName: existingUser.userName,
+        email: existingUser.email,
+        _id: existingUser._id
+      },
+    });
 
     // console.log("token sent");
   } catch (err) {
