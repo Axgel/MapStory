@@ -230,31 +230,31 @@ recoverPassword = async(req, res) => {
     const search_by_username = await User.findOne({userName: userName})
     const search_by_token = await User.findOne({passwordToken: token})
     if(!search_by_token || !search_by_username){
-      console.log("Doesn't Exist")
+      //console.log("Doesn't Exist")
       return res.status(400).json({
         errorMessage: "Invalid token/Username",
       });
     }
     if(search_by_token.email !== search_by_username.email){
-      console.log("Wrong token or username")
+      //console.log("Wrong token or username")
       return res.status(400).json({
         errorMessage: "Invalid Token and username",
       });
     }
     if (Date.now() > search_by_token.passwordTimeout){
-      console.log("Expired Token")
+      //console.log("Expired Token")
       return res.status(400).json({
         errorMessage: "Token has expired ",
       });
     }
     if (password.length < 8) {
-      console.log("Password length not greater than 8")
+      //console.log("Password length not greater than 8")
       return res.status(400).json({
         errorMessage: "Please enter a password of at least 8 characters.",
       });
     }
     if (password !== passwordVerify) {
-      console.log("Password is not the same as password verified")
+      //console.log("Password is not the same as password verified")
       return res.status(400).json({
         errorMessage: "Please enter the same password twice.",
       });
@@ -280,11 +280,11 @@ recoverPassword = async(req, res) => {
         success: true
       })
     } else {
-      console.error("Failed Update");
+      //console.error("Failed Update");
       res.status(500).send();
     }
   }catch (err) {
-    console.error(err);
+    //console.error(err);
     res.status(500).send();
   }
 
