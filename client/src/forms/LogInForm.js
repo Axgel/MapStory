@@ -32,7 +32,7 @@ export default function LogInForm() {
 
           <div>
             <label htmlFor="pwd">Password: </label><br></br>
-            <input className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd" required></input>
+            <input className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd"></input>
           </div>
         </div>
 
