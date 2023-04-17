@@ -163,8 +163,9 @@ function AuthContextProvider(props) {
 
   auth.recoveryEmail = async function (email) {
     let error = "";
+    let response; 
     try {
-      const response = await api.recoveryEmail(email);
+      response = await api.recoveryEmail(email);
     } catch (err) {
       error = err.response.data.errorMessage;
       console.log(error)
