@@ -4,39 +4,16 @@ import AuthContext from "../auth";
 
 export default function LogInForm() {
   const { auth } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  function handleRecoverPassword(event){
-    // navigate("/recover")
-    // const formData = new FormData(event.currentTarget);
-    // auth.recoveryEmail(
-    //   formData.get('email'),
-    // )
-  }
-
-  function handleLogin(event){
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    auth.loginUser(
-      formData.get('email'),
-      formData.get('pwd')
-    )
-    // auth.recoveryEmail(
-    //   formData.get('email'),
-    // )
-  }
 
   function handleSubmit(event){
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     if (event.nativeEvent.submitter.name === "Log In"){
-      console.log("Logging User")
       auth.loginUser(
         formData.get('email'),
         formData.get('pwd')
       )
     }else {
-      console.log("Sending Recovery Email")
       auth.recoveryEmail(
         formData.get('email'),
       )

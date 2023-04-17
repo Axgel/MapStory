@@ -165,12 +165,13 @@ function AuthContextProvider(props) {
     let error = "";
     try {
       const response = await api.recoveryEmail(email);
-      if (response.status === 200) {
-        console.log("Email SENT!")
-      }
     } catch (err) {
       error = err.response.data.errorMessage;
       console.log(error)
+    }
+
+    if(response && response.status === 200){
+      navigate("/");
     }
   };
 
@@ -184,9 +185,6 @@ function AuthContextProvider(props) {
       const userName = searchParams.get("userName");
       const token = searchParams.get("token");
       response = await api.recoverPassword(userName, token, password, passwordVerify);
-      if (response && response.status === 200) {
-        console.log("Password Resetted!")
-      } 
     } catch (err) {
       console.log(err.response)
       error = err.response.errorMessage;
