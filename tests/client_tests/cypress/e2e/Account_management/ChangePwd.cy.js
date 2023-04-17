@@ -37,6 +37,12 @@ describe('Change Passsword', () => {
         cy.url().should('include', '/profile')
         // cy.url().should('include', '/')
         // cy.get('#loginEmail').should('exist')
+
+        cy.get('#editPasswordIcon').click()
+        cy.get('#changeCurPwd').clear().type('password321')
+        cy.get('#changeNewPwd').clear().type('password')
+        cy.get('#changeCfmPwd').clear().type('password')
+        cy.contains('OK').click()
     });
     //TODO: how to determine when you successfully changed your password?
 })
