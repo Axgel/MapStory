@@ -32,7 +32,11 @@ app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie:{ maxAge: 12 * 60 * 60 * 1000}
+  cookie:{ 
+    maxAge: 12 * 60 * 60 * 1000,
+    sameSite: 'none',
+    secure: 'auto'
+  }
 }));
 
 // SETUP OUR OWN ROUTERS AS MIDDLEWARE
