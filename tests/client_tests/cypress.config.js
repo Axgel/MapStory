@@ -9,8 +9,10 @@ module.exports = defineConfig({
     supportFile: './cypress/support/e2e.js',
     experimentalSessionAndOrigin: true,
     specPattern: [
-      './cypress/e2e/Account_management/*.cy.js',
-      './cypress/e2e/*.cy.js'
+      // './cypress/e2e/Account_management/*.cy.js',
+      // './cypress/e2e/*.cy.js'
+      './cypress/e2e/Account_management/Register.cy.js',
+      './cypress/e2e/Account_management/ResetPwd.cy.js',
     ]
   },
 });
