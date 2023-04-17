@@ -38,7 +38,7 @@ export default function Header() {
         </h1>
       </div>
       <div className="w-[50px] h-[50px] mx-12 rounded-full bg-white flex flex-row-reverse">
-        <img onClick={toggleMenuOpen} className="w-12 h-12" src={ProfileIcon} alt=""></img>
+        <img id="profileIcon" onClick={toggleMenuOpen} className="w-12 h-12" src={ProfileIcon} alt=""></img>
         <div id="profile-dd" className="absolute w-[150px] mt-[55px] rounded-lg bg-white hidden">
           <p onClick={handleProfileScreen} className="text-left px-3 py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">Profile</p>
           <p onClick={handleHomeScreen} className="text-left px-3 py-3 hover:bg-dropdownhover">Home</p>

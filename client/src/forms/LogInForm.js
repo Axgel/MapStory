@@ -27,12 +27,12 @@ export default function LogInForm() {
         <div className="flex flex-col items-center justify-center gap-6">
           <div>
             <label htmlFor="email">Email: </label><br></br>
-            <input className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="text" name="email" required></input>
+            <input id="loginEmail" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="text" name="email" required></input>
           </div>
 
           <div>
             <label htmlFor="pwd">Password: </label><br></br>
-            <input className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd" required></input>
+            <input id="loginPwd" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd" required></input>
           </div>
         </div>
 

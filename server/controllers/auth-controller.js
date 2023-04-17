@@ -294,7 +294,6 @@ recoverPassword = async(req, res) => {
 changeUsername = async (req, res) => {
   try {
     const { email, userName } = req.body;
-
     if (!email || !userName) {
       return res
         .status(400)

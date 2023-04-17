@@ -8,7 +8,7 @@ export default function ChangeUsernameModal(props) {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const [username, setUsername] = useState('');
-  
+
   function handleCloseModal(e){
     e.stopPropagation();
     store.setCurrentModal(CurrentModal.NONE);
@@ -20,7 +20,6 @@ export default function ChangeUsernameModal(props) {
 
   function handleChangeUsername(e) {
     e.stopPropagation();
-    console.log(username, auth.user.userName);
     if(username.length != 0 || username != auth.user.userName) 
       auth.changeUsername(username);
     store.setCurrentModal(CurrentModal.NONE);
