@@ -210,6 +210,7 @@ function AuthContextProvider(props) {
         },
       });
       navigate("/");
+  }
 
   auth.recoveryEmail = async function (email) {
     let error = "";
