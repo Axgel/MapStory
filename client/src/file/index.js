@@ -37,20 +37,16 @@ function GlobalFileContextProvider(props) {
     }
   };
 
-  file.loadAllSubregions = function(){
-    async function asyncLoadAllSubregions(){
-      if(store.openedMap){
-        let response = await api.getAllSubregions(store.openedMap._id);
-        if(response.status === 200){
-          fileReducer({
-            type: GlobalFileActionType.LOAD_SUBREGIONS,
-            payload: {subregions: response.data.subregions}
-          })
-        }
+  file.loadAllSubregions = async function(){
+    if(store.openedMap){
+      let response = await api.getAllSubregions(store.openedMap._id);
+      if(response.status === 200){
+        fileReducer({
+          type: GlobalFileActionType.LOAD_SUBREGIONS,
+          payload: {subregions: response.data.subregions}
+        })
       }
     }
-  
-    asyncLoadAllSubregions();
   }
 
 
