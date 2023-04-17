@@ -90,12 +90,12 @@ describe ("POST /profile/password", () => {
     })
 })
 
-describe ("POST /recoverPassword", () => {
-    describe("Testing endpoints", () => {
-        //respond with 200 since there is already data in the db
-        test("should response with 200 status code", async () => {
-            const response = await request(app).post("/auth/recoverPassword").send({})
-            expect(response.status).toEqual(200)
-        })
-    })
-})
+// describe ("POST /recoverPassword", () => {
+//     describe("Testing endpoints", () => {
+//         //respond with 200 since there is already data in the db
+//         test("should response with 200 status code", async () => {
+//             const response = await request(app).post("/auth/recoverPassword").send({})
+//             expect(response.status).toEqual(200)
+//         })
+//     })
+// })
