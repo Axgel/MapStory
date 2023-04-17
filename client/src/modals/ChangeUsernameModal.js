@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { CurrentModal } from "../enums";
 
 import { GlobalStoreContext } from "../store";
@@ -20,8 +20,9 @@ export default function ChangeUsernameModal(props) {
 
   function handleChangeUsername(e) {
     e.stopPropagation();
+    if(username.length != 0 || username != auth.user.userName) 
+      auth.changeUsername(username);
     store.setCurrentModal(CurrentModal.NONE);
-    auth.changeUsername(username);
   }
   
   if(store.currentModal == CurrentModal.CHANGE_USERNAME){
@@ -31,7 +32,7 @@ export default function ChangeUsernameModal(props) {
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[350px] text-left">
           <h1 className="text-xl text-center mt-4 mx-9">Change Your Username</h1>
           <h1 className="mx-6 my-1 text-start">Username</h1>
-          <input id="inputChangeUsername" className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="text" placeholder="Username" onChange={handleChange} required></input>
+          <input className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="text" defaultValue={auth.user.userName} onChange={handleChange}></input>
           <br></br><br></br>
           <div className="flex flex-row-reverse mx-3">
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleChangeUsername}>OK</button>

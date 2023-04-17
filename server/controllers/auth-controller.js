@@ -166,9 +166,9 @@ registerUser = async (req, res) => {
     res.status(200).json({
       success: true,
       user: {
-        userName: existingUser.userName,
-        email: existingUser.email,
-        _id: existingUser._id
+        userName: savedUser.userName,
+        email: savedUser.email,
+        _id: savedUser._id
       },
     });
 
@@ -294,21 +294,27 @@ recoverPassword = async(req, res) => {
 changeUsername = async (req, res) => {
   try {
     const { email, userName } = req.body;
-
-    if (!userName) {
+    if (!email || !userName) {
       return res
         .status(400)
         .json({ errorMessage: "Please enter all required fields." });
     }
 
-    const existingUser = await User.findOne({ email: email });
-    if (!existingUser) {
+    const existingEmail = await User.findOne({ email: email });
+    if (!existingEmail) {
       return res.status(401).json({
         errorMessage: "Wrong email provided.",
       });
     }
 
-    const newUser = await User.findOneAndUpdate({ email: email } , {userName: userName});
+    const existingUser = await User.findOne({ userName : userName });
+    if (existingUser) {
+      return res.status(400).json({
+        errorMessage: "An account with this username already exists.",
+      });
+    }
+
+    const newUser = await User.findOneAndUpdate({ email: email }, {userName: userName}, {new : true});
     return res.status(200).json({
       success: true,
       user: {
@@ -325,10 +331,73 @@ changeUsername = async (req, res) => {
 
 //Changing password on profile screen
 changePassword = async (req, res) => {
-  //Todo: Implement password change via email passing 
-  return res.status(200).json({
-    success: true
-  })
+  try {
+    const { email, oldPwd, newPwd, cfmPwd } = req.body;
+    //console.log(email, oldPwd, newPwd, cfmPwd);
+    if (!email || !oldPwd || !newPwd || !cfmPwd) {
+      return res
+        .status(400)
+        .json({ errorMessage: "Please enter all required fields." });
+    }
+    // console.log("all fields provided");
+    
+    const existingUser = await User.findOne({ email: email });
+    // console.log("existingUser: " + existingUser);
+    if (!existingUser) {
+      return res.status(401).json({
+        errorMessage: "Wrong email or password provided.",
+      });
+    }
+
+    const passwordCorrect = await bcrypt.compare(
+      oldPwd,
+      existingUser.passwordHash
+    );
+    if (!passwordCorrect) {
+      // console.log("Incorrect password");
+      return res.status(401).json({
+        errorMessage: "Wrong email or password provided.",
+      });
+    }
+
+    if (oldPwd === newPwd) {
+      // console.log("Incorrect password");
+      return res.status(400).json({
+        errorMessage: "Please enter a different password from your old password.",
+      });
+    }
+
+    if (newPwd.length < 8) {
+      return res.status(400).json({
+        errorMessage: "Please enter a password of at least 8 characters.",
+      });
+    }
+    // console.log("password long enough");
+
+    if (newPwd !== cfmPwd) {
+      return res.status(400).json({
+        errorMessage: "Please enter the same password twice.",
+      });
+    }
+    // console.log("password and password verify match");
+
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const passwordHash = await bcrypt.hash(newPwd, salt);
+    // console.log("passwordHash: " + passwordHash);
+
+    const updated = await User.updateOne({ email: email }, { passwordHash: passwordHash });
+
+    // req.session.token = token;
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
+  // return res.status(200).json({
+  //   success: true
+  // })
 }
 
 module.exports = {

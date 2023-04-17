@@ -65,6 +65,12 @@ function AuthContextProvider(props) {
           error: payload.error
         });
       }
+      case AuthActionType.CHANGE_PASSWORD: {
+        return setAuth({
+          ...auth,
+          error: payload.error
+        });
+      }
       default:
         return auth;
     }
@@ -170,6 +176,49 @@ function AuthContextProvider(props) {
     }
   };
 
+  auth.changeUsername = async function (userName) {
+    if(userName.length == 0 || userName == auth.user.userName) return;
+    let error = "";
+    let user = auth.user;
+    const email = user.email;
+    try {
+      const response = await api.changeUsername(email, userName);
+      if (response.status === 200) {
+        user = response.data.user;
+      }
+    } catch (err) {
+      error = err.response.data.errorMessage;
+    }
+
+    authReducer({
+      type: AuthActionType.CHANGE_USERNAME,
+      payload: {
+        user: user,
+        error: error
+      },
+    });
+  };
+
+  auth.changePassword = async function (oldPwd, newPwd, cfmPwd) {
+    let error = "";
+    let response;
+    const email = auth.user.email;
+    try {
+      response = await api.changePassword(email, oldPwd, newPwd, cfmPwd);
+    } catch (err) {
+      error = err.response.data.errorMessage;
+    }
+
+    if (response && response.status === 200) {
+      authReducer({
+        type: AuthActionType.CHANGE_PASSWORD,
+        payload: {
+          error: error
+        },
+      });
+    }
+  }
+
   auth.recoveryEmail = async function (email) {
     let error = "";
     let response; 
@@ -184,7 +233,6 @@ function AuthContextProvider(props) {
       navigate("/");
     }
   };
-
 
   auth.recoverPassword = async function (password, passwordVerify) {
     let error = "";

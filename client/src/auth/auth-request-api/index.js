@@ -68,15 +68,13 @@ export const changeUsername = (email, userName) => {
   });
 };
 
-export const changePassword = (
-  email,
-  password,
-  passwordVerify 
-  ) => {
+
+export const changePassword = (email, oldPwd, newPwd, cfmPwd) => {
   return api.post(`/profile/password`, {
     email: email,
-    password: password,
-    passwordVerify: passwordVerify,
+    oldPwd: oldPwd,
+    newPwd: newPwd,
+    cfmPwd: cfmPwd,
   });
 };
 
