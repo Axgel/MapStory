@@ -9,22 +9,26 @@ describe('Change Username', () => {
     it('change username: cancel', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('input[type=text]').clear().type('badbadbad') //TODO
+            cy.get('#inputChangeUsername').clear().type('badbadbad') //TODO
             cy.contains('Cancel').click()
             //check that the username field has the same value as previous
-            cy.get('input[type=text]').should('have.value', currentUsername)
+            cy.get('#profileUsername').should((newUsername) => {
+                expect(newUsername[0]).to.eql(currentUsername[0]);
+            })
         })
     });
     // username not unique
     it('change username: nonunique username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('input[type=text]').clear().type('tray') //TODO
-            cy.contains('Ok').click()
+            cy.get('#inputChangeUsername').clear().type('tray') //TODO
+            cy.contains('OK').click()
             //TODO: check error
 
             //check that the username field has the same value as previous
-            cy.get('input[type=text]').should('have.value', currentUsername)
+            cy.get('#profileUsername').should((newUsername) => {
+                expect(newUsername[0]).to.eql(currentUsername[0]);
+            })
         })
     });
     //success
