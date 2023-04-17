@@ -1,6 +1,20 @@
 const auth = require("../auth");
 const User = require("../models/user-model");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.sendinblue.com",
+  port: 587,
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_KEY,
+  },
+  tls: {
+    rejectUnauthorized: false
+  },
+});
 
 getLoggedIn = async (req, res) => {
   try {
@@ -167,10 +181,39 @@ registerUser = async (req, res) => {
 
 //Sending password recovery email
 recoveryEmail = async(req, res) => {
+  try{
+    let message_body = ""
+    const {email} = req.body
+    const user = await User.findOne({email: email})
+    const token = crypto.randomBytes(32).toString("hex");
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const resetToken = await bcrypt.hash(token, salt);
+    const update = await User.updateOne({email: email}, {passwordToken: resetToken, passwordTimeout: Date.now() + 600000})
+    if (process.env.ENVIRONMENT === "DEVELOPMENT"){
+      message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
+      // message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+    } else {
+      message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
+      // message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+    }
+    const message = await transporter.sendMail({
+      from: process.env.SMTP_SENDEMAIL,
+      to: email,
+      subject: "Password Reset Notice", 
+      text: message_body,
+    })
+    
+    return res.status(200).json({
+      success: true
+    })
+  }catch(err){
+    return res.status(401).json({
+      errorMessage: "Unable to send email",
+    });
+  }
   //Todo: Sending email via nodemailer and need to install postmail on backend server
-  return res.status(200).json({
-    success: true
-  })
+  
 }
 
 //Resetting password + Use for both recovering password 
@@ -178,9 +221,73 @@ recoverPassword = async(req, res) => {
   // Todo: Finding the account information via token on the URL then reset the password
   // If the token expired then they would have to request another password reset
   // Extract the password expiration time and check it with the current time to see if it already expired
-  return res.status(200).json({
-    success: true
-  })
+  
+  try{
+    // const{userName, token} = req.params
+    // console.log(req.body)
+    // console.log(token)
+    const {userName, token, password, passwordVerify} = req.body
+    const search_by_username = await User.findOne({userName: userName})
+    const search_by_token = await User.findOne({passwordToken: token})
+    if(!search_by_token || !search_by_username){
+      //console.log("Doesn't Exist")
+      return res.status(400).json({
+        errorMessage: "Invalid token/Username",
+      });
+    }
+    if(search_by_token.email !== search_by_username.email){
+      //console.log("Wrong token or username")
+      return res.status(400).json({
+        errorMessage: "Invalid Token and username",
+      });
+    }
+    if (Date.now() > search_by_token.passwordTimeout){
+      //console.log("Expired Token")
+      return res.status(400).json({
+        errorMessage: "Token has expired ",
+      });
+    }
+    if (password.length < 8) {
+      //console.log("Password length not greater than 8")
+      return res.status(400).json({
+        errorMessage: "Please enter a password of at least 8 characters.",
+      });
+    }
+    if (password !== passwordVerify) {
+      //console.log("Password is not the same as password verified")
+      return res.status(400).json({
+        errorMessage: "Please enter the same password twice.",
+      });
+    }
+
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const deleted = await User.deleteOne({userName: userName})
+
+    const newUser = new User({
+      userName: search_by_username.userName,
+      email: search_by_username.email,
+      passwordHash: passwordHash,
+      personalMaps: search_by_username.personalMaps,
+      sharedMaps: search_by_username.sharedMaps
+    });
+    const savedUser = await newUser.save();
+    
+    if(savedUser){
+      return res.status(200).json({
+        success: true
+      })
+    } else {
+      //console.error("Failed Update");
+      res.status(500).send();
+    }
+  }catch (err) {
+    //console.error(err);
+    res.status(500).send();
+  }
+
 }
 
 //Changing username on profile screen

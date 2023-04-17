@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "./auth-request-api";
 
 const AuthContext = createContext();
@@ -21,6 +21,7 @@ function AuthContextProvider(props) {
     error: ""
   });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     auth.getLoggedIn();
@@ -169,26 +170,40 @@ function AuthContextProvider(props) {
     }
   };
 
-  auth.changeUsername = async function (userName) {
+  auth.recoveryEmail = async function (email) {
     let error = "";
-    let user = auth.user;
-    const email = user.email;
+    let response; 
     try {
-      const response = await await api.changeUsername(email, userName);
-      if (response.status === 200) {
-        user = response.data.user;
-      }
+      response = await api.recoveryEmail(email);
     } catch (err) {
       error = err.response.data.errorMessage;
+      console.log(error)
     }
 
-    authReducer({
-      type: AuthActionType.CHANGE_USERNAME,
-      payload: {
-        user: user,
-        error: error
-      },
-    });
+    if(response && response.status === 200){
+      navigate("/");
+    }
+  };
+
+
+  auth.recoverPassword = async function (password, passwordVerify) {
+    let error = "";
+    let response;
+    
+    
+    try {
+      const userName = searchParams.get("userName");
+      const token = searchParams.get("token");
+      response = await api.recoverPassword(userName, token, password, passwordVerify);
+    } catch (err) {
+      console.log(err.response)
+      error = err.response.errorMessage;
+      console.log(error)
+    }
+
+    if (response && response.status === 200) {
+      navigate('/')
+    } 
   };
 
   return (
