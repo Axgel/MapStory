@@ -7,12 +7,11 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000/',
     supportFile: './cypress/support/e2e.js',
-    experimentalSessionAndOrigin: true,
+    // experimentalSessionAndOrigin: true,
     specPattern: [
       // './cypress/e2e/Account_management/*.cy.js',
-      // './cypress/e2e/*.cy.js'
-      './cypress/e2e/Account_management/Register.cy.js',
-      './cypress/e2e/Account_management/ResetPwd.cy.js',
+      // './cypress/e2e/*.cy.js',
+      './cypress/e2e/Account_management/Login.cy.js'
     ]
   },
 });
