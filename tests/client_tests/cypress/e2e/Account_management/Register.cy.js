@@ -7,11 +7,11 @@ describe('Register', () => {
         cy.get('#confirmPwd').type("password");
         cy.get('[type="submit"]').click();
         cy.wait(3000);
-        cy.get('#loginEmail').type('test123@gmail.com');
-        cy.get('#loginPwd').type('password');
-        cy.get('#loginButton').click();
-        cy.wait(3000);
         cy.get("#mapsid").should("exist");
+        // cy.get('#loginEmail').type('test123@gmail.com');
+        // cy.get('#loginPwd').type('password');
+        // cy.get('#loginButton').click();
+        // cy.wait(3000);
     });
 
     it('this thing exists', () => {
