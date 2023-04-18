@@ -10,10 +10,16 @@ describe('Register', () => {
         cy.get('#loginEmail').type('test123@gmail.com');
         cy.get('#loginPwd').type('password');
         cy.get('#loginButton').click();
-        cy.wait();
+        cy.wait(1000);
         cy.get("#mapsid").should("exist");
-
     });
+
+    it('this thing exists', () => {
+        cy.get('#mapsid').should("exist");
+        cy.get('#searchbycy').should("exist");
+    })
+
+
     // //bad email
     // it('register: bad email format', () =>{
     //     cy.get('input[name=email]').type("registerFETgmail.com")
