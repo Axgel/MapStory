@@ -21,7 +21,7 @@ jobs:
       - name: Create server .env file
         uses: SpicyPizza/create-envfile@v1.3
         with:
-          envkey_ENVIRONMENT: PRODUCTION
+          envkey_ENVIRONMENT: DEVELOPMENT
           envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
           envkey_DEV_CORS: ${{ vars.DEV_CORS }}
           envkey_PROD_CORS: ${{ secrets.PROD_CORS }}
