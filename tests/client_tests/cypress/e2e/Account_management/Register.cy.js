@@ -11,8 +11,7 @@ describe('Register', () => {
         cy.get('#loginPwd').type('qwertyuiop');
         cy.get('#loginButton').click();
         cy.wait(1000);
-        cy.get("#mapsid").should("exist");
-        cy.get('#mapsid').should("exist");
+        cy.get("#mapsid").should("exist")
         cy.get('#searchbycy').should("exist");
     })
 
