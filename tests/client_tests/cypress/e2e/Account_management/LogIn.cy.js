@@ -21,13 +21,14 @@ describe('Login', () => {
         cy.visit('/')
         cy.get('#loginEmail').clear().type("testing123@gmail.com")
         cy.get('#loginPwd').clear().type("password")
-        cy.contains('Log In').click()
-        cy.wait(10000)
-        cy.contains('Maps')
+        cy.contains('Log In').click().then((success)=>{
+            cy.contains('Maps')
+            cy.contains('Search By:')
+            cy.contains('Sort By:')
+            cy.get('#profile-dd').should('exist');
+        })
         // cy.visit('/') 
-        cy.contains('Search By:')
-        cy.contains('Sort By:')
-        cy.get('#profile-dd').should('exist');
+        
     });
 
 })
