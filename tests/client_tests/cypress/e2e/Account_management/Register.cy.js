@@ -6,11 +6,11 @@ describe('Register', () => {
         cy.get('#pwd').type("password");
         cy.get('#confirmPwd').type("password");
         cy.get('[type="submit"]').click();
-        cy.wait(1000);
+        cy.wait(3000);
         cy.get('#loginEmail').type('test123@gmail.com');
         cy.get('#loginPwd').type('password');
         cy.get('#loginButton').click();
-        cy.wait(1000);
+        cy.wait(3000);
         cy.get("#mapsid").should("exist");
     });
 
