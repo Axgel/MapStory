@@ -4,17 +4,21 @@ describe('Login', () => {
         cy.visit('/')
         cy.get('#loginEmail').clear().type("testing@gmail.com")
         cy.get('#loginPwd').clear().type("password123")
-        cy.contains('Log In').click();
+        cy.contains('Log In').click()
         //make sure error appears
+        cy.contains('Wrong email or password provided.')
+        cy.contains('OK').click()
 
     });
-    //incorrect password
+    //incorrect email or password
     it('login: incorrect pwd', () =>{
         cy.visit('/')
         cy.get('#loginEmail').clear().type("testuser@stonybrook.edu")
         cy.get('#loginPwd').clear().type("incorrect")
         cy.contains('Log In').click();
         //make sure an error appears
+        cy.contains('Wrong email or password provided.')
+        cy.contains('OK').click()
     });
     //success
     it('login: success', () => {
