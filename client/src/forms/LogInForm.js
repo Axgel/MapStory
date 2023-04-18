@@ -1,6 +1,7 @@
 import React, {useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../auth";
+import { CurrentModal } from "../enums";
 
 export default function LogInForm() {
   const { auth } = useContext(AuthContext);
@@ -14,9 +15,7 @@ export default function LogInForm() {
         formData.get('pwd')
       )
     }else {
-      auth.recoveryEmail(
-        formData.get('email'),
-      )
+      auth.setCurrentModal(CurrentModal.FORGOT_PASSWORD, "")
     }
   }
 
@@ -27,12 +26,12 @@ export default function LogInForm() {
         <div className="flex flex-col items-center justify-center gap-6">
           <div>
             <label htmlFor="email">Email: </label><br></br>
-            <input id="loginEmail" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="text" name="email" required></input>
+            <input id="loginEmail" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="text" name="email"></input>
           </div>
 
           <div>
             <label htmlFor="pwd">Password: </label><br></br>
-            <input id="loginPwd" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd" required></input>
+            <input id="loginPwd" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd"></input>
           </div>
         </div>
 

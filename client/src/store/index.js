@@ -116,7 +116,7 @@ function GlobalStoreContextProvider(props) {
       payload: { openedMap: mapId, currentModal: CurrentModal.NONE },
     });
 
-    navigate("/map");
+    navigate(`/map/${mapId._id}`);
   }
 
   store.parseFileUpload = async function(files) {
@@ -132,7 +132,7 @@ function GlobalStoreContextProvider(props) {
       });
     }
 
-    navigate("/map");
+    navigate(`/map/${response.data.id._id}`);
   }
 
   store.createMapSubregions = function(subregions){

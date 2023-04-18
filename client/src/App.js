@@ -21,7 +21,8 @@ import {
   AddTagModal,
   ChangeUsernameModal,
   ChangePasswordModal,
-  CreateMapModal
+  CreateMapModal,
+  ForgotPasswordModal
  } from "./modals"
 
 import {
@@ -42,7 +43,7 @@ function App() {
               <Route path="/register" element={<RegisterScreen />} />
               <Route path="/recover" element={<RecoverPasswordScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
-              <Route path="/map" element={<MapScreen />} />
+              <Route path="/map/:id" element={<MapScreen />} />
               <Route path="/all" element={<AllScreen />} />
             </Routes>
             <AccountFeedbackModal />
@@ -54,6 +55,7 @@ function App() {
             <ChangeUsernameModal />
             <ChangePasswordModal />
             <CreateMapModal />
+            <ForgotPasswordModal />
           </GlobalFileContextProvider>
         </GlobalStoreContextProvider>
       </AuthContextProvider>
