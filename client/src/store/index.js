@@ -36,6 +36,8 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_VIEW_MODE: {
         return setStore({
           ...store,
+          selectedMap: null,
+          detailView: DetailView.NONE,
           viewMode: payload.viewMode
         })
       }
