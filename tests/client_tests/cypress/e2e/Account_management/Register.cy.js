@@ -1,5 +1,5 @@
 describe('Register', () => {
-    beforeEach(() => {
+    before(() => {
         cy.visit("http://localhost:3000/register");
         cy.get('input[name=email]').type("test123@gmail.com");
         cy.get('input[name=username]').type("testName");
@@ -8,11 +8,12 @@ describe('Register', () => {
         cy.get('[type="submit"]').click();
         cy.wait(3000);
         cy.visit("http://localhost:3000/");
+        cy.get('#loginEmail').type('test123@gmail.com');
+        cy.get('#loginPwd').type('password');
+        cy.get('#loginButton').click();
+        cy.wait(3000);
+        cy.visit("http://localhost:3000/"); 
         cy.get("#mapsid").should("exist");
-        // cy.get('#loginEmail').type('test123@gmail.com');
-        // cy.get('#loginPwd').type('password');
-        // cy.get('#loginButton').click();
-        // cy.wait(3000);
     });
 
     it('this thing exists', () => {
