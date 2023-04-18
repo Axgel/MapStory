@@ -3,10 +3,11 @@ describe('Register', () => {
         cy.visit("http://localhost:3000/register");
         cy.get('input[name=email]').type("test123@gmail.com");
         cy.get('input[name=username]').type("testName");
-        cy.get('#pwd').type("password");
-        cy.get('#confirmPwd').type("password");
+        cy.get('#pwd').type("qwertyuiop");
+        cy.get('#confirmPwd').type("qwertyuiop");
         cy.get('[type="submit"]').click();
         cy.wait(3000);
+        cy.visit("http://localhost:3000/");
         cy.get("#mapsid").should("exist");
         // cy.get('#loginEmail').type('test123@gmail.com');
         // cy.get('#loginPwd').type('password');
