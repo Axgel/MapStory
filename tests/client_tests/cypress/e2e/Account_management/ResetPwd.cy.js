@@ -1,6 +1,6 @@
 describe('Reset Password', () => {
     //success
-    it('pwd reset: success', () =>{
+    it('success', () =>{
         cy.visit('/')
 
     });

@@ -3,7 +3,7 @@ describe('Register', () => {
         cy.visit('/register')
     });
     //bad email 
-    it('register: bad email format', () =>{
+    it('bad email format', () =>{
         cy.get('input[name=email]').type("registerFETgmail.com")
         cy.get('input[name=username]').type("fet")
         cy.get('#pwd').type("frontendtestcypress") 
@@ -14,7 +14,7 @@ describe('Register', () => {
 
     });
     //email exists already
-    it('register: email exists', () =>{
+    it('email exists', () =>{
         cy.get('input[name=email]').type("tesing123@gmail.com")
         cy.get('input[name=username]').type("fet41038")
         cy.get('#pwd').type("frontendtestcypress") 
@@ -27,7 +27,7 @@ describe('Register', () => {
 
     });
     //non-unique username
-    it('register: not unique username', () =>{
+    it('not unique username', () =>{
         cy.get('input[name=email]').type("registerFET@gmail.com")
         cy.get('input[name=username]').type("fet")
         cy.get('#pwd').type("frontendtestcypress") 
@@ -40,7 +40,7 @@ describe('Register', () => {
 
     });
     //password doesnt fit requirements (less than 8 chars)
-    it('register: bad pwd format', () =>{
+    it('bad pwd format', () =>{
         cy.get('input[name=email]').type("registerFET@gmail.com")
         cy.get('input[name=username]').type("fet")
         cy.get('#pwd').type("fet") 
@@ -52,7 +52,7 @@ describe('Register', () => {
 
     });
     //passwords do not match
-    it('register: pwd dont match', () =>{
+    it('pwd dont match', () =>{
         cy.get('input[name=email]').type("registerFET@gmail.com")
         cy.get('input[name=username]').type("fet")
         cy.get('#pwd').type("frontendtestcypress") 
@@ -64,13 +64,13 @@ describe('Register', () => {
 
     });   
     //successful registration
-    it('register: success', () =>{
+    it('success', () =>{
         cy.get('input[name=email]').type("registerFET@gmail.com")
         cy.get('input[name=username]').type("fet123")
         cy.get('#pwd').type("frontendtestcypress") 
         cy.get('#confirmPwd').type("frontendtestcypress")
-        // cy.visit('/')
-        cy.get('#createAccBtn').click()
+        cy.visit('/')
+        // cy.get('#createAccBtn').click()
         //should be directed to the splash screen for user to log in
         cy.url().should('include', '/')
         cy.get('#loginEmail').should('exist');

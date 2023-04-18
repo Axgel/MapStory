@@ -1,6 +1,6 @@
 describe('Login', () => {
     //no account with email
-    it('login: email does not exist', () =>{
+    it('email does not exist', () =>{
         cy.visit('/')
         cy.get('#loginEmail').clear().type("testing@gmail.com")
         cy.get('#loginPwd').clear().type("password123")
@@ -11,7 +11,7 @@ describe('Login', () => {
 
     });
     //incorrect email or password
-    it('login: incorrect pwd', () =>{
+    it('incorrect pwd', () =>{
         cy.visit('/')
         cy.get('#loginEmail').clear().type("testuser@stonybrook.edu")
         cy.get('#loginPwd').clear().type("incorrect")
@@ -21,7 +21,7 @@ describe('Login', () => {
         cy.contains('OK').click()
     });
     //success
-    it('login: success', () => {
+    it('success', () => {
         cy.visit('/')
         cy.get('input[name=email]').type("testing123@gmail.com")
         cy.get('input[name=pwd]').type("password")

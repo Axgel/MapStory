@@ -6,7 +6,7 @@ describe('Change Username', () => {
         cy.contains('Profile').click()
     });
     //press cancel on modal
-    it('change username: cancel', () =>{
+    it('cancel', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
             cy.get('#inputNewUsername').clear().type('badbadbad') //TODO
@@ -18,10 +18,10 @@ describe('Change Username', () => {
         })
     });
     // username not unique
-    it('change username: nonunique username', () =>{
+    it('nonunique username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('#inputNewUsername').clear().type('ken') //TODO
+            cy.get('#inputNewUsername').clear().type('tray') //TODO
             cy.contains('OK').click()
             //check error
             cy.contains('An account with this username already exists.')
@@ -33,7 +33,7 @@ describe('Change Username', () => {
         })
     });
     //success
-    it('change username: success', () =>{
+    it('success', () =>{
         cy.get('#editUsernameIcon').click()
         cy.get('#inputNewUsername').clear().type("newUsername") 
         cy.contains('OK').click()

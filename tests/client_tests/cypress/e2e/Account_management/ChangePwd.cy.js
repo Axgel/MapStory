@@ -6,7 +6,7 @@ describe('Change Passsword', () => {
         cy.contains('Profile').click()
     });
     //press cancel
-    it('change pwd: cancel', () =>{
+    it('cancel', () =>{
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('passcancel')
@@ -16,7 +16,7 @@ describe('Change Passsword', () => {
         cy.url().should('include', '/profile')
     });
     //password doesnt follow standards we set (min 8 characters)
-    it('change pwd: bad pwd', () =>{
+    it('bad pwd', () =>{
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('badpass')
@@ -27,7 +27,7 @@ describe('Change Passsword', () => {
         cy.url().should('include', '/profile')
     });
     //success
-    it('change pwd: success', () =>{
+    it('success', () =>{
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('password321')
