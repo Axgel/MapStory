@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start-client": "cd ../../client && npm ci && npm start",
-    "start-server": "cd ../../server && npm start"
+    "start-server": "cd ../../server && npm ci && npm start"
   },
   "devDependencies": {
     "cypress": "^10.7.0"
