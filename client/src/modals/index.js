@@ -7,6 +7,7 @@ import AddTagModal from "./AddTagModal";
 import ChangeUsernameModal from "./ChangeUsernameModal";
 import ChangePasswordModal from "./ChangePasswordModal";
 import CreateMapModal from "./CreateMapModal";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 
 export {
   AccountFeedbackModal, 
@@ -17,5 +18,6 @@ export {
   AddTagModal,
   ChangeUsernameModal,
   ChangePasswordModal,
-  CreateMapModal
+  CreateMapModal,
+  ForgotPasswordModal
 }
