@@ -22,8 +22,20 @@ describe('Change Passsword', () => {
         cy.get('#changeNewPwd').clear().type('badpass')
         cy.get('#changeCfmPwd').clear().type('badpass')
         cy.contains('OK').click()
-        //TODO: get error
-
+        //TODO: get error in form
+        cy.contains('Password length must be at least 8 characters long')
+        cy.url().should('include', '/profile')
+    });
+    //current password is incorrect
+    it('current pwd incorrect', () =>{
+        cy.get('#editPasswordIcon').click()
+        cy.get('#changeCurPwd').clear().type('password123')
+        cy.get('#changeNewPwd').clear().type('password')
+        cy.get('#changeCfmPwd').clear().type('password')
+        cy.contains('OK').click()
+        //TODO: get error modal
+        cy.contains('Incorrect password entered')
+        cy.contains('OK').click()
         cy.url().should('include', '/profile')
     });
     //success
@@ -37,7 +49,6 @@ describe('Change Passsword', () => {
         cy.url().should('include', '/profile')
         // cy.url().should('include', '/')
         // cy.get('#loginEmail').should('exist')
-
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password321')
         cy.get('#changeNewPwd').clear().type('password')
