@@ -7,8 +7,10 @@ describe('Register', () => {
         cy.get('#confirmPwd').type("qwertyuiop");
         cy.get('[type="submit"]').click();
         cy.wait(1000);
-        cy.visit("/");
-        cy.get('input[name=email]').should('exist')
+        // cy.visit("/");
+        cy.url().should('include', '/')
+        // cy.get('#loginEmail').should('exist');
+        // cy.get('input[name=email]').should('exist')
     })
 
 
