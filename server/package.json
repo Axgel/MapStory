@@ -17,7 +17,13 @@
     "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.5",
-    "nodemailer": "^6.9.1"
+    "nodemailer": "^6.9.1",
+
+    "@teamwork/websocket-json-stream": "^2.0.0",
+    "reconnecting-websocket": "^4.4.0",
+    "sharedb": "^2.2.5",
+    "sharedb-mongo": "^1.0.0",
+    "ws": "^8.5.0"
   },
   "scripts": {
     "start": "node index.js",
