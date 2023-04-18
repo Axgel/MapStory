@@ -158,18 +158,18 @@ registerUser = async (req, res) => {
     // console.log("new user saved: " + savedUser._id);
 
     // LOGIN THE USER
-    const token = auth.signToken(savedUser._id);
+    // const token = auth.signToken(savedUser._id);
     // // console.log("token:" + token);
 
-    req.session.token = token;
+    // req.session.token = token;
 
     res.status(200).json({
       success: true,
-      user: {
-        userName: savedUser.userName,
-        email: savedUser.email,
-        _id: savedUser._id
-      },
+      // user: {
+      //   userName: savedUser.userName,
+      //   email: savedUser.email,
+      //   _id: savedUser._id
+      // },
     });
 
     // console.log("token sent");

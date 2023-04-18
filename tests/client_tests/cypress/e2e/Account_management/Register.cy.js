@@ -7,12 +7,10 @@ describe('Register', () => {
         cy.get('#confirmPwd').type("qwertyuiop");
         cy.get('[type="submit"]').click();
         cy.wait(3000);
-        cy.visit("http://localhost:3000/");
         cy.get('#loginEmail').type('test123@gmail.com');
         cy.get('#loginPwd').type('qwertyuiop');
         cy.get('#loginButton').click();
         cy.wait(3000);
-        cy.visit("http://localhost:3000/"); 
         cy.get("#mapsid").should("exist");
     });
 
