@@ -50,12 +50,12 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./cypress/screenshots
+          path: ./tests/client_tests/cypress/screenshots
       - uses: actions/upload-artifact@v2
         if: always()
         with:
           name: cypress-videos
-          path: ./cypress/videos
+          path: ./tests/client_tests/cypress/videos
       
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v5.6.1 # use the explicit version number
