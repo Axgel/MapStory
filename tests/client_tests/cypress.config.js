@@ -1,7 +1,7 @@
 const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
-  video: false,
+  // video: false,
   chromeWebSecurity: false,
   trashAssetsBeforeRuns: true,
   e2e: {
