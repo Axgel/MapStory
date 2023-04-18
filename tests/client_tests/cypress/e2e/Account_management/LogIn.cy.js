@@ -22,7 +22,6 @@ describe('Login', () => {
         cy.get('input[name=email]').type("testing123@gmail.com")
         cy.get('input[name=pwd]').type("password")
         cy.get('#loginButton').click()
-
         cy.contains('Maps')
         // cy.visit('/') 
         cy.contains('Search By:')
