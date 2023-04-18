@@ -14,12 +14,13 @@ describe('Register', () => {
 
     });
     //email exists already
-    it('register: not unique username', () =>{
+    it('register: email exists', () =>{
         cy.get('input[name=email]').type("tesing123@gmail.com")
         cy.get('input[name=username]').type("fet41038")
         cy.get('#pwd').type("frontendtestcypress") 
         cy.get('#confirmPwd').type("frontendtestcypress")
         cy.get('#createAccBtn').click()
+        cy.wait(1000)
         //get error
         cy.contains('An account with this email address already exists.')
         cy.contains('OK').click()
@@ -32,6 +33,7 @@ describe('Register', () => {
         cy.get('#pwd').type("frontendtestcypress") 
         cy.get('#confirmPwd').type("frontendtestcypress")
         cy.get('#createAccBtn').click()
+        cy.wait(1000)
         //get error
         cy.contains('An account with this username already exists.')
         cy.contains('OK').click()
