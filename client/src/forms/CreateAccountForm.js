@@ -66,7 +66,7 @@ export default function CreateAccountForm() {
           </div>
         </div>
         
-        <button className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" id="createAccBtn">Create Account</button>
+        <button type="submit" className="h-16 w-[150px] bg-brownshade-500 my-8 text-center" id="createAccBtn">Create Account</button>
       </form>
     </div>
   );
