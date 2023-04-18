@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
 import { CurrentModal } from "../enums";
-
+import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 
@@ -11,7 +11,9 @@ export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
-  
+  const navigate = useNavigate();
+
+
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
   if(store.selectedMap && store.selectedMap._id == mapDetails._id){
     mapCardWrapper += "bg-mapselectedfill"
@@ -29,9 +31,10 @@ export default function MapCard(props) {
     }
   }
 
-  function setOpenedMap(e){
+  function handleOpenMap(e){
     e.stopPropagation();
-    store.setOpenedMap(mapDetails);
+    // store.setOpenedMap(mapDetails);
+    navigate(`/map/${mapDetails._id}`);
   }
 
   function setCurrentModal(e, currentModal){
@@ -40,7 +43,7 @@ export default function MapCard(props) {
   }
 
   return (
-    <div className={mapCardWrapper} onClick={setSelectedMap} onDoubleClick={setOpenedMap}>
+    <div className={mapCardWrapper} onClick={setSelectedMap} onDoubleClick={handleOpenMap}>
       <div className="flex">
         {/* Section for upvote/downvote */}
         <div className="flex flex-col justify-center px-2">

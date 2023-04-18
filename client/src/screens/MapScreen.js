@@ -1,6 +1,6 @@
 import React, {useContext, useEffect} from "react";
 import { Header, EditToolbar, Map, MapProperties, MapDetailCard } from "../components";
-
+import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
@@ -8,9 +8,10 @@ import GlobalFileContext from "../file";
 export default function MapScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
+  const { mapId } = useParams();
 
   useEffect(() => {
-    file.loadAllSubregions();
+    file.loadAllSubregions(mapId);
   }, [])
   
   return (

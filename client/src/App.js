@@ -43,7 +43,7 @@ function App() {
               <Route path="/register" element={<RegisterScreen />} />
               <Route path="/recover" element={<RecoverPasswordScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
-              <Route path="/map/:id" element={<MapScreen />} />
+              <Route path="/map/:mapId" element={<MapScreen />} />
               <Route path="/all" element={<AllScreen />} />
             </Routes>
             <AccountFeedbackModal />
