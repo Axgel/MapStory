@@ -18,7 +18,7 @@ jobs:
         run: npm ci
         working-directory: ./server
       
-      - name: Install Dependencies for Server
+      - name: Install Dependencies for Client
         run: npm ci
         working-directory: ./client
 
@@ -29,7 +29,7 @@ jobs:
           envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
           envkey_DEV_CORS: ${{ vars.DEV_CORS }}
           envkey_PROD_CORS: ${{ secrets.PROD_CORS }}
-          envkey_JWT_SCRET: ${{ secrets.JWT_SECRET }}
+          envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
           envkey_SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
           envkey_SMTP_KEY: ${{ secrets.SMTP_KEY }}
           envkey_SMTP_SENDEMAIL: ${{ secrets.SMTP_SENDEMAIL }}
@@ -52,7 +52,7 @@ jobs:
           envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
           envkey_DEV_CORS: ${{ vars.DEV_CORS }}
           envkey_PROD_CORS: ${{ secrets.PROD_CORS }}
-          envkey_JWT_SCRET: ${{ secrets.JWT_SECRET }}
+          envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
           file_name: ./tests/client_tests/.env
           fail_on_empty: true
       
