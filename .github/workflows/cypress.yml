@@ -14,18 +14,6 @@ jobs:
         with:
           node-version: "16"
 
-      - uses: cypress-io/github-action@v4
-      - uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: ./cypress/screenshots
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: cypress-videos
-          path: ./cypress/videos
-
       - name: Install Dependencies for Server
         run: npm ci
         working-directory: ./server
@@ -56,6 +44,18 @@ jobs:
           envkey_REACT_APP_FILE: "${{ vars.REACT_APP_FILE }}"
           file_name: ./client/.env.development
           fail_on_empty: true
+
+      - uses: cypress-io/github-action@v4
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ./cypress/screenshots
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: ./cypress/videos
       
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v5.6.1 # use the explicit version number
