@@ -9,7 +9,7 @@ describe('Register', () => {
         cy.wait(1000);
         // cy.visit("/");
         cy.url().should('include', '/')
-        // cy.get('#loginEmail').should('exist');
+        cy.get('#loginEmail').should('exist');
         // cy.get('input[name=email]').should('exist')
     })
 
