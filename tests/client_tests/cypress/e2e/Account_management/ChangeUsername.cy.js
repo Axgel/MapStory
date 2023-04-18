@@ -21,10 +21,11 @@ describe('Change Username', () => {
     it('change username: nonunique username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('#inputNewUsername').clear().type('tray') //TODO
+            cy.get('#inputNewUsername').clear().type('ken') //TODO
             cy.contains('OK').click()
-            //TODO: check error
-
+            //check error
+            cy.contains('An account with this username already exists.')
+            cy.contains('OK').click()
             //check that the username field has the same value as previous
             cy.get('#profileUsername').should((newUsername) => {
                 expect(newUsername[0]).to.eql(currentUsername[0]);
@@ -38,6 +39,10 @@ describe('Change Username', () => {
         cy.contains('OK').click()
         //check that the username field has the new value
         cy.get('#profileUsername').should('have.value', 'newUsername')
+        //reset to old username
+        cy.get('#editUsernameIcon').click()
+        cy.get('#inputNewUsername').clear().type("fet") 
+        cy.contains('OK').click()
     });
     
 })
