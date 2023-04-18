@@ -14,9 +14,13 @@ jobs:
         with:
           node-version: "16"
 
-      # - name: Install Dependencies for Server
-      #   run: npm ci
-      #   working-directory: ./server
+      - name: Install Dependencies for Server
+        run: npm ci
+        working-directory: ./server
+      
+      - name: Install Dependencies for Server
+        run: npm ci
+        working-directory: ./client
 
       - name: Create server .env file
         uses: SpicyPizza/create-envfile@v1.3

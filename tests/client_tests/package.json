@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start-client": "cd ../../client && npm ci && npm start",
-    "start-server": "cd ../../server && npm ci && node index.js"
+    "start-client": "cd ../../client && npm start",
+    "start-server": "cd ../../server && node index.js"
   },
   "devDependencies": {
     "cypress": "^10.7.0"
