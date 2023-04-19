@@ -30,7 +30,7 @@ describe('Login', () => {
         // cy.visit('/') 
         cy.contains('Search By:')
         cy.contains('Sort By:')
-        cy.get('#profile-dd').should('exist');
+        cy.get('#profileIcon').should('exist')
     });
 
 })
