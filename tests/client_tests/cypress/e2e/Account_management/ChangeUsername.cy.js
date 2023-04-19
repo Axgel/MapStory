@@ -1,6 +1,6 @@
 describe('Change Username', () => {
     beforeEach(() => {
-        cy.login("testUsername", "testUsername")
+        cy.login("test", "test")
         cy.visit('/')
         cy.get('#profileIcon').click()
         cy.contains('Profile').click()
@@ -8,8 +8,9 @@ describe('Change Username', () => {
     //press cancel on modal
     it('cancel', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
+            cy.wait(1000)
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('#inputNewUsername').clear().type('badbadbad') 
+            cy.get('#inputNewUsername').clear().type('cancelcancel') 
             cy.contains('Cancel').click()
             //check that the username field has the same value as previous
             cy.get('#profileUsername').should((newUsername) => {
@@ -26,6 +27,21 @@ describe('Change Username', () => {
             //check error
             cy.contains('An account with this username already exists.')
             cy.contains('OK').click()
+            //check that the username field has the same value as previous
+            cy.get('#profileUsername').should((newUsername) => {
+                expect(newUsername[0]).to.eql(currentUsername[0]);
+            })
+        })
+    });
+    //empty username
+    it('empty username', () =>{
+        cy.get('#profileUsername').then((currentUsername)=>{
+            cy.get('#editUsernameIcon').click() //click edit icon
+            cy.get('#inputNewUsername').clear() //TODO
+            cy.contains('OK').click()
+            //check error
+            cy.contains('Username cannot be empty')
+            cy.contains('Cancel').click()
             //check that the username field has the same value as previous
             cy.get('#profileUsername').should((newUsername) => {
                 expect(newUsername[0]).to.eql(currentUsername[0]);
