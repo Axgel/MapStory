@@ -40,7 +40,7 @@ createMap = (req, res) => {
     user.save().then(() => {
       mapproject.save().then((map) => {
         return res.status(201).json({
-          id: map._id
+          id: mapproject
         })
       }).catch((err) => {
         return res.status(400).json({errpr: "Map not saved"});
@@ -65,8 +65,42 @@ getPersonalAndSharedMaps = async (req, res) => {
   }
 }
 
+updateMapTitle = async(req,res) =>{
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a title to update'
+      })
+    }
+
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.title = body.title;
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project title updated"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured updating map title'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
-  getPersonalAndSharedMaps
+  getPersonalAndSharedMaps,
+  updateMapTitle
 };

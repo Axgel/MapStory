@@ -25,7 +25,7 @@ function GlobalStoreContextProvider(props) {
     personalMaps: null,
     sharedMaps: null,
     selectedMap: null,
-    openedMap: null,
+    //openedMap: null,
   });
 
   const navigate = useNavigate();
@@ -36,6 +36,8 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_VIEW_MODE: {
         return setStore({
           ...store,
+          selectedMap: null,
+          detailView: DetailView.NONE,
           viewMode: payload.viewMode
         })
       }
@@ -55,13 +57,6 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_CURRENT_MODAL: {
         return setStore({
           ...store,
-          currentModal: payload.currentModal
-        })
-      }
-      case GlobalStoreActionType.SET_OPENED_MAP: {
-        return setStore({
-          ...store,
-          openedMap: payload.openedMap,
           currentModal: payload.currentModal
         })
       }
@@ -108,29 +103,28 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
-  store.setOpenedMap = function (mapId) {
-    storeReducer({
-      type: GlobalStoreActionType.SET_OPENED_MAP,
-      payload: { openedMap: mapId, currentModal: CurrentModal.NONE },
-    });
+  // store.setOpenedMap = function (mapId) {
+  //   storeReducer({
+  //     type: GlobalStoreActionType.SET_OPENED_MAP,
+  //     payload: { openedMap: mapId, currentModal: CurrentModal.NONE },
+  //   });
 
-    navigate("/map");
-  }
+  //   navigate(`/map/${mapId._id}`);
+  // }
 
   store.parseFileUpload = async function(files) {
     let geojsonFile = await convertToGeojson(files);
     let subregions = await convertGeojsonToInternalFormat(geojsonFile);
     let subregionIds = await store.createMapSubregions(subregions);
-    let response = await api.createMap(subregionIds, auth.user._id);  
+    let response = await api.createMap(subregionIds, auth.user);  
     if(response.status === 201){
-
-      storeReducer({
-        type: GlobalStoreActionType.SET_OPENED_MAP,
-        payload: {openedMap: response.id, currentModal: CurrentModal.NONE},
-      });
+      // storeReducer({
+      //   type: GlobalStoreActionType.SET_OPENED_MAP,
+      //   payload: {openedMap: response.data.id, currentModal: CurrentModal.NONE},
+      // });
+      store.setCurrentModal(CurrentModal.NONE);
+      navigate(`/map/${response.data.id._id}`);
     }
-
-    navigate("/map");
   }
 
   store.createMapSubregions = function(subregions){
@@ -174,6 +168,13 @@ function GlobalStoreContextProvider(props) {
     }
 
     asyncLoadPersonalAndSharedMaps();
+  }
+
+  store.updateMapTitle = async function(newTitle){
+    let response = await api.updateMapTitle(store.selectedMap._id, newTitle);
+    if(response.status === 200){
+      store.loadPersonalAndSharedMaps();
+    }
   }
 
 

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { CurrentModal } from "../enums";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
+import { ViewMode } from "../enums";
 
 export default function HomeScreen() {
   const { store } = useContext(GlobalStoreContext);
@@ -32,10 +33,18 @@ export default function HomeScreen() {
   }
 
   let mapCards = <></>
-  if(store.personalMaps){
-    mapCards = store.personalMaps.map((map, index) => {
-      return <MapCard key={index} mapDetails={map} />;
-    })
+  if(store.viewMode == ViewMode.PERSONAL && store.personalMaps) {
+      mapCards = store.personalMaps.map((map, index) => {
+        return <MapCard key={index} mapDetails={map} />;
+      })
+  } else if(store.viewMode == ViewMode.SHARED && store.sharedMaps) {
+      mapCards = store.sharedMaps.map((map, index) => {
+        return <MapCard key={index} mapDetails={map} />;
+      })
+  } else if(store.viewMode == ViewMode.PUBLISHED && store.publishedMaps) {
+      mapCards = store.publishedMaps.map((map, index) => {
+        return <MapCard key={index} mapDetails={map} />;
+      })
   }
 
   function setCurrentModal(e, currentModal){

@@ -41,6 +41,10 @@ jobs:
         with:
           envkey_DEBUG: false
           envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
+          envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          envkey_SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+          envkey_SMTP_KEY: ${{ secrets.SMTP_KEY }}
+          envkey_SMTP_SENDEMAIL: ${{ secrets.SMTP_SENDEMAIL }}
           file_name: ./tests/server_tests/.env
           fail_on_empty: true
         

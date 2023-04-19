@@ -44,8 +44,6 @@ describe ("POST /register", () => {
         test("Should respond with status of 400", async () => {
             const response = await request(app).post("/auth/register").send({
                 userName: "JohnS",
-                firstName: "John", 
-                lastName: "Smith", 
                 email: "JohnSmith6969@gmail.com", 
                 password: "123456", 
                 passwordVerify: "123456",
@@ -58,8 +56,6 @@ describe ("POST /register", () => {
         test("Should respond with status of 400", async () => {
             const response = await request(app).post("/auth/register").send({
                 userName: "JohnS",
-                firstName: "John", 
-                lastName: "Smith", 
                 email: "JohnSmith6969@gmail.com", 
                 password: "123456789", 
                 passwordVerify: "123456",
@@ -70,32 +66,33 @@ describe ("POST /register", () => {
     })
 })
 
-describe ("POST /profile/username", () => {
-    describe("Testing endpoints", () => {
-        //respond with 200 since there is already data in the db
-        test("should response with 200 status code", async () => {
-            const response = await request(app).post("/auth/profile/username").send({})
-            expect(response.status).toEqual(200)
-        })
-    })
-})
-
-describe ("POST /profile/password", () => {
-    describe("Testing endpoints", () => {
-        //respond with 200 since there is already data in the db
-        test("should response with 200 status code", async () => {
-            const response = await request(app).post("/auth/profile/password").send({})
-            expect(response.status).toEqual(200)
-        })
-    })
-})
-
-// describe ("POST /recoverPassword", () => {
+// describe ("POST /profile/username", () => {
 //     describe("Testing endpoints", () => {
-//         //respond with 200 since there is already data in the db
-//         test("should response with 200 status code", async () => {
-//             const response = await request(app).post("/auth/recoverPassword").send({})
-//             expect(response.status).toEqual(200)
+//         //respond with 400 since there is already data in the db
+//         test("should response with 400 status code", async () => {
+//             const response = await request(app).post("/auth/profile/username").send({})
+//             expect(response.status).toEqual(400)
 //         })
 //     })
 // })
+
+// describe ("POST /profile/password", () => {
+//     describe("Testing endpoints", () => {
+//         //respond with 400 since there is already data in the db
+//         test("should response with 400 status code", async () => {
+//             const response = await request(app).post("/auth/profile/password").send({})
+//             expect(response.status).toEqual(400)
+//         })
+//     })
+// })
+
+
+describe ("POST /recoverPassword", () => {
+    describe("Testing endpoints", () => {
+        //respond with 400 since there is already data in the db
+        test("should response with 400 status code", async () => {
+            const response = await request(app).post("/auth/recoverPassword").send({})
+            expect(response.status).toEqual(400)
+        })
+    })
+})

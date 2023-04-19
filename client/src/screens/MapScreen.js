@@ -1,6 +1,6 @@
 import React, {useContext, useEffect} from "react";
 import { Header, EditToolbar, Map, MapProperties, MapDetailCard } from "../components";
-
+import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
@@ -8,9 +8,10 @@ import GlobalFileContext from "../file";
 export default function MapScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
+  const { mapId } = useParams();
 
   useEffect(() => {
-    file.loadAllSubregions();
+    file.loadAllSubregions(mapId);
   }, [])
   
   return (
@@ -18,9 +19,9 @@ export default function MapScreen() {
       <Header />
       <EditToolbar />
       <Map />
-      <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
+      {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
         <MapDetailCard mapDetails={store.personalMaps[0]}/>
-      </div>
+      </div> */}
       {/* <div id="map-detail-view" className="absolute bottom-0 m-3">
         <MapProperties />
       </div> */}

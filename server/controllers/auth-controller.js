@@ -79,21 +79,18 @@ loginUser = async (req, res) => {
     const token = auth.signToken(existingUser._id);
     // console.log(token);
 
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: true,
-      })
-      .status(200)
-      .json({
-        success: true,
-        user: {
-          userName: existingUser.userName,
-          email: existingUser.email,
-          _id: existingUser._id
-        },
-      });
+    req.session.token = token;
+    
+
+    res.status(200).json({
+      success: true,
+      user: {
+        userName: existingUser.userName,
+        email: existingUser.email,
+        _id: existingUser._id
+      },
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).send();
@@ -101,14 +98,8 @@ loginUser = async (req, res) => {
 };
 
 logoutUser = async (req, res) => {
-  res
-    .cookie("token", "", {
-      httpOnly: true,
-      expires: new Date(0),
-      secure: true,
-      sameSite: "none",
-    })
-    .send();
+  req.session.destroy();
+  res.status(200).send();
 };
 
 registerUser = async (req, res) => {
@@ -170,21 +161,16 @@ registerUser = async (req, res) => {
     const token = auth.signToken(savedUser._id);
     // // console.log("token:" + token);
 
-    await res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      })
-      .status(200)
-      .json({
-        success: true,
-        user: {
-          userName: savedUser.userName,
-          email: savedUser.email,
-          _id: savedUser._id
-        },
-      });
+    req.session.token = token;
+
+    res.status(200).json({
+      success: true,
+      user: {
+        userName: savedUser.userName,
+        email: savedUser.email,
+        _id: savedUser._id
+      },
+    });
 
     // console.log("token sent");
   } catch (err) {
@@ -249,31 +235,31 @@ recoverPassword = async(req, res) => {
     const search_by_username = await User.findOne({userName: userName})
     const search_by_token = await User.findOne({passwordToken: token})
     if(!search_by_token || !search_by_username){
-      console.log("Doesn't Exist")
+      //console.log("Doesn't Exist")
       return res.status(400).json({
         errorMessage: "Invalid token/Username",
       });
     }
     if(search_by_token.email !== search_by_username.email){
-      console.log("Wrong token or username")
+      //console.log("Wrong token or username")
       return res.status(400).json({
         errorMessage: "Invalid Token and username",
       });
     }
     if (Date.now() > search_by_token.passwordTimeout){
-      console.log("Expired Token")
+      //console.log("Expired Token")
       return res.status(400).json({
         errorMessage: "Token has expired ",
       });
     }
     if (password.length < 8) {
-      console.log("Password length not greater than 8")
+      //console.log("Password length not greater than 8")
       return res.status(400).json({
         errorMessage: "Please enter a password of at least 8 characters.",
       });
     }
     if (password !== passwordVerify) {
-      console.log("Password is not the same as password verified")
+      //console.log("Password is not the same as password verified")
       return res.status(400).json({
         errorMessage: "Please enter the same password twice.",
       });
@@ -299,11 +285,11 @@ recoverPassword = async(req, res) => {
         success: true
       })
     } else {
-      console.error("Failed Update");
+      //console.error("Failed Update");
       res.status(500).send();
     }
   }catch (err) {
-    console.error(err);
+    //console.error(err);
     res.status(500).send();
   }
 
@@ -311,18 +297,112 @@ recoverPassword = async(req, res) => {
 
 //Changing username on profile screen
 changeUsername = async (req, res) => {
-  //Todo: Implement the username change via email passing
-  return res.status(200).json({
-    success: true
-  })
+  try {
+    const { email, userName } = req.body;
+    if (!email || !userName) {
+      return res
+        .status(400)
+        .json({ errorMessage: "Please enter all required fields." });
+    }
+
+    const existingEmail = await User.findOne({ email: email });
+    if (!existingEmail) {
+      return res.status(401).json({
+        errorMessage: "Wrong email provided.",
+      });
+    }
+
+    const existingUser = await User.findOne({ userName : userName });
+    if (existingUser) {
+      return res.status(400).json({
+        errorMessage: "An account with this username already exists.",
+      });
+    }
+
+    const newUser = await User.findOneAndUpdate({ email: email }, {userName: userName}, {new : true});
+    return res.status(200).json({
+      success: true,
+      user: {
+        userName: newUser.userName,
+        email: newUser.email,
+        _id: newUser._id
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
 }
 
 //Changing password on profile screen
 changePassword = async (req, res) => {
-  //Todo: Implement password change via email passing 
-  return res.status(200).json({
-    success: true
-  })
+  try {
+    const { email, oldPwd, newPwd, cfmPwd } = req.body;
+    //console.log(email, oldPwd, newPwd, cfmPwd);
+    if (!email || !oldPwd || !newPwd || !cfmPwd) {
+      return res
+        .status(400)
+        .json({ errorMessage: "Please enter all required fields." });
+    }
+    // console.log("all fields provided");
+    
+    const existingUser = await User.findOne({ email: email });
+    // console.log("existingUser: " + existingUser);
+    if (!existingUser) {
+      return res.status(401).json({
+        errorMessage: "Wrong email or password provided.",
+      });
+    }
+
+    const passwordCorrect = await bcrypt.compare(
+      oldPwd,
+      existingUser.passwordHash
+    );
+    if (!passwordCorrect) {
+      // console.log("Incorrect password");
+      return res.status(401).json({
+        errorMessage: "Wrong email or password provided.",
+      });
+    }
+
+    if (oldPwd === newPwd) {
+      // console.log("Incorrect password");
+      return res.status(400).json({
+        errorMessage: "Please enter a different password from your old password.",
+      });
+    }
+
+    if (newPwd.length < 8) {
+      return res.status(400).json({
+        errorMessage: "Please enter a password of at least 8 characters.",
+      });
+    }
+    // console.log("password long enough");
+
+    if (newPwd !== cfmPwd) {
+      return res.status(400).json({
+        errorMessage: "Please enter the same password twice.",
+      });
+    }
+    // console.log("password and password verify match");
+
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const passwordHash = await bcrypt.hash(newPwd, salt);
+    // console.log("passwordHash: " + passwordHash);
+
+    const updated = await User.updateOne({ email: email }, { passwordHash: passwordHash });
+
+    // req.session.token = token;
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
+  // return res.status(200).json({
+  //   success: true
+  // })
 }
 
 module.exports = {
