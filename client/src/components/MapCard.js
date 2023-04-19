@@ -60,7 +60,7 @@ export default function MapCard(props) {
         {/* Section for map details */}
         <div className="flex flex-col px-8 justify-center">
           <p className="text-2xl font-bold">{mapDetails.title}</p>
-          <p className="text-sm">By: {mapDetails.owner}</p>
+          <p className="text-sm">By: {mapDetails.ownerName}</p>
           <p className="text-xs">Published: {mapDetails.publishedDate}</p>
         </div>
       </div>

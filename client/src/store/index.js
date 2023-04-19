@@ -60,13 +60,6 @@ function GlobalStoreContextProvider(props) {
           currentModal: payload.currentModal
         })
       }
-      // case GlobalStoreActionType.SET_OPENED_MAP: {
-      //   return setStore({
-      //     ...store,
-      //     openedMap: payload.openedMap,
-      //     currentModal: payload.currentModal
-      //   })
-      // }
       case GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS: {
         return setStore({
           ...store,
@@ -123,7 +116,7 @@ function GlobalStoreContextProvider(props) {
     let geojsonFile = await convertToGeojson(files);
     let subregions = await convertGeojsonToInternalFormat(geojsonFile);
     let subregionIds = await store.createMapSubregions(subregions);
-    let response = await api.createMap(subregionIds, auth.user._id);  
+    let response = await api.createMap(subregionIds, auth.user);  
     if(response.status === 201){
       // storeReducer({
       //   type: GlobalStoreActionType.SET_OPENED_MAP,
@@ -175,6 +168,13 @@ function GlobalStoreContextProvider(props) {
     }
 
     asyncLoadPersonalAndSharedMaps();
+  }
+
+  store.updateMapTitle = async function(newTitle){
+    let response = await api.updateMapTitle(store.selectedMap._id, newTitle);
+    if(response.status === 200){
+      store.loadPersonalAndSharedMaps();
+    }
   }
 
 
