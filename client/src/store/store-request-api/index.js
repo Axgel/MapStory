@@ -13,11 +13,12 @@ export const createSubregion = (type, properties, coords) => {
   })
 };
 
-export const createMap = (subregionIds, ownerId) => {
+export const createMap = (subregionIds, owner) => {
   return api.post('/map', {
     title: "Untitled",
     map: subregionIds,
-    owner: ownerId,
+    owner: owner._id,
+    ownerName: owner.userName,
     collaborators: [],
     upvotes: [],
     downvotes: [],
@@ -30,10 +31,17 @@ export const createMap = (subregionIds, ownerId) => {
 
 export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
 
+export const updateMapTitle = (mapId, newTitle) => {
+  return api.put(`/title/${mapId}`, {
+    title: newTitle
+  })
+}
+
 const apis = {
   createSubregion,
   createMap,
-  getPersonalAndSharedMaps
+  getPersonalAndSharedMaps,
+  updateMapTitle
 };
 
 export default apis;
