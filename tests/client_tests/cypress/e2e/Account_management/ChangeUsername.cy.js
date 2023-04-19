@@ -9,7 +9,7 @@ describe('Change Username', () => {
     it('cancel', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
             cy.get('#editUsernameIcon').click() //click edit icon
-            cy.get('#inputNewUsername').clear().type('badbadbad') //TODO
+            cy.get('#inputNewUsername').clear().type('badbadbad') 
             cy.contains('Cancel').click()
             //check that the username field has the same value as previous
             cy.get('#profileUsername').should((newUsername) => {

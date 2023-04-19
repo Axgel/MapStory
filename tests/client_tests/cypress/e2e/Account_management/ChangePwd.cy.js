@@ -45,6 +45,8 @@ describe('Change Passsword', () => {
         cy.get('#changeNewPwd').clear().type('password321')
         cy.get('#changeCfmPwd').clear().type('password321')
         cy.contains('OK').click()
+        cy.contains('Password has been updated!')
+        cy.contains('OK').click()
         //user gets logged out if succesful
         cy.url().should('include', '/profile')
         // cy.url().should('include', '/')
@@ -53,6 +55,8 @@ describe('Change Passsword', () => {
         cy.get('#changeCurPwd').clear().type('password321')
         cy.get('#changeNewPwd').clear().type('password')
         cy.get('#changeCfmPwd').clear().type('password')
+        cy.contains('OK').click()
+        cy.contains('Password has been updated!')
         cy.contains('OK').click()
     });
     //TODO: how to determine when you successfully changed your password?
