@@ -2,6 +2,12 @@ import React, {useEffect, useRef, useState} from 'react';
 import { open } from 'shapefile';
 import { preBuild, simplify } from 'mapshaper-simplify';
 import {truncate} from '@turf/turf';
+// import * as client from "topojson-client";
+// import * as server from "topojson-server";
+// import * as simplify from "topojson-simplify";
+
+
+
 
 export async function convertToGeojson(files) {
     let fileOne = files[0]
@@ -37,7 +43,7 @@ export async function convertToGeojson(files) {
     //reduce all the coordinates to only 5 decimal places
     let reducedPrecision = truncate(geoJSONFile, {precision: 5, coordinates: 2})
 
-    let idealNumPoints = 50000;
+    let idealNumPoints = 600000;//600000 for mapshaper, 100000 for topojson
     let simplifyPercentage = idealNumPoints/JSON.stringify(reducedPrecision).length;
     console.log(JSON.stringify(reducedPrecision).length);
     console.log(simplifyPercentage);
@@ -53,6 +59,10 @@ async function simplifyGeoJSON(file, simplifyPercentage) {
         const dataset = preBuild(file);
         const simplified = simplify(dataset, simplifyPercentage)
         resolve(simplified);
+        // let topology = server.topology({foo: file});
+        // topology = simplify.presimplify(topology);
+        // let topologySimplified = simplify.simplify(topology, simplifyPercentage)
+        // resolve(client.feature(topologySimplified, "foo"));
     });
 }
 

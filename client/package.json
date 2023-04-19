@@ -19,6 +19,9 @@
     "react-scripts": "5.0.1",
     "shapefile": "^0.6.6",
     "tailwindcss": "^3.3.1",
+    "topojson-client": "^3.1.0",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
