@@ -1,6 +1,6 @@
 describe('Change Passsword', () => {
     beforeEach(() => {
-        cy.login("testUsername", "testUsername")
+        cy.login("test", "test")
         cy.visit('/')
         cy.get('#profileIcon').click()
         cy.contains('Profile').click()
