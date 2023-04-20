@@ -35,7 +35,23 @@ export const updateMapTitle = (mapId, newTitle) => {
   })
 }
 
+
 export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
+export const addTags = (mapId, tag) => {
+  return api.put(`/addTags/${mapId}`,{
+    tag: tag
+  })
+}
+
+export const deleteTags = (mapId, tag) => {
+  return api.put(`/deleteTags/${mapId}`,{
+    tag: tag
+  })
+}
+
+export const publishMapById = (mapId) => {
+  return api.put(`/publish/${mapId}`)
+}
 
 export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
 
@@ -47,9 +63,12 @@ export const forkMapById = (mapId) => api.post(`/fork/${mapId}`);
 
 const apis = {
   createSubregion,
-  createMap,
-  getPersonalAndSharedMaps, 
+  createMap, 
   deleteMapById,
+  getPersonalAndSharedMaps,
+  updateMapTitle,
+  addTags, 
+  deleteTags,
   getAllPublishedMaps,
   updateMapTitle,
   publishMapById
