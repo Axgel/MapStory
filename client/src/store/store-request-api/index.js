@@ -49,9 +49,6 @@ export const deleteTags = (mapId, tag) => {
   })
 }
 
-export const publishMapById = (mapId) => {
-  return api.put(`/publish/${mapId}`)
-}
 
 export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
 
