@@ -9,15 +9,17 @@ import AddSubregionIcon from "../assets/AddSubregionIcon.png"
 import RemoveSubregionIcon from "../assets/RemoveSubregionIcon.png"
 import closeIcon from "../assets/closeIcon.png"
 import { useNavigate } from "react-router-dom";
-import { CurrentModal } from "../enums";
+import { CurrentModal, EditMode } from "../enums";
 import FileButton from "./FileButton";
 
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
+import GlobalFileContext from "../file";
 
 
 export default function EditToolbar() {
   const { store } = useContext(GlobalStoreContext);
+  const { file } = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
   function handleExitMap(){
@@ -25,7 +27,16 @@ export default function EditToolbar() {
   }
 
   function setCurrentModal(e, currentModal){
+    e.stopPropagation();
     store.setCurrentModal(currentModal);
+  }
+
+  function setCurrentEditMode(e, currentEditMode){
+    e.stopPropagation();
+    if(currentEditMode == file.currentEditMode){
+      currentEditMode = EditMode.NONE;
+    }
+    file.setCurrentEditMode(currentEditMode);
   }
 
   return (
@@ -51,7 +62,7 @@ export default function EditToolbar() {
 
           <div className="flex gap-4 px-3">
             <img src={AddVertexIcon} alt=""></img>
-            <img src={EditVertexIcon} alt=""></img>
+            <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
           </div>
 
           <div className="w-[1px] bg-black h-full"></div>
