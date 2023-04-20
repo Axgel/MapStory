@@ -65,6 +65,20 @@ getPersonalAndSharedMaps = async (req, res) => {
   }
 }
 
+getPublishedMaps = async(req,res) => {
+  try {
+    const publishedMaps = await MapProject.find({ isPublished: true}).exec();
+    console.log(publishedMaps);
+    return res.status(200).json({
+      publishedMaps: publishedMaps
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured loading published maps'
+    })
+  }
+}
+
 updateMapTitle = async(req,res) =>{
   try{
     const body = req.body;
@@ -108,14 +122,13 @@ addTags = async(req,res) =>{
         error: 'You must provide a tag to input the tag'
       })
     }
-
+    
     MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
       if(err){
         return res.status(404).json({
           error: 'Map project not found'
         })
       }
-
       if (map.tags.includes(body.tag)) {
         return res.status(400).json({
           message: "Duplicate Tag"
@@ -125,16 +138,42 @@ addTags = async(req,res) =>{
       map.save().then(() => {
         return res.status(200).json({
           message: "Map project tag updated"
+       })
+      })
+        })
+
+      } catch(err) {
+        return res.status(400).json({
+           error: 'Error occured updating tags'
+         })
+    }
+}
+
+
+publishMap = async(req,res) =>{
+  try{
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.isPublished = true;
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project saved"
         })
       })
     })
 
   } catch(err) {
     return res.status(400).json({
-      error: 'Error occured updating tags'
+      error: 'Error occured published map'
     })
   }
 }
+
 
 deleteTags = async(req,res) =>{
   try{
@@ -163,11 +202,15 @@ deleteTags = async(req,res) =>{
   }
 }
 
+
 module.exports = {
   createSubregion,
   createMap,
   getPersonalAndSharedMaps,
   updateMapTitle,
   addTags,
-  deleteTags
+  deleteTags,
+  getPublishedMaps,
+  updateMapTitle,
+  publishMap
 };

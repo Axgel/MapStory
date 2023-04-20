@@ -6,7 +6,7 @@ describe('Change Passsword', () => {
         cy.contains('Profile').click()
     });
     //press cancel
-    it('change pwd: cancel', () =>{
+    it('cancel', () =>{
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('passcancel')
@@ -16,33 +16,47 @@ describe('Change Passsword', () => {
         cy.url().should('include', '/profile')
     });
     //password doesnt follow standards we set (min 8 characters)
-    it('change pwd: bad pwd', () =>{
+    it('bad pwd', () =>{
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('badpass')
         cy.get('#changeCfmPwd').clear().type('badpass')
         cy.contains('OK').click()
-        //TODO: get error
-
+        //TODO: get error in form
+        cy.contains('Password length must be at least 8 characters long')
+        cy.url().should('include', '/profile')
+    });
+    //current password is incorrect
+    it('current pwd incorrect', () =>{
+        cy.get('#editPasswordIcon').click()
+        cy.get('#changeCurPwd').clear().type('password123')
+        cy.get('#changeNewPwd').clear().type('password')
+        cy.get('#changeCfmPwd').clear().type('password')
+        cy.contains('OK').click()
+        //TODO: get error modal
+        cy.contains('Incorrect password entered')
+        cy.contains('OK').click()
         cy.url().should('include', '/profile')
     });
     //success
-    it('change pwd: success', () =>{
+    it('success', () =>{
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('password321')
         cy.get('#changeCfmPwd').clear().type('password321')
         cy.contains('OK').click()
+        cy.contains('Password has been updated!')
+        cy.contains('OK').click()
         //user gets logged out if succesful
         cy.url().should('include', '/profile')
         // cy.url().should('include', '/')
         // cy.get('#loginEmail').should('exist')
-
         cy.get('#editPasswordIcon').click()
         cy.get('#changeCurPwd').clear().type('password321')
         cy.get('#changeNewPwd').clear().type('password')
         cy.get('#changeCfmPwd').clear().type('password')
         cy.contains('OK').click()
+        cy.contains('Password has been updated!')
+        cy.contains('OK').click()
     });
-    //TODO: how to determine when you successfully changed your password?
 })
