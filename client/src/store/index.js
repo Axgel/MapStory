@@ -199,7 +199,6 @@ function GlobalStoreContextProvider(props) {
     }
     response = await api.getAllPublishedMaps();
     if(response.status === 200){
-      console.log(personalMaps);
       storeReducer({
         type: GlobalStoreActionType.LOAD_ALL_MAPS,
         payload: {publishedMaps: response.data.publishedMaps, personalMaps: personalMaps, sharedMaps: sharedMaps}
@@ -240,9 +239,8 @@ function GlobalStoreContextProvider(props) {
 
   store.forkMapByMarkedId = async function(){
     if(store.mapIdMarkedForAction == null) return;
-
-    let response = await api.forkMapById(store.mapIdMarkedForAction);
-    if(response.status === 200){
+    let response = await api.forkMapById(store.mapIdMarkedForAction, auth.user._id);
+    if(response.status === 201){
       storeReducer({
         type: GlobalStoreActionType.MAP_ACTION,
         payload: null
@@ -254,8 +252,7 @@ function GlobalStoreContextProvider(props) {
 
   store.deleteMapByMarkedId = async function(){
     if(store.mapIdMarkedForAction == null) return;
-
-    let response = await api.deleteMapById(store.mapIdMarkedForAction, auth.user._id);  
+    let response = await api.deleteMapById(store.mapIdMarkedForAction);  
     if(response.status === 200){
       storeReducer({
         type: GlobalStoreActionType.MAP_ACTION,

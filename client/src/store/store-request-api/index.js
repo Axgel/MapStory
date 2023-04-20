@@ -43,7 +43,12 @@ export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
 
 export const publishMapById = (mapId) => api.put(`/publish/${mapId}`);
 
-export const forkMapById = (mapId) => api.post(`/fork/${mapId}`);
+export const forkMapById = (mapId, userId) => {
+  console.log(userId)
+  return api.post(`/fork/${mapId}`, {
+    userId: userId
+  });
+}
 
 const apis = {
   createSubregion,
@@ -52,7 +57,8 @@ const apis = {
   deleteMapById,
   getAllPublishedMaps,
   updateMapTitle,
-  publishMapById
+  publishMapById, 
+  forkMapById
 };
 
 export default apis;

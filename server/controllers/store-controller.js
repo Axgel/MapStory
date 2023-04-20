@@ -139,9 +139,7 @@ publishMap = async(req,res) =>{
 
 deleteMap = async (req, res) => {
   try {
-    const userId = req.params.userId;
     const mapId = req.params.mapId;
-
     await User.updateMany({}, { $pull: {sharedMaps: mapId}}) //remove map id from user schema(shared maps[])
     await User.updateMany({}, { $pull: {personalMaps: mapId}});//remove mapId from user schema(personalmaps[])
     const mapProject = await MapProject.findById(req.params.mapId);
@@ -158,6 +156,62 @@ deleteMap = async (req, res) => {
   }
 }
 
+forkMap = async (req, res) => {
+  try {
+    console.log(req.body)
+    const user = await User.findById(req.body.userId);
+    const mapProject = await MapProject.findById(req.params.mapId); //mapproject to duplicate
+
+    //create a copy of all the subregions
+    const newSubregions = [];
+    // console.log(mapProject.map)
+    for(let index in mapProject.map){
+      //find subregion with that id
+      let subregion = await Subregion.findOne({ _id: mapProject.map[index] });
+      const newSubregion = new Subregion({
+        type: subregion.type,
+        properties: subregion.properties,
+        coordinates: subregion.coordinates,
+      });
+      newSubregions.push(newSubregion._id);
+      newSubregion.save();
+    }
+    console.log(user);
+
+    const forkedProject = new MapProject({
+      title: mapProject.title,
+      map: newSubregions,
+      owner: user._id,
+      ownerName: user.userName,
+      collaborators: [],
+      upvotes: [],
+      downvotes: [],
+      comments: [],
+      tags: [],
+      isPublished: false,
+      publishedDate: Date.now()
+    });
+    console.log(forkedProject)
+
+    User.findOne({ _id: user._id}, (err, user) => {
+      user.personalMaps.push(forkedProject._id);
+      user.save().then(() => {
+        forkedProject.save().then((map) => {
+          return res.status(201).json({
+            id: forkedProject
+          })
+        }).catch((err) => {
+          return res.status(400).json({errpr: "Map not saved"});
+        })
+      })
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured during forking of map'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
@@ -165,5 +219,6 @@ module.exports = {
   getPublishedMaps, 
   updateMapTitle,
   publishMap, 
-  deleteMap
+  deleteMap, 
+  forkMap
 };
