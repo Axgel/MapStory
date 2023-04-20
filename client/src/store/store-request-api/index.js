@@ -37,7 +37,7 @@ export const updateMapTitle = (mapId, newTitle) => {
 
 export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
 
-export const deleteMapById = (mapId, userId) => api.delete(`/map/${mapId}`);
+export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
 
 export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
 

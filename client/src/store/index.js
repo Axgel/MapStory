@@ -63,6 +63,7 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS: {
         return setStore({
           ...store,
+          currentModal: CurrentModal.NONE,
           personalMaps: payload.personalMaps,
           sharedMaps: payload.sharedMaps
         })
@@ -70,6 +71,7 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.LOAD_ALL_MAPS: {
         return setStore({
           ...store,
+          currentModal: CurrentModal.NONE,
           publishedMaps: payload.publishedMaps,
           sharedMaps: payload.sharedMaps,
           personalMaps: payload.personalMaps

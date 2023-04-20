@@ -62,13 +62,13 @@ export default function MapDetailCard(props) {
   }
 
 
-  let titleElement = <p className="text-2xl font-bold" onDoubleClick={handleToggleEdit}>{mapDetails.title}</p>
+  let titleElement = mapDetails ? <p className="text-2xl font-bold" onDoubleClick={handleToggleEdit}>{mapDetails.title}</p> : <></>
   if(editActive){
     titleElement = <input 
       id="inputNewUsername" 
       className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-2 pl-2" 
       type="text" 
-      defaultValue={mapDetails.title} 
+      defaultValue={mapDetails ? mapDetails.title : ""} 
       onChange={handleUpdateText}
       autoFocus
       onBlur={handleUpdateTitle}
