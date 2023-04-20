@@ -21,6 +21,7 @@ describe('Change Username', () => {
     // username not unique
     it('nonunique username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
+            cy.wait(1000)
             cy.get('#editUsernameIcon').click() //click edit icon
             cy.get('#inputNewUsername').clear().type('tray') //TODO
             cy.contains('OK').click()
@@ -36,6 +37,7 @@ describe('Change Username', () => {
     //empty username
     it('empty username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
+            cy.wait(1000)
             cy.get('#editUsernameIcon').click() //click edit icon
             cy.get('#inputNewUsername').clear() //TODO
             cy.contains('OK').click()
@@ -51,6 +53,7 @@ describe('Change Username', () => {
     //success
     it('success', () =>{
         cy.get('#editUsernameIcon').click()
+        cy.wait(1000);
         cy.get('#inputNewUsername').clear().type("newUsername") 
         cy.contains('OK').click()
         //check that the username field has the new value
