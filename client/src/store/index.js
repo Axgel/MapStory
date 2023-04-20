@@ -201,7 +201,6 @@ function GlobalStoreContextProvider(props) {
     }
     response = await api.getAllPublishedMaps();
     if(response.status === 200){
-      console.log(personalMaps);
       storeReducer({
         type: GlobalStoreActionType.LOAD_ALL_MAPS,
         payload: {publishedMaps: response.data.publishedMaps, personalMaps: personalMaps, sharedMaps: sharedMaps}
