@@ -139,7 +139,6 @@ publishMap = async(req,res) =>{
 
 deleteMap = async (req, res) => {
   try {
-    const userId = req.params.userId;
     const mapId = req.params.mapId;
 
     await User.updateMany({}, { $pull: {sharedMaps: mapId}}) //remove map id from user schema(shared maps[])
