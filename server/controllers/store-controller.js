@@ -65,6 +65,78 @@ getPersonalAndSharedMaps = async (req, res) => {
   }
 }
 
+getPublishedMaps = async(req,res) => {
+  try {
+    const publishedMaps = await MapProject.find({ isPublished: true}).exec();
+    console.log(publishedMaps);
+    return res.status(200).json({
+      publishedMaps: publishedMaps
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured loading published maps'
+    })
+  }
+}
+
+updateMapTitle = async(req,res) =>{
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a title to update'
+      })
+    }
+
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.title = body.title;
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project title updated"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured updating map title'
+    })
+  }
+}
+
+publishMap = async(req,res) =>{
+  try{
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.isPublished = true;
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project saved"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured published map'
+    })
+  }
+}
+
+
 deleteMap = async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -88,6 +160,5 @@ deleteMap = async (req, res) => {
 module.exports = {
   createSubregion,
   createMap,
-  getPersonalAndSharedMaps, 
-  deleteMap
+  getPersonalAndSharedMaps
 };
