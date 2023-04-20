@@ -8,10 +8,7 @@ import AuthContext from "../auth";
 export default function AddTagModal() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
-  useEffect(()=>{
-    console.log("Hello")
-  }, [])
-
+  
   function handleAddTags(e){
     e.stopPropagation();
     let tag = document.getElementById("input_tag").value

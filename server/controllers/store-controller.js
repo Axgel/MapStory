@@ -116,7 +116,39 @@ addTags = async(req,res) =>{
         })
       }
 
+      if (map.tags.includes(body.tag)) {
+        return res.status(400).json({
+          message: "Duplicate Tag"
+        })
+      }
       map.tags.push(body.tag)
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project tag updated"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured updating tags'
+    })
+  }
+}
+
+deleteTags = async(req,res) =>{
+  try{
+    const body = req.body;
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      let temp = map.tags.filter(tag => tag !== body.tag)
+      map.tags = temp
+      
       map.save().then(() => {
         return res.status(200).json({
           message: "Map project tag updated"
@@ -136,5 +168,6 @@ module.exports = {
   createMap,
   getPersonalAndSharedMaps,
   updateMapTitle,
-  addTags
+  addTags,
+  deleteTags
 };

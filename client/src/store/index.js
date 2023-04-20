@@ -196,6 +196,12 @@ function GlobalStoreContextProvider(props) {
     }
   }
 
+  store.deleteTags = async function(tag){
+    let response = await api.deleteTags(store.selectedMap._id, tag);
+    if(response.status === 200){
+      store.loadPersonalAndSharedMaps();
+    }
+  }
 
   return (
     <GlobalStoreContext.Provider value={{ store }}>
