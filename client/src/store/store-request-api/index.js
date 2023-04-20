@@ -49,14 +49,13 @@ export const deleteTags = (mapId, tag) => {
   })
 }
 
-
 export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
 
 export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
 
 export const publishMapById = (mapId) => api.put(`/publish/${mapId}`);
 
-export const forkMapById = (mapId) => api.post(`/fork/${mapId}`);
+export const forkMapById = (mapId, userId) => api.post(`/fork/${mapId}`, {userId: userId});
 
 export const getMapById = (mapId) => api.get(`/map/${mapId}`);
 
@@ -70,7 +69,8 @@ const apis = {
   deleteTags,
   getAllPublishedMaps,
   updateMapTitle,
-  publishMapById,
+  publishMapById, 
+  forkMapById,
   getMapById
 };
 
