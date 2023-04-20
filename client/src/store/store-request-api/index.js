@@ -49,22 +49,13 @@ export const deleteTags = (mapId, tag) => {
   })
 }
 
-export const publishMapById = (mapId) => {
-  return api.put(`/publish/${mapId}`)
-}
-
 export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
 
 export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
 
 export const publishMapById = (mapId) => api.put(`/publish/${mapId}`);
 
-export const forkMapById = (mapId, userId) => {
-  console.log(userId)
-  return api.post(`/fork/${mapId}`, {
-    userId: userId
-  });
-}
+export const forkMapById = (mapId, userId) => api.post(`/fork/${mapId}`, {userId: userId});
 
 const apis = {
   createSubregion,
