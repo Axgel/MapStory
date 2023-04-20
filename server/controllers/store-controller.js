@@ -124,7 +124,7 @@ publishMap = async(req,res) =>{
       map.isPublished = true;
       map.save().then(() => {
         return res.status(200).json({
-          message: "Map project saved"
+          message: "Map project published"
         })
       })
     })
@@ -149,6 +149,7 @@ deleteMap = async (req, res) => {
     await MapProject.remove({_id: mapId}); //delete mapproject
 
     return res.status(200).json({
+      message: "Map project deleted"
     })
   } catch (err) {
     return res.status(400).json({
@@ -160,5 +161,9 @@ deleteMap = async (req, res) => {
 module.exports = {
   createSubregion,
   createMap,
-  getPersonalAndSharedMaps
+  getPersonalAndSharedMaps, 
+  getPublishedMaps, 
+  updateMapTitle,
+  publishMap, 
+  deleteMap
 };

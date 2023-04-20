@@ -15,7 +15,7 @@ export default function DeleteMapModal(props) {
 
   function handleDeleteMap(e){
     e.stopPropagation();
-    store.deleteMapById()
+    store.deleteMapByMarkedId();
   }
 
   if(store.currentModal == CurrentModal.DELETE_MAP){
@@ -29,7 +29,7 @@ export default function DeleteMapModal(props) {
           <h1 className="mx-6 my-2 text-center"> This map will be deleted. Action cannot be undone</h1><br></br><br></br>
           <div className="flex flex-row-reverse mx-3">
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleCloseModal}>Cancel</button>
-            <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleCloseModal}>OK</button>
+            <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleDeleteMap}>OK</button>
           </div>
           
         </div>
