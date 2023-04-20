@@ -5,10 +5,12 @@ import { CurrentModal } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
+import GlobalFileContext from "../file";
 
 
 export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
+  const {file} = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ export default function MapCard(props) {
   function handleOpenMap(e){
     e.stopPropagation();
     store.setSelectedMap(mapDetails);
+    file.setLoadedRegionOnce(false);
     navigate(`/map/${mapDetails._id}`);
   }
 

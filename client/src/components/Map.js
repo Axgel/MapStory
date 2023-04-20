@@ -32,6 +32,7 @@ export default function Map() {
     if(!mapItem || !file.subregions) return;
     if(file.loadedRegionOnce) return;
     // remove all preexisting layers
+    console.log("here");
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
     });
@@ -45,7 +46,7 @@ export default function Map() {
     }
 
     if(tmp){
-      file.setLoadedRegionOnce();
+      file.setLoadedRegionOnce(true);
     }
 
   }, [mapItem, file])
@@ -53,7 +54,6 @@ export default function Map() {
   useEffect(() => {
     if(!tmpRegion || !file || !tmpRegion) return;
 
-    console.log(tmpRegion);
     if(file.editRegions.includes(tmpRegion)){
       tmpRegion.setStyle({ fillColor: '#3387FF'});
       tmpRegion.pm.disable();
@@ -63,7 +63,6 @@ export default function Map() {
       file.updateEditRegions([...file.editRegions, tmpRegion]);
     }
     
-    console.log(tmpRegion == file.editRegions[0]);
     setTmpRegion(null);
   }, [tmpRegion])
 

@@ -12,7 +12,7 @@ export default function MapScreen() {
 
   useEffect(() => {
     file.loadAllSubregions(mapId);
-  }, [])
+   }, [])
   
   return (
     <div>

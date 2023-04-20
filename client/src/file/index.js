@@ -51,7 +51,7 @@ function GlobalFileContextProvider(props) {
       case GlobalFileActionType.SET_LOADED_REGION_ONCE: {
         return setFile({
           ...file,
-          loadedRegionOnce: true
+          loadedRegionOnce: payload.loadedRegionOnce
         })
       }
       default:
@@ -85,10 +85,10 @@ function GlobalFileContextProvider(props) {
     }
   }
 
-  file.setLoadedRegionOnce = function(){
+  file.setLoadedRegionOnce = function(isLoaded){
     fileReducer({
       type: GlobalFileActionType.SET_LOADED_REGION_ONCE,
-      payload: null
+      payload: {loadedRegionOnce: isLoaded}
     })
   }
 
