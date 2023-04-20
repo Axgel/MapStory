@@ -63,7 +63,7 @@ export default function HomeScreen() {
       <div className="flex mt-8">
         <div className="px-10 flex flex-col gap-5 min-w-max flex-grow pb-5">
           <div className="flex justify-between">
-            <p className="text-3xl font-bold">Maps</p>
+            <p id="mapsid" className="text-3xl font-bold">Maps</p>
             <p className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto" onClick={(e) => setCurrentModal(e, CurrentModal.CREATE_MAP)}>
               + Create Map
             </p>

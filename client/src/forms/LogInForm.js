@@ -37,7 +37,7 @@ export default function LogInForm() {
         </div>
 
         <div className="flex flex-col items-center justify-center gap-6 mt-4">
-          <button type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Log In" >Log In</button>
+          <button id="loginButton" type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Log In" >Log In</button>
           <button type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Forgot Password">Forgot Password</button>
         </div>
       </form>
