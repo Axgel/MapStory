@@ -18,6 +18,7 @@ export default function MapScreen() {
 
   useEffect(() => {
     file.loadAllSubregions(mapId);
+    store.loadMapById(mapId);
   }, []);
 
   useEffect(() => {

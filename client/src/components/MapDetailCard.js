@@ -12,7 +12,6 @@ export default function MapDetailCard(props) {
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
   const [editActive, setEditActive] = useState(false);
-  const [title, setTitle] = useState("");
 
   let propertyTabCSS = "px-9 py-2.5 font-semibold ";
   let commentTabCSS = "px-9 py-2.5 font-semibold ";
@@ -43,10 +42,6 @@ export default function MapDetailCard(props) {
     setEditActive(true);
   }
 
-  function handleUpdateText(e){
-    e.stopPropagation();
-    setTitle(e.target.value);
-  }
 
   function handleUpdateTitle(e){
     e.stopPropagation();
@@ -69,7 +64,6 @@ export default function MapDetailCard(props) {
       className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-2 pl-2" 
       type="text" 
       defaultValue={mapDetails ? mapDetails.title : ""} 
-      onChange={handleUpdateText}
       autoFocus
       onBlur={handleUpdateTitle}
       onKeyDown={handleKeyPress}

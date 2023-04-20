@@ -106,6 +106,13 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
+  store.loadMapById = async function(mapId) {
+    const response = await api.getMapById(mapId);
+    if(response.status === 200){
+      store.setSelectedMap(response.data.map);
+    }
+  }
+
   store.setSelectedMap = function (map) {
     const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
     storeReducer({
