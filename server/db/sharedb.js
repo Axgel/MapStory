@@ -1,5 +1,6 @@
 const http = require('http');
 const https = require('https');
+const fs = require("fs");
 const express = require('express');
 const WebSocket = require('ws');
 const sharedb = require('sharedb');
