@@ -10,41 +10,40 @@ export default function Map() {
   const { file } = useContext(GlobalFileContext);
   const [mapRef, setMapRef] = useState("");
   const [mapItem, setMapItem] = useState(null);
+  
 
-
+  // Initializes leaflet map reference
   useEffect(()=> {
-    if(mapRef){
-      const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
-      
-      // Adds the map layer background
-      //'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-      const tileLayer = L.tileLayer('', {
-        // edgeBufferTiles: 2,
-        maxZoom: 19,
-        minZoom: 3,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(map);
-  
-      const southWest = L.latLng(-89.98155760646617, -180);
-      const northEast = L.latLng(89.99346179538875, 180);
-      const bounds = L.latLngBounds(southWest, northEast);
-      map.setMaxBounds(bounds);
-      // L.geoJSON(usastates).addTo(map);
-      setMapItem(map);
-    }
-  
+    if(!mapRef) return;
+
+    const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
+    const southWest = L.latLng(-89.98155760646617, -180);
+    const northEast = L.latLng(89.99346179538875, 180);
+    const bounds = L.latLngBounds(southWest, northEast);
+    map.setMaxBounds(bounds);
+    setMapItem(map);
   },[mapRef])
 
+  // Load all subregions into map
   useEffect(()=>{
-    if(mapItem && file.subregions){
-      for(const region of file.subregions){
-        L.polygon(region.coordinates).addTo(mapItem);
-      }
+    if(!mapItem || !file.subregions) return;
+
+    // remove all preexisting layers
+    mapItem.eachLayer(function (layer) {
+      mapItem.removeLayer(layer);
+    });
+
+    // Add all new subregion layers
+    for(const region of file.subregions){
+      const poly = L.polygon(region.coordinates).addTo(mapItem);
+      poly.on('click', function(e){
+        console.log(e);
+      })
     }
   }, [mapItem, file])
 
 
-
+  // get div of screen on page load to add map to
   function handleInitMapLoad(e){
     setMapRef(e);
   }

@@ -33,7 +33,7 @@ export default function MapCard(props) {
 
   function handleOpenMap(e){
     e.stopPropagation();
-    // store.setOpenedMap(mapDetails);
+    store.setSelectedMap(mapDetails);
     navigate(`/map/${mapDetails._id}`);
   }
 
