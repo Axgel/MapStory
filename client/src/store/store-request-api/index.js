@@ -30,10 +30,13 @@ export const createMap = (subregionIds, ownerId) => {
 
 export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
 
+export const deleteMapById = (mapId, userId) => api.delete(`/map/${mapId}`);
+
 const apis = {
   createSubregion,
   createMap,
-  getPersonalAndSharedMaps
+  getPersonalAndSharedMaps, 
+  deleteMapById
 };
 
 export default apis;

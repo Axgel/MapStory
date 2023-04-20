@@ -177,6 +177,19 @@ function GlobalStoreContextProvider(props) {
     asyncLoadPersonalAndSharedMaps();
   }
 
+  store.deleteMapById = function(){
+    // if(store.mapmidarked for actoin == null) return;
+    // let response = api.deleteMapById(mapiD, auth.user._id);  
+    if(response.status === 201){
+      // storeReducer({
+      //   type: GlobalStoreActionType.SET_OPENED_MAP,
+      //   payload: {openedMap: response.data.id, currentModal: CurrentModal.NONE},
+      // });
+      store.setCurrentModal(CurrentModal.NONE);
+      navigate(`/map/${response.data.id._id}`);
+    }
+  }
+
 
   return (
     <GlobalStoreContext.Provider value={{ store }}>
