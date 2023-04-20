@@ -21,11 +21,11 @@ function GlobalStoreContextProvider(props) {
     currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
     detailView: DetailView.NONE, 
-    publishedMaps: tempData,
+    publishedMaps: null,
     personalMaps: null,
     sharedMaps: null,
     selectedMap: null,
-    //openedMap: null,
+    mapIdMarkedForAction: null
   });
 
   const navigate = useNavigate();
@@ -67,6 +67,28 @@ function GlobalStoreContextProvider(props) {
           sharedMaps: payload.sharedMaps
         })
       }
+      case GlobalStoreActionType.LOAD_ALL_MAPS: {
+        return setStore({
+          ...store,
+          publishedMaps: payload.publishedMaps,
+          sharedMaps: payload.sharedMaps,
+          personalMaps: payload.personalMaps
+        })
+      }
+      case GlobalStoreActionType.SET_MAP_PROJECT_ACTION: {
+        return setStore({
+          ...store,
+          currentModal: payload.currentModal,
+          mapIdMarkedForAction: payload.mapIdMarkedForAction
+        })
+      }
+      case GlobalStoreActionType.MAP_ACTION: {
+        return setStore({
+          ...store,
+          currentModal: CurrentModal.NONE,
+          mapIdMarkedForAction: null,
+        })
+      }
       default:
         return store;
     }
@@ -102,15 +124,6 @@ function GlobalStoreContextProvider(props) {
       payload: {currentModal: currentModal},
     });
   }
-
-  // store.setOpenedMap = function (mapId) {
-  //   storeReducer({
-  //     type: GlobalStoreActionType.SET_OPENED_MAP,
-  //     payload: { openedMap: mapId, currentModal: CurrentModal.NONE },
-  //   });
-
-  //   navigate(`/map/${mapId._id}`);
-  // }
 
   store.parseFileUpload = async function(files) {
     let geojsonFile = await convertToGeojson(files);
@@ -170,9 +183,71 @@ function GlobalStoreContextProvider(props) {
     asyncLoadPersonalAndSharedMaps();
   }
 
+  store.loadAllMaps = async function(){
+    // load all published maps
+
+    let personalMaps = [];
+    let sharedMaps = [];
+    let response;
+
+    if(auth.loggedIn){
+      response = await api.getPersonalAndSharedMaps(auth.user._id);
+      if(response.status === 200){
+        personalMaps = response.data.personalMaps;
+        sharedMaps = response.data.sharedMaps;
+      }
+    }
+    response = await api.getAllPublishedMaps();
+    if(response.status === 200){
+      console.log(personalMaps);
+      storeReducer({
+        type: GlobalStoreActionType.LOAD_ALL_MAPS,
+        payload: {publishedMaps: response.data.publishedMaps, personalMaps: personalMaps, sharedMaps: sharedMaps}
+       });
+    }
+  }
+
   store.updateMapTitle = async function(newTitle){
     let response = await api.updateMapTitle(store.selectedMap._id, newTitle);
     if(response.status === 200){
+      store.loadPersonalAndSharedMaps();
+    }
+  }
+
+  store.setMapProjectAction = function(currentModal, mapId){
+    storeReducer({
+      type: GlobalStoreActionType.SET_MAP_PROJECT_ACTION,
+      payload: {
+        currentModal: currentModal,
+        mapIdMarkedForAction: mapId
+      }
+    })
+  }
+
+  store.publishMapByMarkedId = async function(){
+    if(store.mapIdMarkedForAction == null) return;
+
+    let response = await api.publishMapById(store.mapIdMarkedForAction);
+    if(response.status === 200){
+      storeReducer({
+        type: GlobalStoreActionType.MAP_ACTION,
+        payload: null
+      })
+
+      store.loadAllMaps();
+    }
+  }
+
+  store.forkMapByMarkedId = async function(){
+    if(store.mapIdMarkedForAction == null) return;
+
+    let response = await api.forkMapById(store.mapIdMarkedForAction);
+    if(response.status === 200){
+      storeReducer({
+        type: GlobalStoreActionType.MAP_ACTION,
+        payload: null
+      })
+
       store.loadPersonalAndSharedMaps();
     }
   }

@@ -12,7 +12,7 @@ export default function HomeScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    store.loadPersonalAndSharedMaps();
+    store.loadAllMaps();
   }, [])
 
   let mapDetailCard = <div></div>;
@@ -42,8 +42,8 @@ export default function HomeScreen() {
         return <MapCard key={index} mapDetails={map} />;
       })
   } else if(store.viewMode == ViewMode.PUBLISHED && store.publishedMaps) {
-      mapCards = store.publishedMaps.map((map, index) => {
-        return <MapCard key={index} mapDetails={map} />;
+    mapCards = store.publishedMaps.map((map, index) => {
+      return <MapCard key={index} mapDetails={map} />;
       })
   }
 

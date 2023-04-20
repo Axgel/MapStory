@@ -16,6 +16,7 @@ import {
   PublishMapModal,
   DeleteMapModal,
   ShareMapModal,
+  ForkMapModal,
   ExportMapModal,
   AccountFeedbackModal,
   AddTagModal,
@@ -50,6 +51,7 @@ function App() {
             <PublishMapModal />
             <DeleteMapModal />
             <ShareMapModal />
+            <ForkMapModal />
             <ExportMapModal />
             <AddTagModal />
             <ChangeUsernameModal />
