@@ -29,15 +29,14 @@ export const createMap = (subregionIds, owner) => {
   })
 }
 
-export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
-export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
-
 export const updateMapTitle = (mapId, newTitle) => {
   return api.put(`/title/${mapId}`, {
     title: newTitle
   })
 }
 
+
+export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
 export const addTags = (mapId, tag) => {
   return api.put(`/addTags/${mapId}`,{
     tag: tag
@@ -50,17 +49,19 @@ export const deleteTags = (mapId, tag) => {
   })
 }
 
-export const publishMapById = (mapId) => {
-  return api.put(`/publish/${mapId}`)
-}
 
-export const forkMapById = (mapId) => {
-  return api.post(`/fork/${mapId}`)
-}
+export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
+
+export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
+
+export const publishMapById = (mapId) => api.put(`/publish/${mapId}`);
+
+export const forkMapById = (mapId) => api.post(`/fork/${mapId}`);
 
 const apis = {
   createSubregion,
-  createMap,
+  createMap, 
+  deleteMapById,
   getPersonalAndSharedMaps,
   updateMapTitle,
   addTags, 
