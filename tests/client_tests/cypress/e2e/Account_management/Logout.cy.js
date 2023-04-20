@@ -1,6 +1,6 @@
 describe('Logout', () => {
     //success
-    it('logout: success', () => {
+    it('success', () => {
         cy.login("test", "test")
         cy.visit('/') 
         cy.contains('Search By:')

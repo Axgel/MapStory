@@ -6,10 +6,10 @@ import AuthContext from "../auth";
 import { tempData } from "../data/tempData";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
+import { EditMode } from "../enums";
 
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
-
 
 const tps = new jsTPS();
 
@@ -18,7 +18,11 @@ function GlobalFileContextProvider(props) {
   const { store } = useContext(GlobalStoreContext);
 
   const [file, setFile] = useState({
-    subregions: []
+    subregions: [],
+    currentEditMode: EditMode.NONE,
+    tmpEditRegion: null,
+    editRegions: [],
+    loadedRegionOnce: false,
   });
 
   const navigate = useNavigate();
@@ -32,10 +36,42 @@ function GlobalFileContextProvider(props) {
           subregions: payload.subregions
         })
       }
+      case GlobalFileActionType.SET_EDIT_MODE: {
+        return setFile({
+          ...file,
+          currentEditMode: payload.currentEditMode
+        })
+      }
+      case GlobalFileActionType.UPDATE_EDIT_REGIONS: {
+        return setFile({
+          ...file,
+          editRegions: payload.editRegions
+        })
+      }
+      case GlobalFileActionType.SET_LOADED_REGION_ONCE: {
+        return setFile({
+          ...file,
+          loadedRegionOnce: payload.loadedRegionOnce
+        })
+      }
       default:
         return file;
     }
   };
+
+  file.setCurrentEditMode = function(currentEditMode){
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE,
+      payload: {currentEditMode: currentEditMode}
+    })
+  }
+
+  file.updateEditRegions = function(newEditRegions){
+    fileReducer({
+      type: GlobalFileActionType.UPDATE_EDIT_REGIONS,
+      payload: {editRegions: newEditRegions}
+    })
+  }
 
   file.loadAllSubregions = async function(mapId) {
     // if(store.openedMap){
@@ -47,6 +83,13 @@ function GlobalFileContextProvider(props) {
         payload: {subregions: response.data.subregions}
       })
     }
+  }
+
+  file.setLoadedRegionOnce = function(isLoaded){
+    fileReducer({
+      type: GlobalFileActionType.SET_LOADED_REGION_ONCE,
+      payload: {loadedRegionOnce: isLoaded}
+    })
   }
 
 
