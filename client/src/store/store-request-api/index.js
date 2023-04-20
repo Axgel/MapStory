@@ -38,6 +38,18 @@ export const updateMapTitle = (mapId, newTitle) => {
   })
 }
 
+export const addTags = (mapId, tag) => {
+  return api.put(`/addTags/${mapId}`,{
+    tag: tag
+  })
+}
+
+export const deleteTags = (mapId, tag) => {
+  return api.put(`/deleteTags/${mapId}`,{
+    tag: tag
+  })
+}
+
 export const publishMapById = (mapId) => {
   return api.put(`/publish/${mapId}`)
 }
@@ -50,6 +62,9 @@ const apis = {
   createSubregion,
   createMap,
   getPersonalAndSharedMaps,
+  updateMapTitle,
+  addTags, 
+  deleteTags,
   getAllPublishedMaps,
   updateMapTitle,
   publishMapById

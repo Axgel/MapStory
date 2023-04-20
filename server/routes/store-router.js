@@ -9,6 +9,8 @@ router.post('/map', auth.verify, StoreController.createMap);
 router.get('/ownermaps/:userId', StoreController.getPersonalAndSharedMaps);
 router.get('/publishedmaps', StoreController.getPublishedMaps)
 router.put('/title/:mapId', StoreController.updateMapTitle);
+router.put('/addTags/:mapId', StoreController.addTags);
+router.put('/deleteTags/:mapId', StoreController.deleteTags);
 router.put('/publish/:mapId', StoreController.publishMap);
 
  
