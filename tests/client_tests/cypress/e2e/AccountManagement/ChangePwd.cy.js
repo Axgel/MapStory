@@ -4,11 +4,10 @@ describe('Change Passsword', () => {
         cy.visit('/')
         cy.get('#profileIcon').click()
         cy.contains('Profile').click()
+        cy.get('#editPasswordIcon').click()
     });
     //press cancel
     it('cancel', () =>{
-        cy.get('#editPasswordIcon').click()
-        cy.wait(1000)
         cy.get('#changeCurPwd').type('password')
         cy.get('#changeNewPwd').type('passcancel')
         cy.get('#changeCfmPwd').type('passcancel')
@@ -18,8 +17,6 @@ describe('Change Passsword', () => {
     });
     //password doesnt follow standards we set (min 8 characters)
     it('bad pwd', () =>{
-        cy.get('#editPasswordIcon').click()
-        cy.wait(1000)
         cy.get('#changeCurPwd').type('password')
         cy.get('#changeNewPwd').type('badpass')
         cy.get('#changeCfmPwd').type('badpass')
@@ -30,8 +27,6 @@ describe('Change Passsword', () => {
     });
     //current password is incorrect
     it('current pwd incorrect', () =>{
-        cy.get('#editPasswordIcon').click()
-        cy.wait(1000)
         cy.get('#changeCurPwd').type('password123')
         cy.get('#changeNewPwd').type('password')
         cy.get('#changeCfmPwd').type('password')
@@ -43,8 +38,6 @@ describe('Change Passsword', () => {
     });
     //success
     it('success', () =>{
-        cy.get('#editPasswordIcon').click()
-        cy.wait(1000)
         cy.get('#changeCurPwd').type('password')
         cy.get('#changeNewPwd').type('password321')
         cy.get('#changeCfmPwd').type('password321')

@@ -9,7 +9,7 @@ describe('Import Map', () => {
     it('success', () => {
         //click create map
         cy.get('#createMapBtn').click()
-        cy.get('input[type=file]').selectFile('usastates.json')
+        cy.get('input[type=file]').selectFile('./cypress/fixtures/usastates.json')
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
