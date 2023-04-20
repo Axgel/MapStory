@@ -15,7 +15,7 @@ export default function PublishMapModal(props) {
 
   function handlePublishMap(e){
     e.stopPropagation();
-    store.publishedMapByMarkedId();
+    store.publishMapByMarkedId();
   }
 
   if(store.currentModal == CurrentModal.PUBLISH_MAP){

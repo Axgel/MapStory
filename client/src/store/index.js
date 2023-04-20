@@ -82,7 +82,7 @@ function GlobalStoreContextProvider(props) {
           mapIdMarkedForAction: payload.mapIdMarkedForAction
         })
       }
-      case GlobalStoreActionType.PUBLISH_MAP: {
+      case GlobalStoreActionType.MAP_ACTION: {
         return setStore({
           ...store,
           currentModal: CurrentModal.NONE,
@@ -224,17 +224,31 @@ function GlobalStoreContextProvider(props) {
     })
   }
 
-  store.publishedMapByMarkedId = async function(){
+  store.publishMapByMarkedId = async function(){
     if(store.mapIdMarkedForAction == null) return;
 
     let response = await api.publishMapById(store.mapIdMarkedForAction);
     if(response.status === 200){
       storeReducer({
-        type: GlobalStoreActionType.PUBLISH_MAP,
+        type: GlobalStoreActionType.MAP_ACTION,
         payload: null
       })
 
       store.loadAllMaps();
+    }
+  }
+
+  store.forkMapByMarkedId = async function(){
+    if(store.mapIdMarkedForAction == null) return;
+
+    let response = await api.forkMapById(store.mapIdMarkedForAction);
+    if(response.status === 200){
+      storeReducer({
+        type: GlobalStoreActionType.MAP_ACTION,
+        payload: null
+      })
+
+      store.loadPersonalAndSharedMaps();
     }
   }
 

@@ -75,7 +75,7 @@ export default function MapCard(props) {
           Delete
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.NONE)}>
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>
           Fork
         </div>
       </div>

@@ -42,6 +42,10 @@ export const publishMapById = (mapId) => {
   return api.put(`/publish/${mapId}`)
 }
 
+export const forkMapById = (mapId) => {
+  return api.post(`/fork/${mapId}`)
+}
+
 const apis = {
   createSubregion,
   createMap,
