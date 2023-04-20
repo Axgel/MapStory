@@ -68,7 +68,6 @@ getPersonalAndSharedMaps = async (req, res) => {
 getPublishedMaps = async(req,res) => {
   try {
     const publishedMaps = await MapProject.find({ isPublished: true}).exec();
-    console.log(publishedMaps);
     return res.status(200).json({
       publishedMaps: publishedMaps
     })
