@@ -30,6 +30,7 @@ export const createMap = (subregionIds, owner) => {
 }
 
 export const getPersonalAndSharedMaps = (userId) => api.get(`/ownermaps/${userId}`);
+export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
 
 export const updateMapTitle = (mapId, newTitle) => {
   return api.put(`/title/${mapId}`, {
@@ -37,11 +38,17 @@ export const updateMapTitle = (mapId, newTitle) => {
   })
 }
 
+export const publishMapById = (mapId) => {
+  return api.put(`/publish/${mapId}`)
+}
+
 const apis = {
   createSubregion,
   createMap,
   getPersonalAndSharedMaps,
-  updateMapTitle
+  getAllPublishedMaps,
+  updateMapTitle,
+  publishMapById
 };
 
 export default apis;
