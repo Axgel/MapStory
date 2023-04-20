@@ -16,7 +16,7 @@ export default function HomeScreen() {
   }, [])
 
   let mapDetailCard = <div></div>;
-  if (store.selectedMap) {
+  if (store.selectedMap && store.personalMaps) {
     let selectedMap;
     for(let i=0; i<store.personalMaps.length; i++){
       if(store.personalMaps[i]._id == store.selectedMap._id){

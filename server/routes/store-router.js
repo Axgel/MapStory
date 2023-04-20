@@ -13,6 +13,6 @@ router.put('/title/:mapId', StoreController.updateMapTitle);
 router.put('/addTags/:mapId', StoreController.addTags);
 router.put('/deleteTags/:mapId', StoreController.deleteTags);
 router.put('/publish/:mapId', StoreController.publishMap);
-
+router.get('/map/:mapId', StoreController.getMapById);
  
 module.exports = router;

@@ -221,6 +221,19 @@ deleteTags = async(req,res) =>{
   }
 }
 
+getMapById = async(req,res) => {
+  try{
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      return res.status(200).json({
+        map: map
+      })
+    })
+  } catch(err){
+    return res.status(400).json({
+      error: 'Unable to find map'
+    })
+  }
+}
 
 module.exports = {
   createSubregion,
@@ -232,5 +245,6 @@ module.exports = {
   getPublishedMaps,
   updateMapTitle,
   publishMap, 
-  deleteMap
+  deleteMap,
+  getMapById
 };

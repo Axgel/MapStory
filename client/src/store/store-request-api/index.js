@@ -58,6 +58,8 @@ export const publishMapById = (mapId) => api.put(`/publish/${mapId}`);
 
 export const forkMapById = (mapId) => api.post(`/fork/${mapId}`);
 
+export const getMapById = (mapId) => api.get(`/map/${mapId}`);
+
 const apis = {
   createSubregion,
   createMap, 
@@ -68,7 +70,8 @@ const apis = {
   deleteTags,
   getAllPublishedMaps,
   updateMapTitle,
-  publishMapById
+  publishMapById,
+  getMapById
 };
 
 export default apis;
