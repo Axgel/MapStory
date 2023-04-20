@@ -33,7 +33,8 @@ function GlobalFileContextProvider(props) {
       case GlobalFileActionType.LOAD_SUBREGIONS: {
         return setFile({
           ...file,
-          subregions: payload.subregions
+          subregions: payload.subregions,
+          loadedRegionOnce: false
         })
       }
       case GlobalFileActionType.SET_EDIT_MODE: {
