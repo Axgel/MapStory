@@ -98,9 +98,43 @@ updateMapTitle = async(req,res) =>{
   }
 }
 
+addTags = async(req,res) =>{
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a tag to input the tag'
+      })
+    }
+
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.tags.push(body.tag)
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project tag updated"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured updating tags'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
   getPersonalAndSharedMaps,
-  updateMapTitle
+  updateMapTitle,
+  addTags
 };

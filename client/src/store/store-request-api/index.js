@@ -37,11 +37,18 @@ export const updateMapTitle = (mapId, newTitle) => {
   })
 }
 
+export const addTags = (mapId, tag) => {
+  return api.put(`/addTags/${mapId}`,{
+    tag: tag
+  })
+}
+
 const apis = {
   createSubregion,
   createMap,
   getPersonalAndSharedMaps,
-  updateMapTitle
+  updateMapTitle,
+  addTags
 };
 
 export default apis;

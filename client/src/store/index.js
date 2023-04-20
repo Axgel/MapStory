@@ -153,17 +153,27 @@ function GlobalStoreContextProvider(props) {
     async function asyncLoadPersonalAndSharedMaps(){
       let personalMaps = [];
       let sharedMaps = [];
+      let selectedMap = null;
       if(auth.loggedIn){
         let response = await api.getPersonalAndSharedMaps(auth.user._id);     
         if(response.status === 200){
           personalMaps = response.data.personalMaps;
           sharedMaps = response.data.sharedMaps;
+          if (store.selectedMap){
+            for (const map of personalMaps){
+              if (map._id === store.selectedMap._id){
+                selectedMap = map
+                break;
+              }
+            }
+          }
         }
       }
+      console.log(selectedMap)
 
       storeReducer({
         type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,
-        payload: {personalMaps: personalMaps, sharedMaps: sharedMaps},
+        payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap},
       });
     }
 
@@ -172,6 +182,14 @@ function GlobalStoreContextProvider(props) {
 
   store.updateMapTitle = async function(newTitle){
     let response = await api.updateMapTitle(store.selectedMap._id, newTitle);
+    if(response.status === 200){
+      store.loadPersonalAndSharedMaps();
+    }
+  }
+
+
+  store.addTags = async function(newTag){
+    let response = await api.addTags(store.selectedMap._id, newTag);
     if(response.status === 200){
       store.loadPersonalAndSharedMaps();
     }
