@@ -32,11 +32,12 @@ export default function LogInForm() {
           <div>
             <label htmlFor="pwd">Password: </label><br></br>
             <input id="loginPwd" className="border-solid border-brownshade-600 border-2 bg-black bg-opacity-15 outline-none h-12 w-80" type="password" name="pwd"></input>
+
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-center gap-6 mt-4">
-          <button type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Log In" >Log In</button>
+          <button id="loginButton" type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Log In" >Log In</button>
           <button type="submit" className="h-12 w-[150px] bg-brownshade-500" name = "Forgot Password">Forgot Password</button>
         </div>
       </form>

@@ -5,10 +5,12 @@ import { CurrentModal } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
+import GlobalFileContext from "../file";
 
 
 export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
+  const {file} = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
   const navigate = useNavigate();
@@ -33,13 +35,14 @@ export default function MapCard(props) {
 
   function handleOpenMap(e){
     e.stopPropagation();
-    // store.setOpenedMap(mapDetails);
+    store.setSelectedMap(mapDetails);
+    file.setLoadedRegionOnce(false);
     navigate(`/map/${mapDetails._id}`);
   }
 
-  function setCurrentModal(e, currentModal){
+  function setMapProjectAction(e, currentModal){
     e.stopPropagation();
-    store.setCurrentModal(currentModal);
+    store.setMapProjectAction(currentModal, mapDetails._id);
   }
 
   return (
@@ -60,22 +63,22 @@ export default function MapCard(props) {
         {/* Section for map details */}
         <div className="flex flex-col px-8 justify-center">
           <p className="text-2xl font-bold">{mapDetails.title}</p>
-          <p className="text-sm">By: {mapDetails.owner}</p>
+          <p className="text-sm">By: {mapDetails.ownerName}</p>
           <p className="text-xs">Published: {mapDetails.publishedDate}</p>
         </div>
       </div>
 
       {/* Section for publish, delete, fork buttons */}
       <div className="flex px-8 gap-4 items-center cursor-pointer">
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-publishfill hover:bg-opacity-50" onClick={(e) => setCurrentModal(e, CurrentModal.PUBLISH_MAP)}>
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-publishfill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>
           Publish
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-deletefill hover:bg-opacity-50" onClick={(e) => setCurrentModal(e, CurrentModal.DELETE_MAP)}>
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-deletefill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>
           Delete
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50">
+        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>
           Fork
         </div>
       </div>

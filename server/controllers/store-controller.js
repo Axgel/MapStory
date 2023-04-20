@@ -65,8 +65,151 @@ getPersonalAndSharedMaps = async (req, res) => {
   }
 }
 
+getPublishedMaps = async(req,res) => {
+  try {
+    const publishedMaps = await MapProject.find({ isPublished: true}).exec();
+    return res.status(200).json({
+      publishedMaps: publishedMaps
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured loading published maps'
+    })
+  }
+}
+
+updateMapTitle = async(req,res) =>{
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a title to update'
+      })
+    }
+
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.title = body.title;
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project title updated"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured updating map title'
+    })
+  }
+}
+
+addTags = async(req,res) =>{
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a tag to input the tag'
+      })
+    }
+    
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+      if (map.tags.includes(body.tag)) {
+        return res.status(400).json({
+          message: "Duplicate Tag"
+        })
+      }
+      map.tags.push(body.tag)
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project tag updated"
+       })
+      })
+        })
+
+      } catch(err) {
+        return res.status(400).json({
+           error: 'Error occured updating tags'
+         })
+    }
+}
+
+
+publishMap = async(req,res) =>{
+  try{
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      map.isPublished = true;
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project saved"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured published map'
+    })
+  }
+}
+
+
+deleteTags = async(req,res) =>{
+  try{
+    const body = req.body;
+    MapProject.findOne({ _id: req.params.mapId}, (err, map) => {
+      if(err){
+        return res.status(404).json({
+          error: 'Map project not found'
+        })
+      }
+
+      let temp = map.tags.filter(tag => tag !== body.tag)
+      map.tags = temp
+      
+      map.save().then(() => {
+        return res.status(200).json({
+          message: "Map project tag updated"
+        })
+      })
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured updating tags'
+    })
+  }
+}
+
+
 module.exports = {
   createSubregion,
   createMap,
-  getPersonalAndSharedMaps
+  getPersonalAndSharedMaps,
+  updateMapTitle,
+  addTags,
+  deleteTags,
+  getPublishedMaps,
+  updateMapTitle,
+  publishMap
 };

@@ -86,6 +86,7 @@ describe ("POST /register", () => {
 //     })
 // })
 
+
 describe ("POST /recoverPassword", () => {
     describe("Testing endpoints", () => {
         //respond with 400 since there is already data in the db
