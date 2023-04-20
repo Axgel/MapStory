@@ -33,6 +33,7 @@ jobs:
           envkey_SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
           envkey_SMTP_KEY: ${{ secrets.SMTP_KEY }}
           envkey_SMTP_SENDEMAIL: ${{ secrets.SMTP_SENDEMAIL }}
+          envkey_SOCKET_URL: ${{ secrets.SOCKET_URL }}
           file_name: ./server/.env
           fail_on_empty: true     
 
