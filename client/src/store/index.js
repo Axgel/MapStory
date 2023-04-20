@@ -64,7 +64,8 @@ function GlobalStoreContextProvider(props) {
         return setStore({
           ...store,
           personalMaps: payload.personalMaps,
-          sharedMaps: payload.sharedMaps
+          sharedMaps: payload.sharedMaps,
+          selectedMap: payload.selectedMap
         })
       }
       default:
@@ -159,6 +160,7 @@ function GlobalStoreContextProvider(props) {
         if(response.status === 200){
           personalMaps = response.data.personalMaps;
           sharedMaps = response.data.sharedMaps;
+          console.log(store.selectedMap);
           if (store.selectedMap){
             for (const map of personalMaps){
               if (map._id === store.selectedMap._id){
@@ -169,7 +171,6 @@ function GlobalStoreContextProvider(props) {
           }
         }
       }
-      console.log(selectedMap)
 
       storeReducer({
         type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,

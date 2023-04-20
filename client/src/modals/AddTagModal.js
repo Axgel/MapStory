@@ -23,10 +23,13 @@ export default function AddTagModal() {
     store.setCurrentModal(CurrentModal.NONE);
   }
 
-  let tagCards = store.selectedMap ? store.selectedMap.tags.map((tag, index) => {
-    return <TagCard key={index} tag={tag} /> ;
-  }): <></>
-  
+  let tagCards = <></>;
+  if(store.selectedMap){
+    tagCards = store.selectedMap.tags.map((tag, index) => {
+      return <TagCard key={index} tag={tag} /> ;
+    })
+  }
+
   if(store.currentModal == CurrentModal.TAG){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center mx-2">
