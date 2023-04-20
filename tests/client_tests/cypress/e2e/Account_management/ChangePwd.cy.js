@@ -8,6 +8,7 @@ describe('Change Passsword', () => {
     //press cancel
     it('cancel', () =>{
         cy.get('#editPasswordIcon').click()
+        cy.wait(1000)
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('passcancel')
         cy.get('#changeCfmPwd').clear().type('passcancel')
@@ -18,6 +19,7 @@ describe('Change Passsword', () => {
     //password doesnt follow standards we set (min 8 characters)
     it('bad pwd', () =>{
         cy.get('#editPasswordIcon').click()
+        cy.wait(1000)
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('badpass')
         cy.get('#changeCfmPwd').clear().type('badpass')
@@ -29,6 +31,7 @@ describe('Change Passsword', () => {
     //current password is incorrect
     it('current pwd incorrect', () =>{
         cy.get('#editPasswordIcon').click()
+        cy.wait(1000)
         cy.get('#changeCurPwd').clear().type('password123')
         cy.get('#changeNewPwd').clear().type('password')
         cy.get('#changeCfmPwd').clear().type('password')
@@ -41,6 +44,7 @@ describe('Change Passsword', () => {
     //success
     it('success', () =>{
         cy.get('#editPasswordIcon').click()
+        cy.wait(1000)
         cy.get('#changeCurPwd').clear().type('password')
         cy.get('#changeNewPwd').clear().type('password321')
         cy.get('#changeCfmPwd').clear().type('password321')
@@ -52,6 +56,7 @@ describe('Change Passsword', () => {
         // cy.url().should('include', '/')
         // cy.get('#loginEmail').should('exist')
         cy.get('#editPasswordIcon').click()
+        cy.wait(1000)
         cy.get('#changeCurPwd').clear().type('password321')
         cy.get('#changeNewPwd').clear().type('password')
         cy.get('#changeCfmPwd').clear().type('password')
