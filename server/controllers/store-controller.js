@@ -161,7 +161,7 @@ publishMap = async(req,res) =>{
       map.isPublished = true;
       map.save().then(() => {
         return res.status(200).json({
-          message: "Map project saved"
+          message: "Map project published"
         })
       })
     })
@@ -173,6 +173,26 @@ publishMap = async(req,res) =>{
   }
 }
 
+
+deleteMap = async (req, res) => {
+  try {
+    const mapId = req.params.mapId;
+
+    await User.updateMany({}, { $pull: {sharedMaps: mapId}}) //remove map id from user schema(shared maps[])
+    await User.updateMany({}, { $pull: {personalMaps: mapId}});//remove mapId from user schema(personalmaps[])
+    const mapProject = await MapProject.findById(req.params.mapId);
+    await Subregion.deleteMany({ _id: { $in: mapProject.map }}); //get all subregionId -> delete subregionId object
+    await MapProject.remove({_id: mapId}); //delete mapproject
+
+    return res.status(200).json({
+      message: "Map project deleted"
+    })
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured during deletion of map'
+    })
+  }
+}
 
 deleteTags = async(req,res) =>{
   try{
@@ -211,5 +231,6 @@ module.exports = {
   deleteTags,
   getPublishedMaps,
   updateMapTitle,
-  publishMap
+  publishMap, 
+  deleteMap
 };
