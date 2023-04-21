@@ -23,7 +23,7 @@ export default function CreateMapModal(props) {
   function handleSubmitFile(e){
     e.stopPropagation();
     if(mapFile){
-      store.parseFileUpload(mapFile);
+      store.parseFileUpload(mapFile, "PLACEHOLDER");
     }
     setMapFile(null);
   }

@@ -8,6 +8,7 @@ const SubregionSchema = new Schema(
         type: {type: String, required: true},
         properties: {type: Map, of: String},
         coordinates: {type: Schema.Types.Mixed},
+        isStale: {type: Boolean, required: true}
     },
     { timestamps: true },
 )
