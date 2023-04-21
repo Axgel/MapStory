@@ -5,20 +5,21 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_STORE,
 });
 
-export const createSubregion = (type, properties, coords) => {
+export const createSubregion = (mapId, type, properties, coords) => {
   return api.post(`/subregion`, {
+    mapId: mapId,
     type: type,
     properties: properties,
-    coordinates: coords
+    coordinates: coords,
+    isStale: false
   })
 };
 
-export const createMap = (subregionIds, owner) => {
+export const createMap = (user, mapTitle) => {
   return api.post('/map', {
-    title: "Untitled",
-    map: subregionIds,
-    owner: owner._id,
-    ownerName: owner.userName,
+    title: mapTitle,
+    owner: user._id,
+    ownerName: user.userName,
     collaborators: [],
     upvotes: [],
     downvotes: [],
@@ -51,7 +52,7 @@ export const deleteTags = (mapId, tag) => {
 
 export const deleteMapById = (mapId) => api.delete(`/delete/${mapId}`);
 
-export const getAllPublishedMaps = () => api.get(`/publishedmaps`);
+export const getPublishedMaps = () => api.get(`/publishedmaps`);
 
 export const publishMapById = (mapId) => api.put(`/publish/${mapId}`);
 
@@ -67,7 +68,7 @@ const apis = {
   updateMapTitle,
   addTags, 
   deleteTags,
-  getAllPublishedMaps,
+  getPublishedMaps,
   updateMapTitle,
   publishMapById, 
   forkMapById,

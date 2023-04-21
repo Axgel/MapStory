@@ -41,7 +41,6 @@ export default function EditToolbar() {
     file.setCurrentEditMode(currentEditMode);
   }
 
-
   function handleUpdateTitle(e){
     e.stopPropagation();
     store.updateMapTitle(e.target.value);
