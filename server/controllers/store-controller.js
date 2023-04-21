@@ -193,7 +193,6 @@ deleteMap = async (req, res) => {
 
 forkMap = async (req, res) => {
   try {
-    console.log(req.body)
     const user = await User.findById(req.body.userId);
     const mapProject = await MapProject.findById(req.params.mapId); //mapproject to duplicate
 
