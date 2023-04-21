@@ -9,8 +9,7 @@ sharedb.types.register(json1.type);
 
 getAllSubregions = async (req, res) => {
   try{
-    const mapProject = await MapProject.findById(req.params.mapId);
-    const subregions = await Subregion.find({ _id: { $in: mapProject.map}}).exec();
+    const subregions = await Subregion.find({ mapId: req.params.mapId }).exec();
     return res.status(200).json({
       subregions: subregions
     })
