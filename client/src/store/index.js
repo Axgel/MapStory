@@ -76,7 +76,8 @@ function GlobalStoreContextProvider(props) {
           currentModal: CurrentModal.NONE,
           publishedMaps: payload.publishedMaps,
           sharedMaps: payload.sharedMaps,
-          personalMaps: payload.personalMaps
+          personalMaps: payload.personalMaps,
+          selectedMap: payload.selectedMap
         })
       }
       case GlobalStoreActionType.SET_MAP_PROJECT_ACTION: {
@@ -168,6 +169,20 @@ function GlobalStoreContextProvider(props) {
     }
   }
 
+  store.selectedMapInList = function(mapList){
+    if(store.selectedMap){
+      for(const map of mapList){
+        if(map._id === store.selectedMap._id){
+          return map;
+        }
+      }
+    }
+
+    return false;
+  }
+
+
+
   store.loadPersonalAndSharedMaps = async function(currentModal){
     let personalMaps = [];
     let sharedMaps = [];
@@ -179,13 +194,10 @@ function GlobalStoreContextProvider(props) {
       personalMaps = response.data.personalMaps;
       sharedMaps = response.data.sharedMaps;
 
-      if (store.selectedMap){
-        for (const map of personalMaps){
-          if (map._id === store.selectedMap._id){
-            selectedMap = map
-            break;
-          }
-        }
+      if(store.selectedMapInList(personalMaps)){
+        selectedMap = store.selectedMapInList(personalMaps);
+      } else if(store.selectedMapInList(sharedMaps)){
+        selectedMap = store.selectedMapInList(sharedMaps);
       }
     }
     
@@ -200,6 +212,7 @@ function GlobalStoreContextProvider(props) {
   store.loadAllMaps = async function(){
     let personalMaps = [];
     let sharedMaps = [];
+    let selectedMap = null;
     let response;
     
     if(auth.loggedIn){
@@ -210,10 +223,20 @@ function GlobalStoreContextProvider(props) {
       }
     }
     response = await api.getPublishedMaps();
+
+    
     if(response.status === 200){
+      if(store.selectedMapInList(personalMaps)){
+        selectedMap = store.selectedMapInList(personalMaps);
+      } else if(store.selectedMapInList(sharedMaps)){
+        selectedMap = store.selectedMapInList(sharedMaps);
+      } else if(store.selectedMapInList(response.data.publishedMaps)){
+        selectedMap = store.selectedMapInList(response.data.publishMaps);
+      }
+
       storeReducer({
         type: GlobalStoreActionType.LOAD_ALL_MAPS,
-        payload: {publishedMaps: response.data.publishedMaps, personalMaps: personalMaps, sharedMaps: sharedMaps}
+        payload: {publishedMaps: response.data.publishedMaps, personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap}
        });
     }
   }
