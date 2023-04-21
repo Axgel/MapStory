@@ -31,7 +31,7 @@ export default function ForgotPasswordModal() {
   
   if(auth.currentModal == CurrentModal.FORGOT_PASSWORD){
     return (
-      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center">
+      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[350px] text-left">
           <h1 className="text-xl text-center mt-4 mx-9">Recover Your Password</h1>

@@ -21,9 +21,9 @@ function GlobalStoreContextProvider(props) {
     currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
     detailView: DetailView.NONE, 
-    publishedMaps: null,
-    personalMaps: null,
-    sharedMaps: null,
+    publishedMaps: [],
+    personalMaps: [],
+    sharedMaps: [],
     selectedMap: null,
     mapIdMarkedForAction: null
   });
@@ -44,6 +44,7 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_SELECTED_MAP: {
         return setStore({
           ...store,
+          currentModal: CurrentModal.NONE,
           selectedMap: payload.selectedMap,
           detailView: payload.detailView
         })
@@ -63,7 +64,7 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS: {
         return setStore({
           ...store,
-          currentModal: CurrentModal.NONE,
+          // currentModal: CurrentModal.NONE,
           personalMaps: payload.personalMaps,
           sharedMaps: payload.sharedMaps,
           selectedMap: payload.selectedMap
@@ -106,6 +107,13 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
+  store.loadMapById = async function(mapId) {
+    const response = await api.getMapById(mapId);
+    if(response.status === 200){
+      store.setSelectedMap(response.data.map);
+    }
+  }
+
   store.setSelectedMap = function (map) {
     const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
     storeReducer({
@@ -128,81 +136,72 @@ function GlobalStoreContextProvider(props) {
     });
   }
 
-  store.parseFileUpload = async function(files) {
+  store.parseFileUpload = async function(files, mapTitle) {
     let geojsonFile = await convertToGeojson(files);
     let subregions = await convertGeojsonToInternalFormat(geojsonFile);
-    let subregionIds = await store.createMapSubregions(subregions);
-    let response = await api.createMap(subregionIds, auth.user);  
+    let response = await api.createMap(auth.user, mapTitle);
     if(response.status === 201){
-      // storeReducer({
-      //   type: GlobalStoreActionType.SET_OPENED_MAP,
-      //   payload: {openedMap: response.data.id, currentModal: CurrentModal.NONE},
-      // });
-      store.setCurrentModal(CurrentModal.NONE);
-      navigate(`/map/${response.data.id._id}`);
-    }
-  }
-
-  store.createMapSubregions = function(subregions){
-    async function asyncCreateMapSubregions() {
-      const asyncSubregions = [];
-      for(let i=0; i<subregions.length; i++){
-        asyncSubregions.push(api.createSubregion(subregions[i].type, subregions[i].properties, subregions[i].coords));
-      }
-      const addedRegions = await Promise.all(asyncSubregions);
-      const ids = [];
-      
-      for(const region of addedRegions){
-        if(region.status !== 201){
-          console.log("failed to create all subregions");
-          return;
+      console.log("asd");
+      await store.createMapSubregions(subregions, response.data.map._id);
+      storeReducer({
+        type: GlobalStoreActionType.SET_SELECTED_MAP,
+        payload: {
+          selectedMap: response.data.map,
+          detailView: DetailView.NONE
         }
-        ids.push(region.data.id);
-      }
-      return ids;
+      })
+      navigate(`/map/${response.data.map._id}`);
     }
-
-    return asyncCreateMapSubregions();
   }
 
-  store.loadPersonalAndSharedMaps = function(){
-    async function asyncLoadPersonalAndSharedMaps(){
-      let personalMaps = [];
-      let sharedMaps = [];
-      let selectedMap = null;
-      if(auth.loggedIn){
-        let response = await api.getPersonalAndSharedMaps(auth.user._id);     
-        if(response.status === 200){
-          personalMaps = response.data.personalMaps;
-          sharedMaps = response.data.sharedMaps;
-          console.log(store.selectedMap);
-          if (store.selectedMap){
-            for (const map of personalMaps){
-              if (map._id === store.selectedMap._id){
-                selectedMap = map
-                break;
-              }
-            }
+  store.createMapSubregions = async function(subregions, mapId){
+    const asyncSubregions = [];
+    for(let i=0; i<subregions.length; i++){
+      asyncSubregions.push(api.createSubregion(mapId, subregions[i].type, subregions[i].properties, subregions[i].coords));
+    }
+    const addedRegions = await Promise.all(asyncSubregions);      
+    for(const region of addedRegions){
+      if(region.status !== 201){
+        console.log("failed to create all subregions");
+        return;
+      }
+    }
+  }
+
+  store.loadPersonalAndSharedMaps = async function(){
+    let personalMaps = [];
+    let sharedMaps = [];
+    let selectedMap = null;
+    if(!auth.loggedIn) return;
+
+    let response = await api.getPersonalAndSharedMaps(auth.user._id);     
+    if(response.status === 200){
+      personalMaps = response.data.personalMaps;
+      sharedMaps = response.data.sharedMaps;
+
+      if (store.selectedMap){
+        for (const map of personalMaps){
+          if (map._id === store.selectedMap._id){
+            selectedMap = map
+            break;
           }
         }
       }
-
-      storeReducer({
-        type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,
-        payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap},
-      });
     }
-
-    asyncLoadPersonalAndSharedMaps();
+    
+    storeReducer({
+      type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,
+      payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap},
+    });
   }
 
-  store.loadAllMaps = async function(){
-    // load all published maps
 
+
+  store.loadAllMaps = async function(){
     let personalMaps = [];
     let sharedMaps = [];
     let response;
-
+    
     if(auth.loggedIn){
       response = await api.getPersonalAndSharedMaps(auth.user._id);
       if(response.status === 200){
@@ -210,7 +209,7 @@ function GlobalStoreContextProvider(props) {
         sharedMaps = response.data.sharedMaps;
       }
     }
-    response = await api.getAllPublishedMaps();
+    response = await api.getPublishedMaps();
     if(response.status === 200){
       storeReducer({
         type: GlobalStoreActionType.LOAD_ALL_MAPS,

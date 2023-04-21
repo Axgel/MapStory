@@ -15,7 +15,7 @@ export default function ExportMapModal() {
 
   if(store.currentModal == CurrentModal.EXPORT_MAP){
     return (
-      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center mx-2">
+      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center mx-2 z-50">
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[450px] max-w-md text-center mx-12">
           <h1 className="text-xl mt-4 mb-4 mx-12">Export 'Borders - United States 1989'</h1>
 

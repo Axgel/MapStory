@@ -5,7 +5,6 @@ const ObjectId = Schema.Types.ObjectId;
 const MapProjectSchema = new Schema(
   {
     title: {type: String, required: true},
-    map: [{type: ObjectId, ref: 'Subregion'}],
     owner: {type: ObjectId, ref: 'User'},
     ownerName: {type: String, required: true},
     collaborators: [{type: ObjectId, ref: 'User'}],
