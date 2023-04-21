@@ -20,7 +20,7 @@ export default function DeleteMapModal(props) {
 
   if(store.currentModal == CurrentModal.DELETE_MAP){
     return (
-      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center">
+      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg w-96 text-right">
           <h1 className="text-xl text-center mt-4 mb-2 mx-9">Deleting Map</h1>

@@ -99,7 +99,7 @@ export default function Map() {
   }
 
   return (
-    <div className="w-full h-[700px]" id="map" ref={handleInitMapLoad}>
+    <div className="w-full h-[700px] z-10" id="map" ref={handleInitMapLoad}>
     </div>
   );
 }
