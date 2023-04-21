@@ -8,7 +8,7 @@ export default function TagCard(props) {
   function handleDeleteTags(e){
     e.stopPropagation();
     let tag = document.getElementById("displayed_tag").innerHTML
-    store.deleteTags(tag)
+    store.deleteTags(props.tag)
   }
 
 
