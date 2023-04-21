@@ -64,7 +64,7 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS: {
         return setStore({
           ...store,
-          // currentModal: CurrentModal.NONE,
+          currentModal: payload.currentModal,
           personalMaps: payload.personalMaps,
           sharedMaps: payload.sharedMaps,
           selectedMap: payload.selectedMap
@@ -168,7 +168,7 @@ function GlobalStoreContextProvider(props) {
     }
   }
 
-  store.loadPersonalAndSharedMaps = async function(){
+  store.loadPersonalAndSharedMaps = async function(currentModal){
     let personalMaps = [];
     let sharedMaps = [];
     let selectedMap = null;
@@ -191,7 +191,7 @@ function GlobalStoreContextProvider(props) {
     
     storeReducer({
       type: GlobalStoreActionType.LOAD_PERSONAL_AND_SHARED_MAPS,
-      payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap},
+      payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap, currentModal: currentModal},
     });
   }
 
@@ -221,7 +221,7 @@ function GlobalStoreContextProvider(props) {
   store.updateMapTitle = async function(newTitle){
     let response = await api.updateMapTitle(store.selectedMap._id, newTitle);
     if(response.status === 200){
-      store.loadPersonalAndSharedMaps();
+      store.loadPersonalAndSharedMaps(CurrentModal.NONE);
     }
   }
 
@@ -258,7 +258,7 @@ function GlobalStoreContextProvider(props) {
         payload: null
       })
 
-      store.loadPersonalAndSharedMaps();
+      store.loadPersonalAndSharedMaps(CurrentModal.NONE);
     }
   }
 
@@ -278,14 +278,14 @@ function GlobalStoreContextProvider(props) {
   store.addTags = async function(newTag){
     let response = await api.addTags(store.selectedMap._id, newTag);
     if(response.status === 200){
-      store.loadPersonalAndSharedMaps();
+      store.loadPersonalAndSharedMaps(CurrentModal.TAG);
     }
   }
 
   store.deleteTags = async function(tag){
     let response = await api.deleteTags(store.selectedMap._id, tag);
     if(response.status === 200){
-      store.loadPersonalAndSharedMaps();
+      store.loadPersonalAndSharedMaps(CurrentModal.TAG);
     }
   }
 

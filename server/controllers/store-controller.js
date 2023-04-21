@@ -217,7 +217,7 @@ forkMap = async (req, res) => {
         newMapProject.save();
       })
     })
-
+    
     const oldSubregions = await Subregion.find({ mapId: req.params.mapId }).exec();
     for(const region of oldSubregions){
       const newSubregion = new Subregion({
@@ -228,13 +228,12 @@ forkMap = async (req, res) => {
         isStale: false
       });
 
-      newSubregion.save().then(() => {
-        return res.status(200).json({
-          message: "Forked map project"
-        })
-      })
+      await newSubregion.save();
     }
-
+    
+    return res.status(201).json({
+      message: "Forked map project"
+    })
   } catch (err) {
     return res.status(400).json({
       error: 'Error occured during forking of map'
