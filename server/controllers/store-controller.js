@@ -199,7 +199,7 @@ forkMap = async (req, res) => {
 
     // create a copy of the map
     const newMapProject = new MapProject({
-      title: mapProject.title,
+      title: `Copy of ${mapProject.title}`,
       owner: user._id,
       ownerName: user.userName,
       collaborators: [],
