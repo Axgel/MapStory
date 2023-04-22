@@ -4,9 +4,10 @@ describe('Add Tags', () => {
         cy.visit('/')
         cy.get('#mapsid').should('exist'); //verify on home page
         //double click DO NOT DELETE (map name)
-        cy.contains("TESTING").dblclick()
+        cy.get(":nth-child(1) > .px-8").dblclick()
         cy.url().should('include', '/map')
     });
+    
     //tag already exists
     
     //success
