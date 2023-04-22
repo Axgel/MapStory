@@ -103,6 +103,27 @@ logoutUser = async (req, res) => {
   res.status(200).send();
 };
 
+//Function only meant for testing purposes
+deleteUser = async(req, res) => {
+  try{
+    const {email} = req.body
+
+    const deleted = await User.deleteOne({email: email})
+    if(deleted){
+      return res.status(200).json({
+        success: true
+      })
+    } else {
+      return res.status(400).json({
+        success: false
+      })
+    }
+  }catch(err){
+    console.error(err);
+    res.status(500).send();
+  }
+}
+
 registerUser = async (req, res) => {
   try {
     const { userName, email, password, passwordVerify } = req.body;
@@ -186,6 +207,12 @@ recoveryEmail = async(req, res) => {
     if (process.env.ENVIRONMENT === "DEVELOPMENT"){
       message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+      //Testing purposes: we don't need to send out the email for when we are using JEST
+      return res.status(200).json({
+        success: true,
+        username: username,
+        resetToken: resetToken
+      })
     } else {
       message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
@@ -205,8 +232,6 @@ recoveryEmail = async(req, res) => {
       errorMessage: "Unable to send email",
     });
   }
-  //Todo: Sending email via nodemailer and need to install postmail on backend server
-  
 }
 
 //Resetting password + Use for both recovering password 
@@ -216,9 +241,6 @@ recoverPassword = async(req, res) => {
   // Extract the password expiration time and check it with the current time to see if it already expired
   
   try{
-    // const{userName, token} = req.params
-    // console.log(req.body)
-    // console.log(token)
     const {userName, token, password, passwordVerify} = req.body
     const search_by_username = await User.findOne({userName: userName})
     const search_by_token = await User.findOne({passwordToken: token})
@@ -295,7 +317,7 @@ changeUsername = async (req, res) => {
 
     const existingEmail = await User.findOne({ email: email });
     if (!existingEmail) {
-      return res.status(401).json({
+      return res.status(400).json({
         errorMessage: "Wrong email provided.",
       });
     }
@@ -410,4 +432,5 @@ module.exports = {
   recoverPassword,
   changeUsername,
   changePassword,
+  deleteUser,
 };
