@@ -34,7 +34,7 @@ export default function AddTagModal() {
           <h1 className="text-xl mt-4 mb-4 mx-12">Add Tags 'Borders - United States 1989'</h1>
           <div className="flex justify-between mx-12 mb-3 min-w-[360px]">
             <input id = "input_tag" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Tags" required></input>
-            <button className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddTags}>ADD</button>
+            <button id="addTagBtn" className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddTags}>ADD</button>
           </div>
 
           <p className="text-lightgrey text-left mx-12">Tags:</p>
