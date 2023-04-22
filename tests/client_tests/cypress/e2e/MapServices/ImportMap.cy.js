@@ -1,6 +1,6 @@
 describe('Import Map', () => {
     beforeEach(() => {
-        cy.login("test", "test")
+        cy.login("testServices", "testServices")
         cy.visit('/')
         cy.get('#mapsid').should('exist'); //verify on home page
         cy.get('#createMapBtn').click() //click create map
