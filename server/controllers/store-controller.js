@@ -281,6 +281,109 @@ getMapById = async(req,res) => {
   }
 }
 
+addCollaborators = async(req, res) => {
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a collaborator to add'
+      })
+    }
+
+    const collaborator = await User.findOne({ email : body.collaboratorEmail });   
+    const map = await MapProject.findOne({ _id: req.params.mapId }); 
+
+    if (map.collaborators.includes(collaborator._id)) {
+      return res.status(400).json({
+        error: "Collaborator already added"
+      })
+    }
+
+    map.collaborators.push(collaborator._id);
+    await map.save();
+
+    if(collaborator.sharedMaps.includes(map._id)){
+      return res.status(400).json({
+        error: "Map already added to user"
+      })
+    }
+
+    collaborator.sharedMaps.push(map._id);
+    await collaborator.save();
+
+    return res.status(200).json({
+      message: "Collaborator added"
+    })
+
+  } catch(err){
+    return res.status(400).json({
+      error: 'Unable to add collaborator'
+    })
+  }
+}
+
+removeCollaborators = async(req, res) => {
+  try{
+    const body = req.body;
+
+    if(!body){
+      return res.status(400).json({
+        success: false,
+        error: 'You must provide a collaborator to add'
+      })
+    }
+
+    const collaborator = await User.findOne({ email : body.collaboratorEmail });   
+    const map = await MapProject.findOne({ _id: req.params.mapId }); 
+
+    if (!map.collaborators.includes(collaborator._id)) {
+      return res.status(400).json({
+        error: "Collaborator not added to map"
+      })
+    }
+
+    let temp = map.collaborators.filter(userid => userid === collaborator._id);
+    map.collaborators = temp
+    await map.save();
+
+    if(!collaborator.sharedMaps.includes(map._id)){
+      return res.status(400).json({
+        error: "User doesnt have shared map"
+      })
+    }
+
+    temp = collaborator.sharedMaps.filter(mapid => mapid === map._id);
+    collaborator.sharedMaps = temp;
+    await collaborator.save();
+
+    return res.status(200).json({
+      message: "Collaborator removed"
+    })
+
+  } catch(err){
+    return res.status(400).json({
+      error: 'Unable to add collaborator'
+    })
+  }
+}
+
+
+getUserById = async(req,res) => {
+  try{
+    User.findOne({ _id: req.params.userId}, (err, user) => {
+      return res.status(200).json({
+        user: user 
+      })
+    })
+  } catch(err){
+    return res.status(400).json({
+      error: 'Unable to find map'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
@@ -293,5 +396,8 @@ module.exports = {
   publishMap, 
   deleteMap, 
   forkMap,
-  getMapById
+  getMapById,
+  addCollaborators,
+  removeCollaborators,
+  getUserById
 };
