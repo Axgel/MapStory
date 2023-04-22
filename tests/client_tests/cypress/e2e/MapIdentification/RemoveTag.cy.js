@@ -17,7 +17,6 @@ describe('Remove Tag', () => {
         // cy.get(':nth-child(1) > .w-auto > #displayed_tag').exists()
         cy.get(':nth-child(1) > .w-auto > #displayed_tag').then((tag)=>{
             cy.get(':nth-child(1) > .w-auto > #removeTagBtn').click() //click X icon
-            //check that the username field has the same value as previous
             cy.get(':nth-child(1) > .w-auto > #displayed_tag').should("not.contain", tag)
         })
     });
