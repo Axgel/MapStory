@@ -11,6 +11,7 @@ module.exports = defineConfig({
     specPattern: [
       './cypress/e2e/AccountManagement/*.cy.js',
       './cypress/e2e/MapServices/*.cy.js',
+      './cypress/e2e/MapIdentification/*.cy.js',
       './cypress/e2e/*.cy.js'
 
     ]
