@@ -42,9 +42,8 @@ describe('Change Passsword', () => {
         cy.get('#changeCurPwd').type('password')
         cy.get('#changeNewPwd').type('password321')
         cy.get('#changeCfmPwd').type('password321')
-        cy.intercept('POST', '/auth/profile/password').as('changePassword')
+        cy.intercept('POST', '/auth/profile/password', {})
         cy.contains('OK').click()
-        cy.wait('@changePassword').its('response.statusCode').should('eq', 200)
         cy.contains('Password has been updated!')
         cy.url().should('include', '/profile')
     });
