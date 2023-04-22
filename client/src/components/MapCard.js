@@ -16,6 +16,20 @@ export default function MapCard(props) {
   const navigate = useNavigate();
 
 
+  let publishButtonCSS = 'border-solid border rounded-lg text-center px-6 py-2 bg-publishfill hover:bg-opacity-50 ';
+  let deleteButtonCSS = 'border-solid border rounded-lg text-center px-6 py-2 bg-deletefill hover:bg-opacity-50 ';
+  let forkButtonCSS = 'border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50 ';
+  let publishedWrapper = <p className="text-xs text-red-500">Not Published</p>;
+
+  if(mapDetails.isPublished){
+    publishButtonCSS += 'hidden '
+    publishedWrapper = <p className="text-xs text-green-500">Published: {mapDetails.publishedDate}</p>;
+  }
+  if(!auth || mapDetails.owner != auth.user._id){
+    deleteButtonCSS += 'hidden '
+    publishButtonCSS += 'hidden '
+  }
+
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
   if(store.selectedMap && store.selectedMap._id == mapDetails._id){
     mapCardWrapper += "bg-mapselectedfill"
@@ -35,7 +49,7 @@ export default function MapCard(props) {
 
   function handleOpenMap(e){
     e.stopPropagation();
-    store.setSelectedMap(mapDetails);
+    store.loadMapById(mapDetails._id);
     file.setLoadedRegionOnce(false);
     navigate(`/map/${mapDetails._id}`);
   }
@@ -62,23 +76,23 @@ export default function MapCard(props) {
 
         {/* Section for map details */}
         <div className="flex flex-col px-8 justify-center">
-          <p className="text-2xl font-bold">{mapDetails.title}</p>
+          <p className="text-xl font-bold max-w-3xl text-ellipsis overflow-hidden">{mapDetails.title}</p>
           <p className="text-sm">By: {mapDetails.ownerName}</p>
-          <p className="text-xs">Published: {mapDetails.publishedDate}</p>
+          {publishedWrapper}
         </div>
       </div>
 
       {/* Section for publish, delete, fork buttons */}
       <div className="flex px-8 gap-4 items-center cursor-pointer">
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-publishfill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>
+        <div className={publishButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>
           Publish
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-deletefill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>
+        <div className={deleteButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>
           Delete
         </div>
 
-        <div className="border-solid border rounded-lg text-center px-6 py-2 bg-forkfill hover:bg-opacity-50" onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>
+        <div className={forkButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>
           Fork
         </div>
       </div>

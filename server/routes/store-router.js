@@ -16,5 +16,8 @@ router.put('/deleteTags/:mapId', StoreController.deleteTags);
 router.put('/publish/:mapId', StoreController.publishMap);
 router.delete('/map/:mapId', StoreController.deleteMap);
 router.get('/map/:mapId', StoreController.getMapById);
- 
+router.put('/addCollaborators/:mapId', StoreController.addCollaborators);
+router.put('/removeCollaborators/:mapId', StoreController.removeCollaborators);
+router.get('/user/:userId', StoreController.getUserById);
+
 module.exports = router;

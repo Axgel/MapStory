@@ -11,13 +11,21 @@ export default function AddTagModal() {
   
   function handleAddTags(e){
     e.stopPropagation();
-    let tag = document.getElementById("input_tag").value
-    store.addTags(tag)
+    let tag = document.getElementById("input_tag").value;
+    document.getElementById("input_tag").value = "";
+    store.addTags(tag);
   }
 
   function handleCloseModal(e){
     e.stopPropagation();
     store.setCurrentModal(CurrentModal.NONE);
+  }
+
+  function handleKeyPress(e) {
+    e.stopPropagation();
+    if (e.code === "Enter") {
+      handleAddTags(e);
+    }
   }
 
   let tagCards = <></>;
@@ -33,7 +41,7 @@ export default function AddTagModal() {
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[450px] max-w-md text-center mx-12">
           <h1 className="text-xl mt-4 mb-4 mx-12">Add Tags 'Borders - United States 1989'</h1>
           <div className="flex justify-between mx-12 mb-3 min-w-[360px]">
-            <input id = "input_tag" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Tags" required></input>
+            <input id = "input_tag" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Tags" onKeyDown={handleKeyPress} required></input>
             <button className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddTags}>ADD</button>
           </div>
 

@@ -1,5 +1,6 @@
 const auth = require("../auth");
 const User = require("../models/user-model");
+const MapProject = require("../models/mapproject-model");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -307,6 +308,14 @@ changeUsername = async (req, res) => {
     }
 
     const newUser = await User.findOneAndUpdate({ email: email }, {userName: userName}, {new : true});
+
+    const asyncMapProjects = [];
+    for(const mapId of newUser.personalMaps){
+      asyncMapProjects.push(MapProject.findOneAndUpdate({ _id: mapId }, { ownerName: userName }));
+    }
+
+    await Promise.all(asyncMapProjects);
+
     return res.status(200).json({
       success: true,
       user: {

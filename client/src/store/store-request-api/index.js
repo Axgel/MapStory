@@ -60,6 +60,20 @@ export const forkMapById = (mapId, userId) => api.post(`/fork/${mapId}`, {userId
 
 export const getMapById = (mapId) => api.get(`/map/${mapId}`);
 
+export const addCollaborator = (mapId, collaboratorEmail) => {
+  return api.put(`/addCollaborators/${mapId}`, {
+    collaboratorEmail: collaboratorEmail
+  })
+}
+export const removeCollaborator = (mapId, collaboratorEmail) => {
+  return api.put(`/removeCollaborators/${mapId}`, {
+    collaboratorEmail: collaboratorEmail
+  })
+}
+
+export const getUserById = (userId) => api.get(`/user/${userId}`);
+
+
 const apis = {
   createSubregion,
   createMap, 
@@ -72,7 +86,10 @@ const apis = {
   updateMapTitle,
   publishMapById, 
   forkMapById,
-  getMapById
+  getMapById,
+  addCollaborator,
+  removeCollaborator,
+  getUserById
 };
 
 export default apis;
