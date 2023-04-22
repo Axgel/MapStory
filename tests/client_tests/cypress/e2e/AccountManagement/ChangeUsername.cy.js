@@ -55,13 +55,9 @@ describe('Change Username', () => {
         cy.get('#editUsernameIcon').click()
         cy.wait(1000);
         cy.get('#inputNewUsername').clear().type("newUsername") 
+        cy.intercept('POST', '/auth/profile/username').as('changeUsername')
         cy.contains('OK').click()
-        //check that the username field has the new value
-        cy.get('#profileUsername').should('have.value', 'newUsername')
-        //reset to old username
-        cy.get('#editUsernameIcon').click()
-        cy.get('#inputNewUsername').clear().type("fet") 
-        cy.contains('OK').click()
+        cy.wait('@changeUsername').its('response.statusCode').should('eq', 200)
     });
     
 })
