@@ -1,6 +1,6 @@
-describe('Remove Tag', () => {
+describe('Add Tags', () => {
     beforeEach(() => {
-        cy.login("test", "test")
+        cy.login("testIdentification", "testIdentification")
         cy.visit('/')
         cy.get('#mapsid').should('exist'); //verify on home page
         //double click DO NOT DELETE (map name)
@@ -12,8 +12,15 @@ describe('Remove Tag', () => {
     
     //tag already exists
     
-    //success
-    it('success', () => {
+    //add 
+    it('add success', () => {
+        cy.get('#input_tag').type("rare usa")
+        cy.get('#addTagBtn').click()
+        cy.contains("rare usa")
+    });
+
+    //remove
+    it('remove success', () => {
         // cy.get(':nth-child(1) > .w-auto > #displayed_tag').exists()
         cy.get(':nth-child(1) > .w-auto > #displayed_tag').then((tag)=>{
             cy.get(':nth-child(1) > .w-auto > #removeTagBtn').click() //click X icon
