@@ -59,7 +59,7 @@ export default function EditToolbar() {
     setEditActive(true);
   }
 
-  let titleElement = store.selectedMap ?  <p className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>
+  let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>
 
   if(editActive){
     titleElement = <input 
