@@ -4,16 +4,18 @@ import { CurrentModal } from "../enums";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
-export default function ChangePasswordModal(props) {
+export default function ChangePasswordModal() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const [oldPwd, setOldPwd] = useState('');
   const [newPwd, setNewPwd] = useState('');
   const [cfmPwd, setCfmPwd] = useState('');
+  const [errMsg, setErrMsg] = useState('');
 
   function handleCloseModal(e){
     e.stopPropagation();
     store.setCurrentModal(CurrentModal.NONE);
+    setErrMsg("");
   }
 
   const handleChange = (event) => {
@@ -33,13 +35,24 @@ export default function ChangePasswordModal(props) {
 
   function handleChangePassword(e) {
     e.stopPropagation();
+    if(newPwd.length < 8 || cfmPwd.length < 8){
+      setErrMsg("Password length must be at least 8 characters long");
+      return;
+    }
+
+    if(newPwd != cfmPwd){
+      setErrMsg("Passwords do not match");
+      return;
+    }
+
     auth.changePassword(oldPwd, newPwd, cfmPwd);
     store.setCurrentModal(CurrentModal.NONE);
+    setErrMsg("");
   }
 
   if(store.currentModal == CurrentModal.CHANGE_PASSWORD){
     return (
-      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center">
+      <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[350px] text-left">
           <h1 className="text-xl text-center mt-4 mx-9">Change Your Password</h1>
@@ -51,7 +64,8 @@ export default function ChangePasswordModal(props) {
 
           <h1 className="mx-6 my-1 text-start">Confirm New Password</h1>
           <input id="changeCfmPwd" className="w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2" type="password" placeholder="Confirm New Pasword" onChange={handleChange} name="confirm"></input>
-          <br></br><br></br>
+          <p className="mx-6 text-red-600">{errMsg}</p>
+          <br></br>
           <div className="flex flex-row-reverse mx-3">
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleChangePassword}>OK</button>
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleCloseModal}>Cancel</button>

@@ -16,12 +16,14 @@ import {
   PublishMapModal,
   DeleteMapModal,
   ShareMapModal,
+  ForkMapModal,
   ExportMapModal,
   AccountFeedbackModal,
   AddTagModal,
   ChangeUsernameModal,
   ChangePasswordModal,
-  CreateMapModal
+  CreateMapModal,
+  ForgotPasswordModal
  } from "./modals"
 
 import {
@@ -42,18 +44,20 @@ function App() {
               <Route path="/register" element={<RegisterScreen />} />
               <Route path="/recover" element={<RecoverPasswordScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
-              <Route path="/map" element={<MapScreen />} />
+              <Route path="/map/:mapId" element={<MapScreen />} />
               <Route path="/all" element={<AllScreen />} />
             </Routes>
             <AccountFeedbackModal />
             <PublishMapModal />
             <DeleteMapModal />
             <ShareMapModal />
+            <ForkMapModal />
             <ExportMapModal />
             <AddTagModal />
             <ChangeUsernameModal />
             <ChangePasswordModal />
             <CreateMapModal />
+            <ForgotPasswordModal />
           </GlobalFileContextProvider>
         </GlobalStoreContextProvider>
       </AuthContextProvider>

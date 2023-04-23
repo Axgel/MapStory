@@ -1,21 +1,12 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "./auth-request-api";
-
+import { AuthActionType, CurrentModal } from "../enums";
 const AuthContext = createContext();
-
-// THESE ARE ALL THE TYPES OF UPDATES TO OUR AUTH STATE THAT CAN BE PROCESSED
-export const AuthActionType = {
-  GET_LOGGED_IN: "GET_LOGGED_IN",
-  LOGIN_USER: "LOGIN_USER",
-  LOGOUT_USER: "LOGOUT_USER",
-  REGISTER_USER: "REGISTER_USER",
-  CHANGE_USERNAME: "CHANGE_USERNAME",
-  CHANGE_PASSWORD: "CHANGE_PASSWORD"
-};
 
 function AuthContextProvider(props) {
   const [auth, setAuth] = useState({
+    currentModal: CurrentModal.NONE,
     user: null,
     loggedIn: false,
     error: ""
@@ -30,15 +21,23 @@ function AuthContextProvider(props) {
   const authReducer = (action) => {
     const { type, payload } = action;
     switch (type) {
+      case AuthActionType.SET_CURRENT_MODAL: {
+        return setAuth({
+          ...auth,
+          currentModal: payload.currentModal,
+          error: payload.error
+        })
+      }
       case AuthActionType.GET_LOGGED_IN: {
         return setAuth({
+          ...auth,
           user: payload.user,
-          loggedIn: payload.loggedIn,
-          error: payload.error,
+          loggedIn: payload.loggedIn
         });
       }
       case AuthActionType.LOGIN_USER: {
         return setAuth({
+          ...auth,
           user: payload.user,
           loggedIn: payload.loggedIn,
           error: payload.error
@@ -46,29 +45,27 @@ function AuthContextProvider(props) {
       }
       case AuthActionType.LOGOUT_USER: {
         return setAuth({
+          ...auth,
           user: null,
           loggedIn: false,
-          error: payload.error
         });
       }
       case AuthActionType.REGISTER_USER: {
         return setAuth({
+          ...auth,
           user: payload.user,
           loggedIn: payload.loggedIn,
-          error: payload.error
         });
       }
       case AuthActionType.CHANGE_USERNAME: {
         return setAuth({
           ...auth,
           user: payload.user,
-          error: payload.error
         });
       }
       case AuthActionType.CHANGE_PASSWORD: {
         return setAuth({
           ...auth,
-          error: payload.error
         });
       }
       default:
@@ -76,146 +73,111 @@ function AuthContextProvider(props) {
     }
   };
 
+  auth.setCurrentModal = function(modal, err){
+    authReducer({
+      type: AuthActionType.SET_CURRENT_MODAL,
+      payload: {
+        currentModal: modal,
+        error: err
+      }
+    })
+  }
+  
   auth.getLoggedIn = async function () {
-    let loggedIn = false;
-    let user = null;
-    let error = "";
-
     try {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
-        loggedIn = response.data.loggedIn;
-        user = response.data.user;
+        authReducer({
+          type: AuthActionType.GET_LOGGED_IN,
+          payload: {
+            loggedIn: response.data.loggedIn,
+            user: response.data.user
+          }
+        })
       }
     } catch (err) {
-      error = err.response.data.errorMessage;
+      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
-
-    authReducer({
-      type: AuthActionType.GET_LOGGED_IN,
-      payload: {
-        loggedIn: loggedIn,
-        user: user,
-        error: error
-      }
-    })
   };
 
   auth.registerUser = async function (userName, email, password, passwordVerify){
-    let loggedIn = false;
-    let user = null;
-    let error = "";
-    let response;
-
     try {
-      response = await api.registerUser(userName, email, password, passwordVerify);
+      const response = await api.registerUser(userName, email, password, passwordVerify);
+      if(response.status === 200){
+        authReducer({
+          type: AuthActionType.REGISTER_USER,
+          payload: {
+            loggedIn: false,
+            user: null
+          }
+        })
+        navigate("/");
+      }
     } catch (err) {
-      error = err.response.data.errorMessage;
+      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
-    
-    authReducer({
-      type: AuthActionType.REGISTER_USER,
-      payload: {
-        loggedIn: loggedIn,
-        user: user,
-        error: error,
-      },
-    });
-
-    if (response && response.status === 200) {
-      navigate("/");
-    } 
   };
 
   auth.loginUser = async function (email, password) {
-    let loggedIn = false;
-    let user = null;
-    let error = "";
-
     try {
       const response = await api.loginUser(email, password);
       if (response.status === 200) {
-        loggedIn = true;
-        user = response.data.user;
-      }
+        authReducer({
+          type: AuthActionType.LOGIN_USER,
+          payload: {
+            loggedIn: true,
+            user: response.data.user
+          }
+        })
+      } 
     } catch (err) {
-      error = err.response.data.errorMessage;
-    }
-    
-    authReducer({
-      type: AuthActionType.LOGIN_USER,
-      payload: {
-        loggedIn: loggedIn,
-        user: user,
-        error: error
-      },
-    });
-    if (loggedIn){
-      navigate("/");
+      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
   };
 
   auth.logoutUser = async function () {
-    let error = "";
-    let response;
     try {
-      response = await api.logoutUser();
+      const response = await api.logoutUser();
+      if(response.status === 200){
+        authReducer({
+          type: AuthActionType.LOGOUT_USER,
+          payload: null
+        })
+        navigate("/");
+      }
     } catch (err) {
-      error = err.response.data.errorMessage;
-    }
-
-    authReducer({
-      type: AuthActionType.LOGOUT_USER,
-      payload: {
-        error: error
-      },
-    });
-
-    if(response && response.status === 200){
-      navigate("/");
+      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
   };
 
   auth.changeUsername = async function (userName) {
-    if(userName.length == 0 || userName == auth.user.userName) return;
-    let error = "";
-    let user = auth.user;
-    const email = user.email;
     try {
-      const response = await api.changeUsername(email, userName);
+      const response = await api.changeUsername(auth.user.email, userName);
       if (response.status === 200) {
-        user = response.data.user;
+        authReducer({
+          type: AuthActionType.CHANGE_USERNAME,
+          payload: {
+            user: response.data.user
+          }
+        })
       }
     } catch (err) {
-      error = err.response.data.errorMessage;
+      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
-
-    authReducer({
-      type: AuthActionType.CHANGE_USERNAME,
-      payload: {
-        user: user,
-        error: error
-      },
-    });
   };
 
   auth.changePassword = async function (oldPwd, newPwd, cfmPwd) {
-    let error = "";
-    let response;
-    const email = auth.user.email;
     try {
-      response = await api.changePassword(email, oldPwd, newPwd, cfmPwd);
+      const response = await api.changePassword(auth.user.email, oldPwd, newPwd, cfmPwd);
+      if(response.status === 200){
+        authReducer({
+          type: AuthActionType.CHANGE_PASSWORD,
+          payload: null
+        })
+        auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, "Password has been updated!");
+      }
     } catch (err) {
-      error = err.response.data.errorMessage;
-    }
-
-    if (response && response.status === 200) {
-      authReducer({
-        type: AuthActionType.CHANGE_PASSWORD,
-        payload: {
-          error: error
-        },
-      });
+      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, "Incorrect password entered");
     }
   }
 

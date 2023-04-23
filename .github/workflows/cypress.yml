@@ -17,6 +17,10 @@ jobs:
       - name: Install Dependencies for Server
         run: npm ci
         working-directory: ./server
+      
+      - name: Install Dependencies for Client
+        run: npm ci
+        working-directory: ./client
 
       - name: Create server .env file
         uses: SpicyPizza/create-envfile@v1.3
@@ -25,13 +29,13 @@ jobs:
           envkey_DB_CONNECT: ${{ secrets.DB_CONNECT }}
           envkey_DEV_CORS: ${{ vars.DEV_CORS }}
           envkey_PROD_CORS: ${{ secrets.PROD_CORS }}
-          envkey_JWT_SCRET: ${{ secrets.JWT_SECRET }}
+          envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          envkey_SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+          envkey_SMTP_KEY: ${{ secrets.SMTP_KEY }}
+          envkey_SMTP_SENDEMAIL: ${{ secrets.SMTP_SENDEMAIL }}
+          envkey_SOCKET_URL: ${{ secrets.SOCKET_URL }}
           file_name: ./server/.env
-          fail_on_empty: true
-
-      - name: Run Server
-        run: npm start &
-        working-directory: ./server      
+          fail_on_empty: true     
 
       - name: Create client .env file
         uses: SpicyPizza/create-envfile@v1.3
@@ -46,5 +50,5 @@ jobs:
         uses: cypress-io/github-action@v5.6.1 # use the explicit version number
         with:
           working-directory: ./tests/client_tests
-          start: npm run start-client
+          start: npm run start-client, npm run start-server
           wait-on: '${{ vars.DEV_CORS }}'

@@ -1,5 +1,6 @@
 const auth = require("../auth");
 const User = require("../models/user-model");
+const MapProject = require("../models/mapproject-model");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -154,25 +155,12 @@ registerUser = async (req, res) => {
       personalMaps: [],
       sharedMaps: []
     });
-    const savedUser = await newUser.save();
-    // console.log("new user saved: " + savedUser._id);
-
-    // LOGIN THE USER
-    const token = auth.signToken(savedUser._id);
-    // // console.log("token:" + token);
-
-    req.session.token = token;
+    
+    await newUser.save();
 
     res.status(200).json({
-      success: true,
-      user: {
-        userName: savedUser.userName,
-        email: savedUser.email,
-        _id: savedUser._id
-      },
+      success: true
     });
-
-    // console.log("token sent");
   } catch (err) {
     console.error(err);
     res.status(500).send();
@@ -185,6 +173,11 @@ recoveryEmail = async(req, res) => {
     let message_body = ""
     const {email} = req.body
     const user = await User.findOne({email: email})
+    if(!user){
+      return res.status(401).json({
+        errorMessage: "Account doesn't exist",
+      });
+    }
     const token = crypto.randomBytes(32).toString("hex");
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -315,6 +308,14 @@ changeUsername = async (req, res) => {
     }
 
     const newUser = await User.findOneAndUpdate({ email: email }, {userName: userName}, {new : true});
+
+    const asyncMapProjects = [];
+    for(const mapId of newUser.personalMaps){
+      asyncMapProjects.push(MapProject.findOneAndUpdate({ _id: mapId }, { ownerName: userName }));
+    }
+
+    await Promise.all(asyncMapProjects);
+
     return res.status(200).json({
       success: true,
       user: {
