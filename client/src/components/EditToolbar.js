@@ -116,10 +116,10 @@ export default function EditToolbar() {
         <div id="tagsBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.TAG)}>
           Tags
         </div>
-        <div id="shareMap" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
+        <div id="shareMapBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
           Share
         </div>
-        <div id="exportMap" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.EXPORT_MAP)}>
+        <div id="exportMapBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.EXPORT_MAP)}>
           Export
         </div>
       </div>

@@ -52,7 +52,7 @@ export default function ShareMapModal() {
           <h1 className="text-xl mt-4 mb-4 mx-12">Share 'Borders - United States 1989'</h1>
           <div className="flex justify-between mx-12 mb-3 min-w-[360px]">
             <input id="add-collaborator" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Collaborators" onKeyDown={handleKeyPress}></input>
-            <button className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddCollaborator}>ADD</button>
+            <button id="addCollaboratorBtn" className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddCollaborator}>ADD</button>
           </div>
 
           <p className="text-lightgrey text-left mx-12">People with access:</p>

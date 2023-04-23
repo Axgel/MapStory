@@ -13,8 +13,7 @@ describe('Fork Map', () => {
             cy.get(':nth-child(2) > .gap-4 > #forkBtn').click() //click publish button
             cy.contains("OK").click()
             cy.contains("Copy of "+ title.text())
-        })
-        
+        })  
     });
 
 })
