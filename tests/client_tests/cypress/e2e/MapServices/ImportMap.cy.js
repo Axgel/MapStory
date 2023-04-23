@@ -3,9 +3,11 @@ describe('Import Map', () => {
         cy.login("testServices", "testServices")
         cy.visit('/')
         cy.get('#mapsid').should('exist'); //verify on home page
+        cy.wait(1000)
+        cy.get('#createMapBtn').click()
         cy.contains("Upload File")
-        cy.get('#fileUpload').click()
         //click create map
+        cy.get('#fileUpload').click()
         
     });
     //file not formatted properly (SHP + JSON)
@@ -23,34 +25,11 @@ describe('Import Map', () => {
         // })
         // cy.wait(5000)
         // cy.wait('@getPublishedMaps')
-        // cy.wait(1000)
-            
         cy.get('#fileUpload').selectFile('./cypress/fixtures/usastates.json')
-        cy.get('#upload-map-title').type("Testing geojson")
+        cy.get('#upload-map-title').clear().type("Testing geojson")
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
     });
 
 })
-
-// describe('Import Map', () => {
-//     beforeEach(() => {
-//         cy.login("test", "test")
-//         cy.visit('/')
-//         cy.get('#mapsid').should('exist'); //verify on home page
-//         cy.get('#createMapBtn').click() //click create map
-//         cy.contains("Upload File")
-//         cy.get('#fileUpload').click()
-//     });
-//     //file not formatted properly (SHP + JSON)
-//     //success
-//     it('success', () => {
-        
-//         cy.get('#fileUpload').selectFile('./cypress/fixtures/usastates.json')
-//         cy.get('#uploadFileBtn').click()
-//         cy.wait(1000)
-//         cy.url().should('include', '/map')
-//     });
-
-// })
