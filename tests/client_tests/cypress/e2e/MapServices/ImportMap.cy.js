@@ -3,8 +3,10 @@ describe('Import Map', () => {
         cy.login("testServices", "testServices")
         cy.visit('/')
         cy.get('#mapsid').should('exist'); //verify on home page
-        cy.get('#createMapBtn').click() //click create map
         cy.contains("Upload File")
+        cy.get('#fileUpload').click()
+        //click create map
+        
     });
     //file not formatted properly (SHP + JSON)
     
@@ -21,9 +23,10 @@ describe('Import Map', () => {
         // })
         // cy.wait(5000)
         // cy.wait('@getPublishedMaps')
-        
-        cy.get('#fileUpload').click()
+        // cy.wait(1000)
+            
         cy.get('#fileUpload').selectFile('./cypress/fixtures/usastates.json')
+        cy.get('#upload-map-title').type("Testing geojson")
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
@@ -38,11 +41,12 @@ describe('Import Map', () => {
 //         cy.get('#mapsid').should('exist'); //verify on home page
 //         cy.get('#createMapBtn').click() //click create map
 //         cy.contains("Upload File")
+//         cy.get('#fileUpload').click()
 //     });
 //     //file not formatted properly (SHP + JSON)
 //     //success
 //     it('success', () => {
-//         cy.get('#fileUpload').click()
+        
 //         cy.get('#fileUpload').selectFile('./cypress/fixtures/usastates.json')
 //         cy.get('#uploadFileBtn').click()
 //         cy.wait(1000)
