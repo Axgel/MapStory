@@ -22,10 +22,10 @@ describe('Tags', () => {
 
     //remove
     it('remove success', () => {
-        // cy.get(':nth-child(1) > .w-auto > #displayed_tag').exists()
-        cy.get(':nth-child(1) > .w-auto > #displayed_tag').then((tag)=>{
-            cy.get(':nth-child(1) > .w-auto > #removeTagBtn').click() //click X icon
-            cy.get(':nth-child(1) > .w-auto > #displayed_tag').should("not.contain", tag)
+        cy.get(':nth-child(1) > .w-auto > #displayed_tag')
+        cy.get(':nth-child(1) > #tagCard > #displayed_tag').then((tag)=>{
+            cy.get(':nth-child(1) > #tagCard > #removeTagBtn').click() //click X icon
+            cy.get(':nth-child(1) > #tagCard > #displayed_tag').should("not.contain", tag)
         })
     });
 
