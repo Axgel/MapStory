@@ -47,13 +47,16 @@ export default function Map() {
     // Add all new subregion layers
     for(const region of file.subregions){
       const poly = L.polygon(region.coordinates).addTo(mapItem);
-      poly.on('click', selectRegion);
+      poly.on('click', (e) => selectRegion(e));
       poly.on('pm:vertexadded', (e) => {
         auth.socket.emit('addVertex', {
           indexPath: e.indexPath,
-          latlng: [e.latlng.lat, e.latlng.lng],
+          latlng: [e.latlng.lng, e.latlng.lat],
           subregionId: region._id
         })
+
+        file.updateSubregionTest(region._id);
+
       });
       tmp = true;
     }

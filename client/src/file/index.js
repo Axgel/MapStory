@@ -101,6 +101,19 @@ function GlobalFileContextProvider(props) {
     })
   }
 
+  file.updateSubregionTest = function(subregionId){
+    const copySubregions = file.subregions;
+    for(let i=0; i<file.subregions.length; i++){
+      if(file.subregions[i]._id === subregionId){
+        copySubregions[i].coordinates[0][0][3] = [-92.538593,37.050674];
+        fileReducer({
+          type: GlobalFileActionType.LOAD_SUBREGIONS,
+          payload: {subregions: copySubregions}
+        })
+      }
+    }
+  }
+
 
   return (
     <GlobalFileContext.Provider value={{ file }}>
