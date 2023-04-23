@@ -21,7 +21,6 @@ export default function Map() {
   useEffect(()=> {
     if(!mapRef) return;
 
-    console.log("Asd");
     const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
     const southWest = L.latLng(-89.98155760646617, -180);
     const northEast = L.latLng(89.99346179538875, 180);
@@ -59,7 +58,7 @@ export default function Map() {
   }, [mapItem, file])
 
   useEffect(() => {
-    if(!tmpRegion || !file || !tmpRegion) return;
+    if(!tmpRegion || !file) return;
 
     if(file.editRegions.includes(tmpRegion)){
       tmpRegion.setStyle({ fillColor: '#3387FF'});

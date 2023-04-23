@@ -20,15 +20,20 @@ export default function MapScreen() {
   useEffect(() => {
     file.loadAllSubregions(mapId);
     store.loadMapById(mapId);
+    if (!auth.user) return;
+    if (!auth.socket) return;
     
-    if(auth.socket){
-      auth.socket.emit('mapDetails', {
+    auth.socket.emit('openProject', {
         mapId: mapId,
-        userId: auth.user._id,
-        socketId: auth.socket.id,
-      })
-    }
+    })
 
+    auth.socket.on('version', function(data){
+      console.log(data);
+    }); 
+
+    return () => {
+      auth.socket.emit('closeProject');
+    }
   }, [auth]);
   
   return (

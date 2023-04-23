@@ -82,18 +82,30 @@ switch (process.env.ENVIRONMENT) {
     })
 
     const mapProjects = {};
-    const userProjects = {};
 
     socketIO.on('connection', (socket) => {
-      // console.log(socket);
-      console.log(`${socket.id} user just connected!`);
-
-      socket.on('mapDetails', (data) => {
-        console.log(data);
-      })
+      console.log(`${socket.id} user just connected to server!`);
 
       socket.on('openProject', (data) => {
-        console.log(data);
+        const { mapId } = data;
+
+        if(mapProjects[mapId]) {
+          const clients = mapProjects[mapId].clients;
+          clients.push(socket.id)
+        } else {
+          const mapProject = {version : 1, clients : [socket.id]}
+          mapProjects[mapId] = mapProject;
+        }
+        console.log(mapProjects);
+        const version = {version : mapProjects[mapId].version};
+        socketIO.to(socket.id).emit('version', version);
+      })
+
+      socket.on('closeProject', () => {
+        for(const mapId in mapProjects) {
+          const mapProject = mapProjects[mapId] 
+          mapProject.clients = mapProject.clients.filter(socketId => socketId !== socket.id);
+        }
       })
 
       socket.on('message', (data) => {
@@ -101,7 +113,10 @@ switch (process.env.ENVIRONMENT) {
       })
 
       socket.on('disconnect', () => {
-        console.log('A user disconnected');
+        for(const mapId in mapProjects) {
+          const mapProject = mapProjects[mapId] 
+          mapProject.clients = mapProject.clients.filter(socketId => socketId !== socket.id);
+        }
       });
     });
 
