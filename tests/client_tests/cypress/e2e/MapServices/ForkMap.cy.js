@@ -1,4 +1,4 @@
-describe('Publish Map', () => {
+describe('Fork Map', () => {
     beforeEach(() => {
         cy.login("testServices", "testServices")
         cy.visit('/')

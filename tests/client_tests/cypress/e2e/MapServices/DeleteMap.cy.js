@@ -1,4 +1,4 @@
-describe('Publish Map', () => {
+describe('Delete Map', () => {
     beforeEach(() => {
         cy.login("test", "test")
         cy.visit('/')
