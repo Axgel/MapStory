@@ -51,6 +51,7 @@ export default function Map() {
       poly.on('pm:vertexadded', (e) => {
         auth.socket.emit('addVertex', {
           indexPath: e.indexPath,
+          latlng: [e.latlng.lat, e.latlng.lng],
           subregionId: region._id
         })
       });
