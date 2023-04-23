@@ -5,9 +5,9 @@ describe('Tags', () => {
         cy.get('#mapsid').should('exist') //verify on home page
         // TODO: check and make sure map is not published
         cy.get(".mt-8 > .px-10 > :nth-child(2)").dblclick()
+        cy.wait(1000)
         cy.url().should('include', '/map')
         cy.get('#tagsBtn').click() //click on tag
-        cy.wait(1000)
         cy.contains("Add Tags") 
     });
     
