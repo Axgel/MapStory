@@ -13,7 +13,6 @@ const session = require("express-session");
 const dotenv = require("dotenv");
 dotenv.config();
 const db = require("./db/index");
-const sdb = require("./db/sharedb");
 
 // CREATE OUR SERVER
 const PORT = 4000;
@@ -32,24 +31,7 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
-// const options = {
-//    WebSocket: WebSocket,
-//    connectionTimeout: 1000,
-//    maxRetries: 10,
-// };
 
-// let socket = new ReconnectingWebSocket('ws://localhost:5050', [], options);
-// let connection = new sharedb.Connection(socket);
-// doc = connection.get('documents', "testdocument");
-// doc.subscribe((error) => {
-//   if (error) throw error;
-//   // If doc.type is undefined, the document has not been created, so let's create it
-//   if (!doc.type) {
-//      doc.create([], (error) => {
-//         if (error) console.error(error);
-//      });
-//   };
-// });
 
 const sameSite = (process.env.ENVIRONMENT == "DEVELOPMENT") ? 'strict' : 'none';
 
