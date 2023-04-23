@@ -2,13 +2,13 @@ describe('Change Passsword', () => {
     beforeEach(() => {
         cy.login("test", "test")
         cy.visit('/')
+        cy.wait(1000)
         cy.get('#profileIcon').click()
         cy.contains('Profile').click()
         cy.get('#editPasswordIcon').click()
     });
     //press cancel
     it('cancel', () =>{
-        // cy.wait(1000)
         cy.get('#changeCurPwd').type('password')
         cy.get('#changeNewPwd').type('passcancel')
         cy.get('#changeCfmPwd').type('passcancel')
