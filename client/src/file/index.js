@@ -16,22 +16,22 @@ const tps = new jsTPS();
 function GlobalFileContextProvider(props) {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
-  const { socket } = props;
 
   const [file, setFile] = useState({
     subregions: [],
     currentEditMode: EditMode.NONE,
     tmpEditRegion: null,
     editRegions: [],
-    loadedRegionOnce: false,
-    socket: socket
+    loadedRegionOnce: false
   });
 
   useEffect(() => {
     if(auth.socket){
-      socket.on('messageRes', (data) => console.log(data));
+      auth.socket.on('addVertexValidate', (data) => {
+        console.log(data);
+      })
     }
-  }, [socket])
+  }, [auth.socket])
 
   const navigate = useNavigate();
 

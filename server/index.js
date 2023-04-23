@@ -108,8 +108,9 @@ switch (process.env.ENVIRONMENT) {
         }
       })
 
-      socket.on('message', (data) => {
-        socketIO.emit('messageRes', data);
+      socket.on('addVertex', (data) => {
+        console.log(data);
+        socketIO.emit('addVertexValidate', data)
       })
 
       socket.on('disconnect', () => {

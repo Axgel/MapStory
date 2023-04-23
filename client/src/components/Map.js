@@ -47,7 +47,13 @@ export default function Map() {
     // Add all new subregion layers
     for(const region of file.subregions){
       const poly = L.polygon(region.coordinates).addTo(mapItem);
-      poly.on('click', selectRegion)
+      poly.on('click', selectRegion);
+      poly.on('pm:vertexadded', (e) => {
+        auth.socket.emit('addVertex', {
+          indexPath: e.indexPath,
+          subregionId: region._id
+        })
+      });
       tmp = true;
     }
 
@@ -90,24 +96,13 @@ export default function Map() {
     }
   }, [file])
 
-
   function addVertexValidate(e){
-    console.log(e.event.latlng);
-
-    auth.socket.emit('message', {
-      msg: e.event.latlng,
-      id: `${auth.socket.id}${Math.random()}`,
-      socketId: auth.socket.id
-    })
-
     return true;
   }
 
   function moveVertexValidate(e){
     console.log(e);
-
-
-    return true;
+    return false;
   }
 
   function selectRegion(e){
