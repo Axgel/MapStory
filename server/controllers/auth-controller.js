@@ -190,12 +190,12 @@ registerUser = async (req, res) => {
 
 //Sending password recovery email
 recoveryEmail = async(req, res) => {
-  try{
+  try {
     let message_body = ""
     const {email} = req.body
     const user = await User.findOne({email: email})
-    if(!user){
-      return res.status(401).json({
+    if(!user) {
+      return res.status(400).json({
         errorMessage: "Account doesn't exist",
       });
     }
@@ -204,30 +204,30 @@ recoveryEmail = async(req, res) => {
     const salt = await bcrypt.genSalt(saltRounds);
     const resetToken = await bcrypt.hash(token, salt);
     const update = await User.updateOne({email: email}, {passwordToken: resetToken, passwordTimeout: Date.now() + 600000})
-    if (process.env.ENVIRONMENT === "DEVELOPMENT"){
+    if (process.env.ENVIRONMENT === "DEVELOPMENT") {
       message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
       //Testing purposes: we don't need to send out the email for when we are using JEST
       return res.status(200).json({
         success: true,
-        username: username,
+        userName: user.userName,
         resetToken: resetToken
       })
     } else {
       message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+      const message = await transporter.sendMail({
+        from: process.env.SMTP_SENDEMAIL,
+        to: email,
+        subject: "Password Reset Notice", 
+        text: message_body,
+      })
+      
+      return res.status(200).json({
+        success: true
+      })
     }
-    const message = await transporter.sendMail({
-      from: process.env.SMTP_SENDEMAIL,
-      to: email,
-      subject: "Password Reset Notice", 
-      text: message_body,
-    })
-    
-    return res.status(200).json({
-      success: true
-    })
-  }catch(err){
+  } catch(err) {
     return res.status(401).json({
       errorMessage: "Unable to send email",
     });
@@ -240,7 +240,7 @@ recoverPassword = async(req, res) => {
   // If the token expired then they would have to request another password reset
   // Extract the password expiration time and check it with the current time to see if it already expired
   
-  try{
+  try {
     const {userName, token, password, passwordVerify} = req.body
     const search_by_username = await User.findOne({userName: userName})
     const search_by_token = await User.findOne({passwordToken: token})

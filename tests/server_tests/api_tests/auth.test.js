@@ -1,11 +1,6 @@
-const {app, close_all_connections} = require("../../../server/index");
+const app = require("../../../server/app");
 const request = require("supertest");
-const agent = request.agent(app)
 
-// console.log(server)
-// afterAll(() => {
-//     close_all_connections();
-// })
 
 describe ("POST /register", () => {
     describe("Attempt to add user without including any fields", () =>{
@@ -117,6 +112,8 @@ describe ("POST /profile/password", () => {
             const response = await request(app).post("/auth/profile/password").send({})
             expect(response.status).toEqual(400)
         })
+    })
+    describe("Testing changing password", () => {
         it("should response with 200 status code", async () => {
             const response = await request(app).post("/auth/profile/password").send({
                 email: "JohnSmith6969@gmail.com",
@@ -136,9 +133,33 @@ describe ("POST /recoverPassword", () => {
         it("should response with 400 status code", async () => {
             const response = await request(app).post("/auth/recoverPassword").send({})
             expect(response.status).toEqual(400)
-        })
-    })
-})
+        });
+    });
+    describe("Testing Password reset", () =>{
+        let token;
+        let userName;
+        it("should send an email with token and userName", async () => {
+            const response = await request(app).post("/auth/recoveryEmail").send({
+                email: "JohnSmith6969@gmail.com"
+            });
+            expect(response.status).toEqual(200);
+            expect(response.body.userName).toBeDefined();
+            expect(response.body.resetToken).toBeDefined();
+            
+            token = response.body.resetToken
+            userName = response.body.userName
+        });
+        it("should recover password", async () => {
+            const response = await request(app).post("/auth/recoverPassword").send({
+                userName: userName,
+                token: token, 
+                password: "0123456789",
+                passwordVerify: "0123456789"
+            });
+            expect(response.status).toEqual(200);
+        });
+    });
+});
 
 describe ("Cleaning up database", ()=>{
     describe("Cleaning up data", () =>{
