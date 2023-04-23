@@ -16,7 +16,7 @@ const db = require("./db/index");
 // CREATE OUR SERVER
 const PORT = 4000;
 const app = express();
-const cors_url = (process.env.ENVIRONMENT == "DEVELOPMENT") ? process.env.DEV_CORS : process.env.PROD_CORS;
+const cors_url = (process.env.ENVIRONMENT === "DEVELOPMENT") ? process.env.DEV_CORS : process.env.PROD_CORS;
 let server;
 
 // SETUP THE MIDDLEWARE
@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 
 
-const sameSite = (process.env.ENVIRONMENT == "DEVELOPMENT") ? 'strict' : 'none';
+const sameSite = (process.env.ENVIRONMENT === "DEVELOPMENT") ? 'strict' : 'none';
 
 app.use(session({
   secret: process.env.JWT_SECRET,
@@ -106,6 +106,7 @@ switch (process.env.ENVIRONMENT) {
           const mapProject = mapProjects[mapId] 
           mapProject.clients = mapProject.clients.filter(socketId => socketId !== socket.id);
         }
+        console.log(mapProjects);
       })
 
       socket.on('addVertex', (data) => {
@@ -118,6 +119,7 @@ switch (process.env.ENVIRONMENT) {
           const mapProject = mapProjects[mapId] 
           mapProject.clients = mapProject.clients.filter(socketId => socketId !== socket.id);
         }
+        console.log(mapProjects);
       });
     });
 

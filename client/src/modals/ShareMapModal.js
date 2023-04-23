@@ -19,9 +19,9 @@ export default function ShareMapModal() {
     const collaboratorEmail = document.getElementById("add-collaborator").value;
     document.getElementById("add-collaborator").value = "";
     if(!auth.user || !store.selectedMapOwner) return;
-    if(auth.user.email !== store.selectedMapOwner.email || collaboratorEmail == store.selectedMapOwner.email) return;
+    if(auth.user.email !== store.selectedMapOwner.email || collaboratorEmail === store.selectedMapOwner.email) return;
     for(const collaborator of store.collaborators){
-      if(collaborator.email == collaboratorEmail) return;
+      if(collaborator.email === collaboratorEmail) return;
     }
   
     store.addCollaborator(collaboratorEmail);
@@ -45,7 +45,7 @@ export default function ShareMapModal() {
     });
   }
 
-  if(store.currentModal == CurrentModal.SHARE_MAP){
+  if(store.currentModal === CurrentModal.SHARE_MAP){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center mx-2 z-50">
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[450px] max-w-md text-center mx-12">

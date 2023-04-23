@@ -20,6 +20,9 @@ export default function MapScreen() {
   useEffect(() => {
     file.loadAllSubregions(mapId);
     store.loadMapById(mapId);
+  }, []);
+
+  useEffect(() => {
     if (!auth.user) return;
     if (!auth.socket) return;
     

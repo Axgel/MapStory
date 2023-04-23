@@ -18,7 +18,7 @@ export default function DeleteMapModal(props) {
     store.deleteMapByMarkedId();
   }
 
-  if(store.currentModal == CurrentModal.DELETE_MAP){
+  if(store.currentModal === CurrentModal.DELETE_MAP){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 

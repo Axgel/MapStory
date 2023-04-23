@@ -35,7 +35,7 @@ export default function EditToolbar() {
 
   function setCurrentEditMode(e, currentEditMode){
     e.stopPropagation();
-    if(currentEditMode == file.currentEditMode){
+    if(currentEditMode === file.currentEditMode){
       currentEditMode = EditMode.NONE;
     }
     file.setCurrentEditMode(currentEditMode);

@@ -20,18 +20,8 @@ function GlobalFileContextProvider(props) {
   const [file, setFile] = useState({
     subregions: [],
     currentEditMode: EditMode.NONE,
-    tmpEditRegion: null,
     editRegions: [],
-    loadedRegionOnce: false
   });
-
-  useEffect(() => {
-    if(auth.socket){
-      auth.socket.on('addVertexValidate', (data) => {
-        console.log(data);
-      })
-    }
-  }, [auth.socket])
 
   const navigate = useNavigate();
 
@@ -42,7 +32,8 @@ function GlobalFileContextProvider(props) {
         return setFile({
           ...file,
           subregions: payload.subregions,
-          loadedRegionOnce: false
+          currentEditMode: EditMode.NONE,
+          editRegions: [],
         })
       }
       case GlobalFileActionType.SET_EDIT_MODE: {
@@ -55,12 +46,6 @@ function GlobalFileContextProvider(props) {
         return setFile({
           ...file,
           editRegions: payload.editRegions
-        })
-      }
-      case GlobalFileActionType.SET_LOADED_REGION_ONCE: {
-        return setFile({
-          ...file,
-          loadedRegionOnce: payload.loadedRegionOnce
         })
       }
       default:
@@ -83,8 +68,6 @@ function GlobalFileContextProvider(props) {
   }
 
   file.loadAllSubregions = async function(mapId) {
-    // if(store.openedMap){
-    //   let response = await api.getAllSubregions(store.openedMap._id);
     let response = await api.getAllSubregions(mapId);
     if(response.status === 200){
       fileReducer({
@@ -92,13 +75,6 @@ function GlobalFileContextProvider(props) {
         payload: {subregions: response.data.subregions}
       })
     }
-  }
-
-  file.setLoadedRegionOnce = function(isLoaded){
-    fileReducer({
-      type: GlobalFileActionType.SET_LOADED_REGION_ONCE,
-      payload: {loadedRegionOnce: isLoaded}
-    })
   }
 
   file.updateSubregionTest = function(subregionId){
