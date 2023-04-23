@@ -6,9 +6,8 @@ const http = require("http");
 const https = require("https");
 const fs = require("fs");
 const session = require("express-session");
-// const WebSocket = require('ws');
-// const ReconnectingWebSocket = require('reconnecting-websocket');
-// const sharedb = require('sharedb/lib/client')
+const { Server } = require("socket.io");
+
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -74,9 +73,42 @@ switch (process.env.ENVIRONMENT) {
     );
     break;
   default:
-    server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    // server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const httpSocketServer = http.createServer(app);
+    const socketIO = new Server(httpSocketServer, {
+      cors: {
+        origin: "http://localhost:3000"
+      }
+    })
+
+    const mapProjects = {};
+    const userProjects = {};
+
+    socketIO.on('connection', (socket) => {
+      // console.log(socket);
+      console.log(`${socket.id} user just connected!`);
+
+      socket.on('mapDetails', (data) => {
+        console.log(data);
+      })
+
+      socket.on('openProject', (data) => {
+        console.log(data);
+      })
+
+      socket.on('message', (data) => {
+        socketIO.emit('messageRes', data);
+      })
+
+      socket.on('disconnect', () => {
+        console.log('A user disconnected');
+      });
+    });
+
+    httpSocketServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
     break;
 }
+
 
 function close_all_connections(){
   db.close();

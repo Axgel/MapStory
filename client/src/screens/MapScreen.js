@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { Header, EditToolbar, Map, MapProperties, MapDetailCard } from "../components";
 import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
@@ -11,6 +11,7 @@ export default function MapScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
+  const [socketId, setSocketId] = useState(null);
 
   const queue = [];
   let free = true;
@@ -19,33 +20,16 @@ export default function MapScreen() {
   useEffect(() => {
     file.loadAllSubregions(mapId);
     store.loadMapById(mapId);
-  }, []);
-
-  useEffect(() => {
-    // if (file.subregions.length === 0) return;
-    if (!auth.user) return;
-    const userId = auth.user._id;
-    const baseURL = process.env.REACT_APP_FILE;
-    const evtSource = new EventSource(baseURL + '/connect/' + userId + "/" + mapId, { withCredentials: true });
-    console.log(evtSource.readyState)
-    // const subregion = file.subregions[0]
-    // const doc = json1.type.create(subregion)
-    // console.log(doc)
-    // const op = json1.replaceOp(["properties", "NAME"], "ALABAMA", "TEST_STATE");
-    // console.log(json1.type.apply(doc, op));
-
-    evtSource.onmessage = function(event) {
-      const parsedData = JSON.parse(event.data);
-      console.log(parsedData)
+    
+    if(auth.socket){
+      auth.socket.emit('mapDetails', {
+        mapId: mapId,
+        userId: auth.user._id,
+        socketId: auth.socket.id,
+      })
     }
 
-    evtSource.onerror = () => {
-      console.log("eventsource error");
-      evtSource.close();
-    }
   }, [auth]);
-
-
   
   return (
     <div>

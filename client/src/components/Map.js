@@ -7,9 +7,11 @@ import usastates from '../data/usastates.json'
 import { GlobalStoreContext } from '../store'
 import GlobalFileContext from "../file";
 import { EditMode } from "../enums";
+import AuthContext from "../auth";
 
 export default function Map() {
   const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
   const { file } = useContext(GlobalFileContext);
   const [mapRef, setMapRef] = useState("");
   const [mapItem, setMapItem] = useState(null);
@@ -19,12 +21,17 @@ export default function Map() {
   useEffect(()=> {
     if(!mapRef) return;
 
+    console.log("Asd");
     const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
     const southWest = L.latLng(-89.98155760646617, -180);
     const northEast = L.latLng(89.99346179538875, 180);
     const bounds = L.latLngBounds(southWest, northEast);
     map.setMaxBounds(bounds);
     setMapItem(map);
+
+    return () => {
+      map.remove();
+    }
   },[mapRef])
 
   // Load all subregions into map
@@ -32,7 +39,7 @@ export default function Map() {
     if(!mapItem || !file.subregions) return;
     if(file.loadedRegionOnce) return;
     // remove all preexisting layers
-    console.log("here");
+    
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
     });
@@ -77,7 +84,8 @@ export default function Map() {
           // removeVertexOn: 'click',
           // removeVertexValidation: store.removeVertexValidate,
           addVertexOn: 'click',
-          addVertexValidation: addVertexValidate
+          addVertexValidation: addVertexValidate,
+          moveVertexValidation: moveVertexValidate,
         }) 
       }
     }
@@ -86,7 +94,21 @@ export default function Map() {
 
   function addVertexValidate(e){
     console.log(e.event.latlng);
-    return false;
+
+    auth.socket.emit('message', {
+      msg: e.event.latlng,
+      id: `${auth.socket.id}${Math.random()}`,
+      socketId: auth.socket.id
+    })
+
+    return true;
+  }
+
+  function moveVertexValidate(e){
+    console.log(e);
+
+
+    return true;
   }
 
   function selectRegion(e){

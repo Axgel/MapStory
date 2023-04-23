@@ -16,6 +16,7 @@ const tps = new jsTPS();
 function GlobalFileContextProvider(props) {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
+  const { socket } = props;
 
   const [file, setFile] = useState({
     subregions: [],
@@ -23,7 +24,14 @@ function GlobalFileContextProvider(props) {
     tmpEditRegion: null,
     editRegions: [],
     loadedRegionOnce: false,
+    socket: socket
   });
+
+  useEffect(() => {
+    if(auth.socket){
+      socket.on('messageRes', (data) => console.log(data));
+    }
+  }, [socket])
 
   const navigate = useNavigate();
 
