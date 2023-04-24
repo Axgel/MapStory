@@ -12,7 +12,7 @@ sharedb.types.register(json1.type);
 const app = express();
 const backend = new sharedb();
 let webSocketServer;
-const PORT = 5000;
+const PORT = 6000;
 switch (process.env.ENVIRONMENT) {
   case "PRODUCTION":
     const httpsServer = https.createServer(

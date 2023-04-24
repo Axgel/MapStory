@@ -12,6 +12,6 @@ router.post("/recoverPassword", AuthController.recoverPassword);
 // Route for changing profile information
 router.post("/profile/username", AuthController.changeUsername);
 router.post("/profile/password", AuthController.changePassword);
-
+router.post("/deleteUser", AuthController.deleteUser);
 
 module.exports = router;
