@@ -50,8 +50,8 @@ export default function CreateMapModal(props) {
           <input className="py-4" id="fileUpload" type="file" accept=".shp, .dbf, .json" onChange={handleUploadFile} multiple/>
           <p className="mx-6 mb-4 text-red-600">{errMsg}</p>
           <div className="flex flex-row-reverse">
-            <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleSubmitFile}>Create Map</button>
-            <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleCloseModal}>Cancel</button>
+            <button id="uploadFileBtn" className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleSubmitFile}>Create Map</button>
+            <button id="cancelFileUpload" className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleCloseModal}>Cancel</button>
           </div>
         </div>
       </div>

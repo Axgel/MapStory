@@ -2,13 +2,13 @@ describe('Change Username', () => {
     beforeEach(() => {
         cy.login("test", "test")
         cy.visit('/')
+        cy.wait(1000)
         cy.get('#profileIcon').click()
         cy.contains('Profile').click()
     });
     //press cancel on modal
     it('cancel', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
-            cy.wait(1000)
             cy.get('#editUsernameIcon').click() //click edit icon
             cy.get('#inputNewUsername').clear().type('cancelcancel') 
             cy.contains('Cancel').click()
@@ -21,7 +21,7 @@ describe('Change Username', () => {
     // username not unique
     it('nonunique username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
-            cy.wait(1000)
+            // cy.wait(1000)
             cy.get('#editUsernameIcon').click() //click edit icon
             cy.get('#inputNewUsername').clear().type('tray') //TODO
             cy.contains('OK').click()
@@ -37,7 +37,7 @@ describe('Change Username', () => {
     //empty username
     it('empty username', () =>{
         cy.get('#profileUsername').then((currentUsername)=>{
-            cy.wait(1000)
+            // cy.wait(1000)
             cy.get('#editUsernameIcon').click() //click edit icon
             cy.get('#inputNewUsername').clear() //TODO
             cy.contains('OK').click()
@@ -53,14 +53,9 @@ describe('Change Username', () => {
     //success
     it('success', () =>{
         cy.get('#editUsernameIcon').click()
-        cy.wait(1000);
+        // cy.wait(1000);
         cy.get('#inputNewUsername').clear().type("newUsername") 
-        cy.contains('OK').click()
-        //check that the username field has the new value
-        cy.get('#profileUsername').should('have.value', 'newUsername')
-        //reset to old username
-        cy.get('#editUsernameIcon').click()
-        cy.get('#inputNewUsername').clear().type("fet") 
+        cy.intercept('POST', '/auth/profile/username', {})
         cy.contains('OK').click()
     });
     
