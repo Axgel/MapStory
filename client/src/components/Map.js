@@ -6,6 +6,7 @@ import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import GlobalFileContext from "../file";
 import { EditMode } from "../enums";
 import AuthContext from "../auth";
+const json1 = require('ot-json1');
 
 export default function Map() {
   const { auth } = useContext(AuthContext);
@@ -50,14 +51,44 @@ export default function Map() {
       const poly = L.polygon(region.coordinates).addTo(mapItem);
       poly.on('click', (e) => selectRegion(region._id));
       poly.on('pm:vertexadded', (e) => {
-        // console.log(e.indexPath);
-        // console.log(file.subregions)
-        // auth.socket.emit('addVertex', {
-        //   indexPath: e.indexPath,
-        //   latlng: [e.latlng.lng, e.latlng.lat],
-        //   subregionId: region._id
-        // })
+        const path = [...e.indexPath]
+        const index = file.subregions.findIndex(subregion => subregion._id === region._id);
+        path.unshift(index, 'coordinates');
+        const data = [e.latlng.lat, e.latlng.lng];
+
+        const clientOp = json1.insertOp(path, data);
+        file.updateSubregions(clientOp);
+
+        const serverOp = json1.insertOp(e.indexPath, data);
+        auth.socket.emit('sendOp', {
+          subregionId: region._id,
+          op : serverOp,
+        })
       });
+      poly.on('pm:markerdragend', (e) => {
+        const path = [...e.indexPath]
+        let temp = e.layer.getLatLngs();
+        for(const i of path) {
+          temp = temp[i];
+        }
+        const index = file.subregions.findIndex(subregion => subregion._id === region._id);
+        path.unshift(index, 'coordinates');
+        const newVal = [temp.lat, temp.lng];
+
+        let oldVal = file.subregions;
+        for(const i of path) {
+          oldVal = oldVal[i];
+        }
+
+        const clientOp = json1.replaceOp(path, oldVal, newVal);
+        file.updateSubregions(clientOp);
+
+        const serverOp = json1.replaceOp(e.indexPath, oldVal, newVal);
+        auth.socket.emit('sendOp', {
+          subregionId: region._id,
+          op : serverOp,
+        })
+      })
       if (file.editRegions.includes(region._id)) {
         poly.setStyle({ fillColor: 'red'});
         poly.pm.disable();
@@ -81,7 +112,6 @@ export default function Map() {
   }
 
   function moveVertexValidate(e){
-    console.log(e);
     return true;
   }
 

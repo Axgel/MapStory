@@ -16,6 +16,20 @@ getAllSubregions = async (req, res) => {
   }
 }
 
+updateSubregions = async (subregionId, op) => {
+  try{
+    const subregion = await Subregion.findOne({ _id: subregionId});
+    if(!subregion) return false;
+    const coordinates = subregion.coordinates;
+    const newDoc = json1.type.apply(coordinates, op);
+    subregion.coordinates = newDoc;
+    await subregion.save();
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
 
 
 

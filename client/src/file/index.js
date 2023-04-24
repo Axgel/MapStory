@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./file-request-api";
 import AuthContext from "../auth";
-import { tempData } from "../data/tempData";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
+const json1 = require('ot-json1');
 
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
@@ -48,6 +48,12 @@ function GlobalFileContextProvider(props) {
           editRegions: payload.editRegions
         })
       }
+      case GlobalFileActionType.UPDATE_SUBREGIONS: {
+        return setFile({
+          ...file,
+          subregions: payload.subregions,
+        })
+      }
       default:
         return file;
     }
@@ -77,17 +83,12 @@ function GlobalFileContextProvider(props) {
     }
   }
 
-  file.updateSubregionTest = function(subregionId){
-    const copySubregions = file.subregions;
-    for(let i=0; i<file.subregions.length; i++){
-      if(file.subregions[i]._id === subregionId){
-        copySubregions[i].coordinates[0][0][3] = [-92.538593,37.050674];
-        fileReducer({
-          type: GlobalFileActionType.LOAD_SUBREGIONS,
-          payload: {subregions: copySubregions}
-        })
-      }
-    }
+  file.updateSubregions = function(op){
+    const newDoc = json1.type.apply(file.subregions, op);
+    fileReducer({
+      type: GlobalFileActionType.UPDATE_SUBREGIONS,
+      payload: {subregions: newDoc}
+    })
   }
 
 

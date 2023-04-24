@@ -30,8 +30,6 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
-
-
 const sameSite = (process.env.ENVIRONMENT === "DEVELOPMENT") ? 'strict' : 'none';
 
 app.use(session({
@@ -56,6 +54,7 @@ app.use("/file", fileRouter);
 // INITIALIZE OUR DATABASE OBJECT
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
+const mapProjects = {};
 
 switch (process.env.ENVIRONMENT) {
   case "PRODUCTION":
@@ -80,8 +79,6 @@ switch (process.env.ENVIRONMENT) {
         origin: "http://localhost:3000"
       }
     })
-
-    const mapProjects = {};
 
     socketIO.on('connection', (socket) => {
       console.log(`${socket.id} user just connected to server!`);
@@ -109,9 +106,10 @@ switch (process.env.ENVIRONMENT) {
         console.log(mapProjects);
       })
 
-      socket.on('addVertex', (data) => {
-        console.log(data);
-        socketIO.emit('addVertexValidate', data)
+      socket.on('sendOp', async (packet) => {
+        const { subregionId, op} = packet;
+        const done = await updateSubregions(subregionId, op);
+        console.log(done);
       })
 
       socket.on('disconnect', () => {
