@@ -83,11 +83,15 @@ function GlobalFileContextProvider(props) {
     }
   }
 
-  file.updateSubregions = function(op){
-    const newDoc = json1.type.apply(file.subregions, op);
+  file.updateSubregions = function(subregionId, op){
+    const index = file.subregions.findIndex(subregion => subregion._id === subregionId);
+    const doc = JSON.parse(JSON.stringify(file.subregions));
+    const coordinates = doc[index].coordinates;
+    doc[index].coordinates = json1.type.apply(coordinates, op);
+
     fileReducer({
       type: GlobalFileActionType.UPDATE_SUBREGIONS,
-      payload: {subregions: newDoc}
+      payload: {subregions: doc}
     })
   }
 

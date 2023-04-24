@@ -30,10 +30,6 @@ export default function MapScreen() {
         mapId: mapId,
     })
 
-    auth.socket.on('version', function(data){
-      console.log(data);
-    }); 
-
     return () => {
       auth.socket.emit('closeProject');
     }

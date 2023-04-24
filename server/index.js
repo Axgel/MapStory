@@ -107,9 +107,19 @@ switch (process.env.ENVIRONMENT) {
       })
 
       socket.on('sendOp', async (packet) => {
-        const { subregionId, op} = packet;
+        const { mapId, subregionId, op} = packet;
         const done = await updateSubregions(subregionId, op);
-        console.log(done);
+        if(done) {
+          const clients = mapProjects[mapId].clients;
+          const source = socket.id;
+          for(const client of clients) {
+            if(client === source) {
+              socketIO.to(client).emit('owner-ack', {subregionId: subregionId, op: op});
+            } else {
+              socketIO.to(client).emit('others-ack', {subregionId: subregionId, op: op});
+            }
+          }
+        }
       })
 
       socket.on('disconnect', () => {
