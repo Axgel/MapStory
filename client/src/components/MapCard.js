@@ -82,15 +82,15 @@ export default function MapCard(props) {
 
       {/* Section for publish, delete, fork buttons */}
       <div className="flex px-8 gap-4 items-center cursor-pointer">
-        <div className={publishButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>
+        <div id="publishBtn" className={publishButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>
           Publish
         </div>
 
-        <div className={deleteButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>
+        <div id="deleteBtn" className={deleteButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>
           Delete
         </div>
 
-        <div className={forkButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>
+        <div id="forkBtn" className={forkButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>
           Fork
         </div>
       </div>

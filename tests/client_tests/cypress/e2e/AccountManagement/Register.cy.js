@@ -15,7 +15,7 @@ describe('Register', () => {
     });
     //email exists already
     it('email exists', () =>{
-        cy.get('input[name=email]').type("tesing123@gmail.com")
+        cy.get('input[name=email]').type("testing123@gmail.com")
         cy.get('input[name=username]').type("fet41038")
         cy.get('#pwd').type("frontendtestcypress") 
         cy.get('#confirmPwd').type("frontendtestcypress")
@@ -69,8 +69,8 @@ describe('Register', () => {
         cy.get('input[name=username]').type("fet123")
         cy.get('#pwd').type("frontendtestcypress") 
         cy.get('#confirmPwd').type("frontendtestcypress")
-        cy.visit('/')
-        // cy.get('#createAccBtn').click()
+        cy.intercept('POST', '/auth/register', {})
+        cy.get('#createAccBtn').click()
         //should be directed to the splash screen for user to log in
         cy.url().should('include', '/')
         cy.get('#loginEmail').should('exist');
