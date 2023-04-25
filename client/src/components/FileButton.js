@@ -24,7 +24,7 @@ export default function FileButton() {
   }
 
   return (
-    <div className="cursor-pointer m-3">
+    <div className="cursor-pointer m-3 z-50">
       <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded flex items-start p-1" onClick={toggleFileByDD}>
         File
       </div>
@@ -36,7 +36,6 @@ export default function FileButton() {
               <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onMouseLeave={toggleModeByDD}>Viewing Mode</p>
               <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onMouseLeave={toggleModeByDD}>Editing Mode</p>
             </div>
-
 
           </div>
           <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80">Tags</p>

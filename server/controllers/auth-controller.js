@@ -1,5 +1,6 @@
 const auth = require("../auth");
 const User = require("../models/user-model");
+const MapProject = require("../models/mapproject-model");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -102,6 +103,27 @@ logoutUser = async (req, res) => {
   res.status(200).send();
 };
 
+//Function only meant for testing purposes
+deleteUser = async(req, res) => {
+  try{
+    const {email} = req.body
+
+    const deleted = await User.deleteOne({email: email})
+    if(deleted){
+      return res.status(200).json({
+        success: true
+      })
+    } else {
+      return res.status(400).json({
+        success: false
+      })
+    }
+  }catch(err){
+    console.error(err);
+    res.status(500).send();
+  }
+}
+
 registerUser = async (req, res) => {
   try {
     const { userName, email, password, passwordVerify } = req.body;
@@ -154,25 +176,12 @@ registerUser = async (req, res) => {
       personalMaps: [],
       sharedMaps: []
     });
-    const savedUser = await newUser.save();
-    // console.log("new user saved: " + savedUser._id);
-
-    // LOGIN THE USER
-    // const token = auth.signToken(savedUser._id);
-    // // console.log("token:" + token);
-
-    // req.session.token = token;
+    
+    await newUser.save();
 
     res.status(200).json({
-      success: true,
-      // user: {
-      //   userName: savedUser.userName,
-      //   email: savedUser.email,
-      //   _id: savedUser._id
-      // },
+      success: true
     });
-
-    // console.log("token sent");
   } catch (err) {
     console.error(err);
     res.status(500).send();
@@ -181,39 +190,48 @@ registerUser = async (req, res) => {
 
 //Sending password recovery email
 recoveryEmail = async(req, res) => {
-  try{
+  try {
     let message_body = ""
     const {email} = req.body
     const user = await User.findOne({email: email})
+    if(!user) {
+      return res.status(400).json({
+        errorMessage: "Account doesn't exist",
+      });
+    }
     const token = crypto.randomBytes(32).toString("hex");
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const resetToken = await bcrypt.hash(token, salt);
     const update = await User.updateOne({email: email}, {passwordToken: resetToken, passwordTimeout: Date.now() + 600000})
-    if (process.env.ENVIRONMENT === "DEVELOPMENT"){
+    if (process.env.ENVIRONMENT === "DEVELOPMENT") {
       message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+      //Testing purposes: we don't need to send out the email for when we are using JEST
+      return res.status(200).json({
+        success: true,
+        userName: user.userName,
+        resetToken: resetToken
+      })
     } else {
       message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.PROD_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
+      const message = await transporter.sendMail({
+        from: process.env.SMTP_SENDEMAIL,
+        to: email,
+        subject: "Password Reset Notice", 
+        text: message_body,
+      })
+      
+      return res.status(200).json({
+        success: true
+      })
     }
-    const message = await transporter.sendMail({
-      from: process.env.SMTP_SENDEMAIL,
-      to: email,
-      subject: "Password Reset Notice", 
-      text: message_body,
-    })
-    
-    return res.status(200).json({
-      success: true
-    })
-  }catch(err){
+  } catch(err) {
     return res.status(401).json({
       errorMessage: "Unable to send email",
     });
   }
-  //Todo: Sending email via nodemailer and need to install postmail on backend server
-  
 }
 
 //Resetting password + Use for both recovering password 
@@ -222,10 +240,7 @@ recoverPassword = async(req, res) => {
   // If the token expired then they would have to request another password reset
   // Extract the password expiration time and check it with the current time to see if it already expired
   
-  try{
-    // const{userName, token} = req.params
-    // console.log(req.body)
-    // console.log(token)
+  try {
     const {userName, token, password, passwordVerify} = req.body
     const search_by_username = await User.findOne({userName: userName})
     const search_by_token = await User.findOne({passwordToken: token})
@@ -302,7 +317,7 @@ changeUsername = async (req, res) => {
 
     const existingEmail = await User.findOne({ email: email });
     if (!existingEmail) {
-      return res.status(401).json({
+      return res.status(400).json({
         errorMessage: "Wrong email provided.",
       });
     }
@@ -315,6 +330,14 @@ changeUsername = async (req, res) => {
     }
 
     const newUser = await User.findOneAndUpdate({ email: email }, {userName: userName}, {new : true});
+
+    const asyncMapProjects = [];
+    for(const mapId of newUser.personalMaps){
+      asyncMapProjects.push(MapProject.findOneAndUpdate({ _id: mapId }, { ownerName: userName }));
+    }
+
+    await Promise.all(asyncMapProjects);
+
     return res.status(200).json({
       success: true,
       user: {
@@ -409,4 +432,5 @@ module.exports = {
   recoverPassword,
   changeUsername,
   changePassword,
+  deleteUser,
 };

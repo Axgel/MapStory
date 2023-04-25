@@ -25,11 +25,11 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', (username, password) => {
-    cy.session([username, password], () => {
-      cy.visit('/')
-      cy.get('input[name=email]').type("testing123@gmail.com")
-      cy.get('input[name=pwd]').type("password")
-      cy.get('#loginButton').click()
-      cy.contains('Maps')
-    })
+  cy.session([username, password], () => {
+    cy.visit('/')
+    cy.get('input[name=email]').type("testing123@gmail.com")
+    cy.get('input[name=pwd]').type("password")
+    cy.get('#loginButton').click()
+    cy.contains('Maps')
   })
+})

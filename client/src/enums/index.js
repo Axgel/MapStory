@@ -6,6 +6,7 @@ import { SortMode } from "./SortMode"
 import { SearchMode } from "./SearchMode"
 import { DetailView } from "./DetailView"
 import { AuthActionType } from "./AuthActionType"
+import { EditMode } from "./EditMode"
 
 export {
   GlobalStoreActionType,
@@ -15,5 +16,6 @@ export {
   SortMode,
   SearchMode,
   DetailView,
-  AuthActionType
+  AuthActionType,
+  EditMode
 }
