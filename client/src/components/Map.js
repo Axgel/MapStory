@@ -41,6 +41,10 @@ export default function Map() {
       const {subregionId, op} = data;
       file.incrementVersionAndUpdateSubregions(subregionId, op);
     });
+
+    return () => {
+      auth.socket.removeAllListeners();
+    }
   }, [auth, file])
 
   // Load all subregions into map
@@ -52,10 +56,6 @@ export default function Map() {
     });
     
     file.loadAllRegionsToMap(mapItem);
-
-    return () => {
-      auth.socket.removeAllListeners();
-    }
   }, [auth, file, mapItem])
 
 

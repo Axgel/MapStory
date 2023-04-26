@@ -28,39 +28,6 @@ function GlobalFileContextProvider(props) {
     editRegions: {},
   });
 
-  const [tmpRegion, setTmpRegion] = useState(null);
-
-  useEffect(() => {
-    if(!tmpRegion) return;
-
-    if(file.editRegions[tmpRegion.subregionId]){
-      tmpRegion.layer.setStyle({ fillColor: '#3387FF'});
-      tmpRegion.layer.pm.disable();
-      const newEditRegions = file.editRegions;
-      delete newEditRegions[tmpRegion.subregionId];
-      file.updateEditRegions(newEditRegions);
-    }
-    else {
-      const newEditRegions = file.editRegions;
-      newEditRegions[tmpRegion.subregionId] = tmpRegion.layer;
-      file.updateEditRegions(newEditRegions);
-    }
-    
-    setTmpRegion(null);
-  }, [tmpRegion])
-
-  useEffect(() => {
-    for(const region in file.editRegions){
-      const layer = file.editRegions[region];
-      layer.setStyle({ fillColor: 'red'});
-      layer.pm.disable();
-      if(file.currentEditMode == EditMode.EDIT_VERTEX){
-        file.enableLayerOptions(layer);
-      }
-    }
-  }, [file])
-
-
   const navigate = useNavigate();
 
   const fileReducer = (action) => {
@@ -138,7 +105,6 @@ function GlobalFileContextProvider(props) {
   file.loadAllSubregions = async function(mapId) {
     let response = await api.getAllSubregions(mapId);
     if(response.status === 200){
-      console.log(response.data.subregions);
       fileReducer({
         type: GlobalFileActionType.LOAD_SUBREGIONS,
         payload: {subregions: response.data.subregions}
@@ -163,8 +129,8 @@ function GlobalFileContextProvider(props) {
     newSubregions[subregionId].coordinates = json1.type.apply(coordinates, op);
     
     fileReducer({
-      type: GlobalFileActionType.UPDATE_SUBREGIONS,
-      payload: {subregions: newSubregions, version: file.version}
+      type: GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS,
+      payload: {subregions: newSubregions, version: file.version+1}
     })
   }
 
@@ -199,22 +165,18 @@ function GlobalFileContextProvider(props) {
   }
 
   file.initLayerHandlers = function(layer, subregionId){
-    layer.on('click', (e) => file.handleClickLayerWrapper(e, subregionId));
+    layer.on('click', (e) => file.handleClickLayer(e, subregionId));
     layer.on('pm:vertexadded', (e) => file.handleVertexAdded(e, subregionId));
     layer.on('pm:markerdragend', (e) => file.handleMarkerDragEnd(e, subregionId));
     layer.on('pm:vertexremoved', (e) => file.handleVertexRemoved(e, subregionId));
   }
 
-  file.handleClickLayerWrapper = function(e, subregionId){
-    setTmpRegion({layer: e.target, subregionId: subregionId});
-  }
-
-  file.handleClickLayer = function(subregionId){
+  file.handleClickLayer = function(e, subregionId){
     let newEditRegions = file.editRegions;
-    if(file.editRegions.includes(subregionId)){
-      newEditRegions.filter(editRegionId => editRegionId !== subregionId);
+    if(file.editRegions[subregionId]){
+      delete newEditRegions[subregionId];
     } else {
-      newEditRegions.push(subregionId);
+      newEditRegions[subregionId] = e.target;
     }
 
     fileReducer({
@@ -255,7 +217,6 @@ function GlobalFileContextProvider(props) {
     const op = json1.replaceOp(path, oldVal, newVal);
     file.updateSubregions(subregionId, op);
 
-    console.log(file.subregions);
     auth.socket.emit('sendOp', {
       mapId: file.subregions[subregionId].mapId,
       subregionId: subregionId,
