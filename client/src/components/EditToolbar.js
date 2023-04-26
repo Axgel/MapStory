@@ -95,7 +95,7 @@ export default function EditToolbar() {
           <div className="w-[1px] bg-black h-full"></div>
 
           <div className="flex gap-4 px-3">
-            <img src={AddVertexIcon} alt=""></img>
+            <img src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX)} alt=""></img>
             <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
           </div>
 

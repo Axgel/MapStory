@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free';  
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';  
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import GlobalFileContext from "../file";
 import { EditMode } from "../enums";
 import AuthContext from "../auth";
@@ -14,6 +14,7 @@ export default function Map() {
   const { file } = useContext(GlobalFileContext);
   const [mapRef, setMapRef] = useState(null);
   const [mapItem, setMapItem] = useState(null);
+  const [version, setVersion] = useState(1);
   const { mapId } = useParams();
 
   // Initializes leaflet map reference
@@ -36,14 +37,19 @@ export default function Map() {
   useEffect(()=>{
     if(!auth.user || !file.subregions || !mapItem ) return;
     auth.socket.on('version', function(data){
-      console.log(data);
+      if(data.version) {
+        setVersion(data.version)
+      }
     }); 
 
     auth.socket.on('owner-ack', function(data){
-      const {subregionId, op} = data;
+      setVersion(version + 1)
+      // const {subregionId, op} = data;
+      // console.log(subregionId, op)
     }); 
 
     auth.socket.on('others-ack', function(data){
+      setVersion(version + 1);
       const {subregionId, op} = data;
       file.updateSubregions(subregionId, op);
     });
@@ -75,58 +81,76 @@ export default function Map() {
           mapId: mapId,
           subregionId: subregionId,
           op : op,
+          version : version
         })
       });
       poly.on('pm:markerdragend', (e) => {
-        const path = e.indexPath;
-        let temp = e.layer.getLatLngs();
-        for(const i of path) {
-          temp = temp[i];
-        }
-        const newVal = [temp.lat, temp.lng];
+        if(e.indexPath) {
+          const path = e.indexPath;
+          let temp = e.layer.getLatLngs();
+          for(const i of path) {
+            temp = temp[i];
+          }
+          const newVal = [temp.lat, temp.lng];
 
-        const index = file.subregions.findIndex(subregion => subregion._id === subregionId);
-        let oldVal = file.subregions[index].coordinates;
-        for(const i of path) {
-          oldVal = oldVal[i];
-        }
+          const index = file.subregions.findIndex(subregion => subregion._id === subregionId);
+          let oldVal = file.subregions[index].coordinates;
+          for(const i of path) {
+            oldVal = oldVal[i];
+          }
 
-        const op = json1.replaceOp(path, oldVal, newVal);
+          const op = json1.replaceOp(path, oldVal, newVal);
+          file.updateSubregions(subregionId, op);
+
+          auth.socket.emit('sendOp', {
+            mapId: mapId,
+            subregionId: subregionId,
+            op : op,
+            version : version
+          })
+        }
+      });
+      poly.on('pm:vertexremoved', (e) => {
+        const data = [e.marker._latlng.lat, e.marker._latlng.lng];
+
+        const op = json1.removeOp(e.indexPath, data);
         file.updateSubregions(subregionId, op);
 
         auth.socket.emit('sendOp', {
           mapId: mapId,
           subregionId: subregionId,
           op : op,
+          version : version
         })
       })
       if (file.editRegions.includes(region._id)) {
-        poly.setStyle({ fillColor: 'red'});
-        poly.pm.disable();
-        if(file.currentEditMode === EditMode.EDIT_VERTEX){
+        poly.setStyle({ fillColor: 'red'});   
+        if(file.currentEditMode === EditMode.ADD_VERTEX || file.currentEditMode === EditMode.EDIT_VERTEX) {
           poly.pm.enable({
-            limitMarkersToCount: 10,
+            removeLayerBelowMinVertexCount: false,
+            limitMarkersToCount: 5,
             draggable: false,
-            // removeVertexOn: 'click',
-            // removeVertexValidation: store.removeVertexValidate,
             addVertexOn: 'click',
+            removeVertexOn: 'click',
             addVertexValidation: addVertexValidate,
-            moveVertexValidation: moveVertexValidate,
-          }) 
+            moveVertexValidation: editVertexValidate,
+            removeVertexValidation: editVertexValidate,
+            hideMiddleMarkers: file.currentEditMode === EditMode.EDIT_VERTEX
+          })
         }
       }
     }
     return () => {
       auth.socket.removeAllListeners();
     }
-  }, [auth, file, mapItem])
+  }, [auth, file, mapItem, version])
 
   function addVertexValidate(e){
-    return true;
+    return file.currentEditMode === EditMode.ADD_VERTEX;
   }
 
-  function moveVertexValidate(e){
-    return true;
+  function editVertexValidate(e){
+    return file.currentEditMode === EditMode.EDIT_VERTEX;
   }
 
   // get div of screen on page load to add map to
