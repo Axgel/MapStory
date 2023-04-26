@@ -72,7 +72,7 @@ switch (process.env.ENVIRONMENT) {
                 socketIO.to(client).emit('owner-ack', {subregionId: subregionId, op: op});
               } else {
                 socketIO.to(client).emit('others-ack', {subregionId: subregionId, op: op});
-              }
+              } 
             }
           }
         }

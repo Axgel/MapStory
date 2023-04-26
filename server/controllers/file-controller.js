@@ -6,8 +6,14 @@ const json1 = require('ot-json1');
 getAllSubregions = async (req, res) => {
   try{
     const subregions = await Subregion.find({ mapId: req.params.mapId }).exec();
+
+    const subregionsDict = {};
+
+    for(const subregion of subregions){
+      subregionsDict[subregion._id] = subregion;
+    }
     return res.status(200).json({
-      subregions: subregions
+      subregions: subregionsDict
     })
   } catch (err) {
     return res.status(400).json({
