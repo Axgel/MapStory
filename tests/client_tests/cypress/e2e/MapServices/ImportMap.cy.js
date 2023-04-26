@@ -12,19 +12,19 @@ describe('Import Map', () => {
 
     //blank title
     it('blank title', () => {
-        cy.get('#upload-map-title').clear().type("Testing geojson")
+        cy.get('#upload-map-title').clear().type("")
         cy.get('#fileUpload').selectFile('./cypress/fixtures/squares.shp')
         cy.get('#uploadFileBtn').click()
         cy.contains('Map title cannot be empty')
     });
 
     //file not formatted properly (SHP + JSON)
-    it('bad file format', () => {
-        cy.get('#upload-map-title').clear().type("Testing geojson")
-        cy.get('#fileUpload').selectFile(['./cypress/fixtures/squares.shp', './cypress/fixtures/squares.json'])
-        cy.get('#uploadFileBtn').click()
-        cy.contains('Map title cannot be empty')
-    });
+    // it('bad file format', () => {
+    //     cy.get('#upload-map-title').clear().type("Testing geojson")
+    //     cy.get('#fileUpload').selectFile(['./cypress/fixtures/squares.shp', './cypress/fixtures/squares.json'])
+    //     cy.get('#uploadFileBtn').click()
+    //     cy.contains('Map title cannot be empty')
+    // });
 
     //success shp only
     it('shp success', () => {

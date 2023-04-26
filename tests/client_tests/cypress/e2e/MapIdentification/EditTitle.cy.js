@@ -10,6 +10,13 @@ describe('Edit Title', () => {
     });
     
     //blank title
+    // it('edit to blank title', () => {
+    //     // cy.get("#mapTitleTB").then((currentTitle)=>{
+    //         cy.get('#mapTitleTB').dblclick()
+    //         cy.get('#inputNewUsername').clear().type("{enter}");
+    //         //get error for blank title
+    //     // })
+    // });
     
     //success
     it('success', () => {
@@ -18,7 +25,6 @@ describe('Edit Title', () => {
             cy.get('#inputNewUsername').clear().type("newTitle{enter}");
             cy.get('#mapTitleTB').contains("newTitle")
         // })
-        
     });
 
 })
