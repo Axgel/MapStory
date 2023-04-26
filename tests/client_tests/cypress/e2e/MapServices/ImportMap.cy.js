@@ -12,7 +12,7 @@ describe('Import Map', () => {
 
     //blank title
     it('blank title', () => {
-        cy.get('#upload-map-title').clear().type("")
+        cy.get('#upload-map-title').clear()
         cy.get('#fileUpload').selectFile('./cypress/fixtures/squares.shp')
         cy.get('#uploadFileBtn').click()
         cy.contains('Map title cannot be empty')
