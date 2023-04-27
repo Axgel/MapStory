@@ -34,11 +34,13 @@ export default function Map() {
     }); 
   
     auth.socket.on('owner-ack', function(data){
+      console.log(file.version);
       file.incrementVersion();
     }); 
   
     auth.socket.on('others-ack', function(data){
       const {subregionId, op} = data;
+      console.log(file.version);
       file.incrementVersionAndUpdateSubregions(subregionId, op);
     });
 

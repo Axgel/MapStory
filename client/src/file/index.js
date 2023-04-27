@@ -20,8 +20,8 @@ const tps = new jsTPS();
 
 function GlobalFileContextProvider(props) {
   const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
   const { store } = useContext(GlobalStoreContext);
-
   const [file, setFile] = useState({
     version: 1,
     free: true,
@@ -29,8 +29,22 @@ function GlobalFileContextProvider(props) {
     currentEditMode: EditMode.NONE,
     editRegions: {},
   });
+  
+  const [tmpSendOp, setTmpSendOp] = useState(null);
+  useEffect(() => {
+    if(!tmpSendOp || !auth.user) return;
 
-  const navigate = useNavigate();
+    file.updateSubregions(tmpSendOp.subregionId, tmpSendOp.op);
+    auth.socket.emit('sendOp', {
+      mapId: tmpSendOp.mapId,
+      subregionId: tmpSendOp.subregionId,
+      op : tmpSendOp.op,
+      version : file.version
+    })
+
+    setTmpSendOp(null);
+  }, [tmpSendOp])
+
 
   const fileReducer = (action) => {
     const { type, payload } = action;
@@ -209,7 +223,6 @@ function GlobalFileContextProvider(props) {
     // file.sendOpToServer(subregionId, op);
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
-    console.log(tps.toString());
   }
 
   file.handleVertexRemoved = function(e, subregionId) {
@@ -223,12 +236,11 @@ function GlobalFileContextProvider(props) {
   }
 
   file.sendOpToServer = function(subregionId, op) {
-    auth.socket.emit('sendOp', {
+    setTmpSendOp({
       mapId: file.subregions[subregionId].mapId,
       subregionId: subregionId,
-      op : op,
-      version : file.version
-    })
+      op : op
+    });
   }
 
   file.enableLayerOptions = function(layer) {
