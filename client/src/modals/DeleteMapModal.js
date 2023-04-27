@@ -9,6 +9,8 @@ export default function DeleteMapModal(props) {
   const { auth } = useContext(AuthContext);
 
   const mapInfo = store.selectedMap;
+  let titleElement = mapInfo ? <h1 className="text-xl text-center mt-4 mb-2 mx-9">{mapInfo.title}</h1> : <></>;
+  let message = mapInfo ? <h1 className="mx-6 my-2 text-center"> Are you sure you want to permanently delete '{mapInfo.title}'? </h1> : <></>;
 
   function handleCloseModal(e){
     e.stopPropagation();
@@ -26,8 +28,8 @@ export default function DeleteMapModal(props) {
 
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg w-96 text-right">
           <h1 className="text-xl text-center mt-4 mb-2 mx-9">Deleting Map</h1>
-          <h1 className="text-xl text-center mt-4 mb-2 mx-9">{mapInfo.title}</h1>
-          <h1 className="mx-6 my-2 text-center"> Are you sure you want to permanently delete '{mapInfo.title}'? </h1>
+          {titleElement}
+          {message}
           <h1 className="mx-6 my-2 text-center"> *This action cannot be undone.</h1><br></br><br></br>
           <div className="flex flex-row-reverse mx-3">
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handleDeleteMap}>OK</button>

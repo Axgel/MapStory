@@ -15,6 +15,12 @@ export default function PublishMapModal(props) {
     collaboratorsUsernames.push(collaborator.userName)
   }); 
 
+  let titleElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.title}</p> : <></>; 
+  let ownerElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.ownerName}</p> : <></>; 
+  let collaboratorElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{(mapInfo.collaborators.length === 0) ? "There are no collaborators for this map" : collaboratorsUsernames.join(", ")}</p> : <></>; 
+  let tagElement = mapInfo ? <p className="mb-4 text-publishmodalsubtext">{(mapInfo.tags.length === 0) ? "There are currently no tags for this map" : mapInfo.tags.join(", ")}</p> : <></>;
+  let messageElement = mapInfo ? <h1 className="mx-6 my-2 ">Are you sure you want to publish '{mapInfo.title}'. This action cannot be undone.</h1> : <></>;
+
   function handleCloseModal(e){
     e.stopPropagation();
     store.setCurrentModal(CurrentModal.NONE);
@@ -31,14 +37,14 @@ export default function PublishMapModal(props) {
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg w-96 text-center">
           <h1 className="text-xl mt-4 mb-4 mx-9">Publishing Map</h1>
           <h1 className="">Map Name</h1>
-          <p className="mb-2 text-publishmodalsubtext">{mapInfo.title}</p>
+          {titleElement}
           <h1 className="">Owner</h1>
-          <p className="mb-2 text-publishmodalsubtext">{mapInfo.ownerName}</p>
+          {ownerElement}
           <h1 className="">Collaborators</h1>
-          <p className="mb-2 text-publishmodalsubtext">{(mapInfo.collaborators.length === 0) ? "There are no collaborators for this map" : collaboratorsUsernames.join(", ")}</p>
+          {collaboratorElement}
           <h1 className="">Tags</h1>
-          <p className="mb-4 text-publishmodalsubtext">{(mapInfo.tags.length === 0) ? "There are currently no tags for this map" : mapInfo.tags.join(", ")}</p>
-          <h1 className="mx-6 my-2 ">Are you sure you want to publish '{mapInfo.title}'. This action cannot be undone.</h1>
+          {tagElement}
+          {messageElement}
           <h1 className="mx-6 my-2 ">*You will no longer be able to edit this map.</h1>
           <div className="flex flex-row-reverse">
             <button className="bg-brownshade-800 text-white mb-3 mr-3 px-3 rounded-md border-brownshade-850" onClick={handlePublishMap}>OK</button>
