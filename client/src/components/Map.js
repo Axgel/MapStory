@@ -34,7 +34,7 @@ export default function Map() {
     }); 
   
     auth.socket.on('owner-ack', function(data){
-      file.setVersion(file.version + 1)
+      file.incrementVersion();
     }); 
   
     auth.socket.on('others-ack', function(data){

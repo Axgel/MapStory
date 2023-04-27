@@ -11,11 +11,6 @@ export default function MapScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
-  const [socketId, setSocketId] = useState(null);
-
-  const queue = [];
-  let free = true;
-  let version = 1;
 
   useEffect(() => {
     file.loadAllSubregions(mapId);

@@ -10,6 +10,7 @@ import AuthContext from "../auth";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
+import { Test_Transaction } from "../transactions";
 const json1 = require('ot-json1');
 
 export const GlobalFileContext = createContext({});
@@ -23,6 +24,7 @@ function GlobalFileContextProvider(props) {
 
   const [file, setFile] = useState({
     version: 1,
+    free: true,
     subregions: {},
     currentEditMode: EditMode.NONE,
     editRegions: {},
@@ -33,12 +35,6 @@ function GlobalFileContextProvider(props) {
   const fileReducer = (action) => {
     const { type, payload } = action;
     switch (type) {
-      case GlobalFileActionType.SET_VERSION: {
-        return setFile({
-          ...file,
-          version: payload.version
-        })
-      }
       case GlobalFileActionType.LOAD_SUBREGIONS: {
         return setFile({
           ...file,
@@ -65,6 +61,12 @@ function GlobalFileContextProvider(props) {
           subregions: payload.subregions,
         })
       }
+      case GlobalFileActionType.SET_VERSION: {
+        return setFile({
+          ...file,
+          version: payload.version
+        })
+      }
       case GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS: {
         return setFile({
           ...file, 
@@ -76,31 +78,6 @@ function GlobalFileContextProvider(props) {
         return file;
     }
   };
-  
-  file.setVersion = function(version){
-    fileReducer({
-      type: GlobalFileActionType.SET_VERSION,
-      payload: {version: version}
-    })
-  }
-
-  file.initMapContainer = function(mapRef){
-    const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
-    const southWest = L.latLng(-89.98155760646617, -180);
-    const northEast = L.latLng(89.99346179538875, 180);
-    const bounds = L.latLngBounds(southWest, northEast);
-    map.setMaxBounds(bounds);
-    map.doubleClickZoom.disable(); 
-
-    return map;
-  }
-
-  file.setCurrentEditMode = function(currentEditMode){
-    fileReducer({
-      type: GlobalFileActionType.SET_EDIT_MODE,
-      payload: {currentEditMode: currentEditMode}
-    })
-  }
 
   file.loadAllSubregions = async function(mapId) {
     let response = await api.getAllSubregions(mapId);
@@ -112,29 +89,74 @@ function GlobalFileContextProvider(props) {
     }
   }
 
-  file.updateSubregions = function(subregionId, op){
+  file.setCurrentEditMode = function(currentEditMode) {
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE,
+      payload: {currentEditMode: currentEditMode}
+    })
+  }
+
+  file.handleClickLayer = function(e, subregionId) {
+    let newEditRegions = file.editRegions;
+    if(file.editRegions[subregionId]){
+      delete newEditRegions[subregionId];
+    } else {
+      newEditRegions[subregionId] = e.target;
+    }
+
+    fileReducer({
+      type: GlobalFileActionType.UPDATE_EDIT_REGIONS,
+      payload: {editRegions: newEditRegions}
+    })
+  }
+
+  file.updateSubregions = function(subregionId, op) {
     const newSubregions = file.subregions;
     const coordinates = newSubregions[subregionId].coordinates;
     newSubregions[subregionId].coordinates = json1.type.apply(coordinates, op);
-    
     fileReducer({
       type: GlobalFileActionType.UPDATE_SUBREGIONS,
       payload: {subregions: newSubregions}
     })
   }
 
-  file.incrementVersionAndUpdateSubregions = function(subregionId, op){
+  file.setVersion = function(version) {
+    fileReducer({
+      type: GlobalFileActionType.SET_VERSION,
+      payload: {version: version}
+    })
+  }
+
+  file.incrementVersion = function() {
+    fileReducer({
+      type: GlobalFileActionType.SET_VERSION,
+      payload: {version: file.version + 1}
+    })
+  }
+
+  file.incrementVersionAndUpdateSubregions = function(subregionId, op) {
     const newSubregions = file.subregions;
     const coordinates = newSubregions[subregionId].coordinates;
     newSubregions[subregionId].coordinates = json1.type.apply(coordinates, op);
     
     fileReducer({
       type: GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS,
-      payload: {subregions: newSubregions, version: file.version+1}
+      payload: {subregions: newSubregions, version: file.version + 1}
     })
   }
 
-  file.loadAllRegionsToMap = function(mapItem){
+  file.initMapContainer = function(mapRef) {
+    const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
+    const southWest = L.latLng(-89.98155760646617, -180);
+    const northEast = L.latLng(89.99346179538875, 180);
+    const bounds = L.latLngBounds(southWest, northEast);
+    map.setMaxBounds(bounds);
+    map.doubleClickZoom.disable(); 
+
+    return map;
+  }
+
+  file.loadAllRegionsToMap = function(mapItem) {
     for(const subregionId in file.subregions){
       const region = file.subregions[subregionId];
       const layer = L.polygon(region.coordinates).addTo(mapItem);
@@ -150,7 +172,66 @@ function GlobalFileContextProvider(props) {
     }
   }
 
-  file.enableLayerOptions = function(layer){
+  file.initLayerHandlers = function(layer, subregionId) {
+    layer.on('click', (e) => file.handleClickLayer(e, subregionId));
+    layer.on('pm:vertexadded', (e) => file.handleVertexAdded(e, subregionId));
+    layer.on('pm:markerdragend', (e) => file.handleMarkerDragEnd(e, subregionId));
+    layer.on('pm:vertexremoved', (e) => file.handleVertexRemoved(e, subregionId));
+  }
+
+  file.handleVertexAdded = function(e, subregionId) {
+    const data = [e.latlng.lat, e.latlng.lng];
+    const op = json1.insertOp(e.indexPath, data);
+    // file.updateSubregions(subregionId, op);
+    // file.sendOpToServer(subregionId, op);
+    const transaction = new Test_Transaction(file, subregionId, op);
+    tps.addTransaction(transaction);
+    console.log(tps.toString());
+  }
+
+  file.handleMarkerDragEnd = function(e, subregionId) {
+    if(!e.indexPath) return;
+
+    const path = e.indexPath;
+    let temp = e.layer.getLatLngs();
+    for(const i of path) {
+      temp = temp[i];
+    }
+    const newVal = [temp.lat, temp.lng];
+    
+    let oldVal = file.subregions[subregionId].coordinates;
+    for(const i of path) {
+      oldVal = oldVal[i];
+    }
+
+    const op = json1.replaceOp(path, oldVal, newVal);
+    // file.updateSubregions(subregionId, op);
+    // file.sendOpToServer(subregionId, op);
+    const transaction = new Test_Transaction(file, subregionId, op);
+    tps.addTransaction(transaction);
+    console.log(tps.toString());
+  }
+
+  file.handleVertexRemoved = function(e, subregionId) {
+    const data = [e.marker._latlng.lat, e.marker._latlng.lng];
+    const op = json1.removeOp(e.indexPath, data);
+    // file.updateSubregions(subregionId, op);
+    // file.sendOpToServer(subregionId, op);
+    const transaction = new Test_Transaction(file, subregionId, op);
+    tps.addTransaction(transaction);
+    console.log(tps.toString());
+  }
+
+  file.sendOpToServer = function(subregionId, op) {
+    auth.socket.emit('sendOp', {
+      mapId: file.subregions[subregionId].mapId,
+      subregionId: subregionId,
+      op : op,
+      version : file.version
+    })
+  }
+
+  file.enableLayerOptions = function(layer) {
     layer.pm.enable({
       removeLayerBelowMinVertexCount: false,
       limitMarkersToCount: 5,
@@ -164,93 +245,24 @@ function GlobalFileContextProvider(props) {
     })
   }
 
-  file.initLayerHandlers = function(layer, subregionId){
-    layer.on('click', (e) => file.handleClickLayer(e, subregionId));
-    layer.on('pm:vertexadded', (e) => file.handleVertexAdded(e, subregionId));
-    layer.on('pm:markerdragend', (e) => file.handleMarkerDragEnd(e, subregionId));
-    layer.on('pm:vertexremoved', (e) => file.handleVertexRemoved(e, subregionId));
-  }
-
-  file.handleClickLayer = function(e, subregionId){
-    let newEditRegions = file.editRegions;
-    if(file.editRegions[subregionId]){
-      delete newEditRegions[subregionId];
-    } else {
-      newEditRegions[subregionId] = e.target;
-    }
-
-    fileReducer({
-      type: GlobalFileActionType.UPDATE_EDIT_REGIONS,
-      payload: {editRegions: newEditRegions}
-    })
-  }
-
-  file.handleVertexAdded = function(e, subregionId){
-    if(!auth.user) return;
-    const data = [e.latlng.lat, e.latlng.lng];
-    const op = json1.insertOp(e.indexPath, data);
-    file.updateSubregions(subregionId, op);
-
-    auth.socket.emit('sendOp', {
-      mapId: file.subregions[subregionId].mapId,
-      subregionId: subregionId,
-      op : op,
-      version : file.version
-    })
-  }
-
-  file.handleMarkerDragEnd = function(e, subregionId){
-    if(!e.indexPath) return;
-    const path = e.indexPath;
-    let temp = e.layer.getLatLngs();
-    for(const i of path) {
-      temp = temp[i];
-    }
-    const newVal = [temp.lat, temp.lng];
-
-    
-    let oldVal = file.subregions[subregionId].coordinates;
-    for(const i of path) {
-      oldVal = oldVal[i];
-    }
-
-    const op = json1.replaceOp(path, oldVal, newVal);
-    file.updateSubregions(subregionId, op);
-
-    auth.socket.emit('sendOp', {
-      mapId: file.subregions[subregionId].mapId,
-      subregionId: subregionId,
-      op : op,
-      version : file.version
-    })
-  }
-
-  file.handleVertexRemoved = function(e, subregionId){
-    const data = [e.marker._latlng.lat, e.marker._latlng.lng];
-    const op = json1.removeOp(e.indexPath, data);
-    file.updateSubregions(subregionId, op);
-
-    auth.socket.emit('sendOp', {
-      mapId: file.subregions[subregionId].mapId,
-      subregionId: subregionId,
-      op : op,
-      version : file.version
-    })
-  }
-
-  file.addVertexValidate = function(e){
+  file.addVertexValidate = function(e) {
     return file.currentEditMode === EditMode.ADD_VERTEX;
   }
 
-  file.editVertexValidate = function(e){
+  file.editVertexValidate = function(e) {
     return file.currentEditMode === EditMode.EDIT_VERTEX;
   }
 
-  file.updateEditRegions = function(newEditRegions){
-    fileReducer({
-      type: GlobalFileActionType.UPDATE_EDIT_REGIONS,
-      payload: {editRegions: newEditRegions}
-    })
+  file.handleUndo = function() {
+    if(tps.hasTransactionToUndo()) {
+      tps.undoTransaction();
+    }
+  }
+
+  file.handleRedo = function() {
+    if(tps.hasTransactionToRedo()) {
+      tps.doTransaction();
+    }
   }
 
   return (

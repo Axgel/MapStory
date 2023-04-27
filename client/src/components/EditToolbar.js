@@ -41,6 +41,14 @@ export default function EditToolbar() {
     file.setCurrentEditMode(currentEditMode);
   }
 
+  function handleUndo() {
+    file.handleUndo();
+  }
+
+  function handleRedo() {
+    file.handleRedo();
+  }
+
   function handleUpdateTitle(e){
     e.stopPropagation();
     store.updateMapTitle(e.target.value);
@@ -88,8 +96,8 @@ export default function EditToolbar() {
           <div className="w-[1px] bg-black h-full"></div>
 
           <div className="flex gap-4 px-3">
-            <img src={UndoIcon} alt=""></img>
-            <img src={RedoIcon} alt=""></img>
+            <img src={UndoIcon} onClick={handleUndo} alt=""></img>
+            <img src={RedoIcon} onClick={handleRedo} alt=""></img>
           </div>
 
           <div className="w-[1px] bg-black h-full"></div>
