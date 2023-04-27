@@ -39,9 +39,9 @@ export default function Map() {
     }); 
   
     auth.socket.on('others-ack', function(data){
-      const {subregionId, op} = data;
+      const { op } = data;
       console.log(file.version);
-      file.incrementVersionAndUpdateSubregions(subregionId, op);
+      file.incrementVersionAndUpdateSubregions(op);
     });
 
     return () => {

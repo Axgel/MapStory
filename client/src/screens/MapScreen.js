@@ -13,7 +13,7 @@ export default function MapScreen() {
   const { mapId } = useParams();
 
   useEffect(() => {
-    file.loadAllSubregions(mapId);
+    file.loadAllSubregionsFromDb(mapId);
     store.loadMapById(mapId);
   }, []);
 

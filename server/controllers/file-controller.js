@@ -26,10 +26,18 @@ updateSubregions = async (subregionId, op) => {
   try{
     const subregion = await Subregion.findOne({ _id: subregionId});
     if(!subregion) return false;
-    const coordinates = subregion.coordinates;
-    const newDoc = json1.type.apply(coordinates, op);
-    subregion.coordinates = newDoc;
-    await subregion.save();
+
+    const subregionJson = subregion.toJSON();
+    const tmpSubregionObj = {};
+    tmpSubregionObj[subregion._id] = subregionJson;
+    const newSubregionJson = json1.type.apply(tmpSubregionObj, op);
+
+    await Subregion.findOneAndUpdate(
+      { _id: subregionId},
+      newSubregionJson[subregionId],
+      {new: true}
+    );
+
     return true;
   } catch (err) {
     console.log(err);

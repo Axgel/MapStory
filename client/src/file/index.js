@@ -11,6 +11,7 @@ import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
 import { Test_Transaction } from "../transactions";
+import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
 const json1 = require('ot-json1');
 
 export const GlobalFileContext = createContext({});
@@ -20,8 +21,11 @@ const tps = new jsTPS();
 
 function GlobalFileContextProvider(props) {
   const { auth } = useContext(AuthContext);
-  const navigate = useNavigate();
   const { store } = useContext(GlobalStoreContext);
+  const navigate = useNavigate();
+  
+  const [queue, setQueue] = useState([]);   
+  const [tmpSendOp, setTmpSendOp] = useState(null);
   const [file, setFile] = useState({
     version: 1,
     free: true,
@@ -30,11 +34,10 @@ function GlobalFileContextProvider(props) {
     editRegions: {},
   });
   
-  const [tmpSendOp, setTmpSendOp] = useState(null);
   useEffect(() => {
     if(!tmpSendOp || !auth.user) return;
 
-    file.updateSubregions(tmpSendOp.subregionId, tmpSendOp.op);
+    file.updateSubregions(tmpSendOp.op);
     auth.socket.emit('sendOp', {
       mapId: tmpSendOp.mapId,
       subregionId: tmpSendOp.subregionId,
@@ -93,7 +96,7 @@ function GlobalFileContextProvider(props) {
     }
   };
 
-  file.loadAllSubregions = async function(mapId) {
+  file.loadAllSubregionsFromDb = async function(mapId) {
     let response = await api.getAllSubregions(mapId);
     if(response.status === 200){
       fileReducer({
@@ -124,10 +127,8 @@ function GlobalFileContextProvider(props) {
     })
   }
 
-  file.updateSubregions = function(subregionId, op) {
-    const newSubregions = file.subregions;
-    const coordinates = newSubregions[subregionId].coordinates;
-    newSubregions[subregionId].coordinates = json1.type.apply(coordinates, op);
+  file.updateSubregions = function(op) {
+    const newSubregions = json1.type.apply(file.subregions, op);    
     fileReducer({
       type: GlobalFileActionType.UPDATE_SUBREGIONS,
       payload: {subregions: newSubregions}
@@ -142,16 +143,11 @@ function GlobalFileContextProvider(props) {
   }
 
   file.incrementVersion = function() {
-    fileReducer({
-      type: GlobalFileActionType.SET_VERSION,
-      payload: {version: file.version + 1}
-    })
+    file.setVersion(file.version + 1);
   }
 
-  file.incrementVersionAndUpdateSubregions = function(subregionId, op) {
-    const newSubregions = file.subregions;
-    const coordinates = newSubregions[subregionId].coordinates;
-    newSubregions[subregionId].coordinates = json1.type.apply(coordinates, op);
+  file.incrementVersionAndUpdateSubregions = function(op) {
+    const newSubregions = json1.type.apply(file.subregions, op);
     
     fileReducer({
       type: GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS,
@@ -195,44 +191,41 @@ function GlobalFileContextProvider(props) {
 
   file.handleVertexAdded = function(e, subregionId) {
     const data = [e.latlng.lat, e.latlng.lng];
-    const op = json1.insertOp(e.indexPath, data);
-    // file.updateSubregions(subregionId, op);
-    // file.sendOpToServer(subregionId, op);
+    const path = createVertexOperationPath(subregionId, e.indexPath);
+    const op = json1.insertOp(path, data);
+
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
-    console.log(tps.toString());
   }
 
   file.handleMarkerDragEnd = function(e, subregionId) {
     if(!e.indexPath) return;
-
-    const path = e.indexPath;
+    let indexPath = e.indexPath;
     let temp = e.layer.getLatLngs();
-    for(const i of path) {
+    for(const i of indexPath) {
       temp = temp[i];
     }
     const newVal = [temp.lat, temp.lng];
     
     let oldVal = file.subregions[subregionId].coordinates;
-    for(const i of path) {
+    for(const i of indexPath) {
       oldVal = oldVal[i];
     }
 
+    const path = createVertexOperationPath(subregionId, indexPath);
+
     const op = json1.replaceOp(path, oldVal, newVal);
-    // file.updateSubregions(subregionId, op);
-    // file.sendOpToServer(subregionId, op);
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
 
   file.handleVertexRemoved = function(e, subregionId) {
     const data = [e.marker._latlng.lat, e.marker._latlng.lng];
-    const op = json1.removeOp(e.indexPath, data);
-    // file.updateSubregions(subregionId, op);
-    // file.sendOpToServer(subregionId, op);
+    const path = createVertexOperationPath(subregionId, e.indexPath);
+    const op = json1.removeOp(path, data);
+
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
-    console.log(tps.toString());
   }
 
   file.sendOpToServer = function(subregionId, op) {
