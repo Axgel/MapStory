@@ -71,9 +71,9 @@ switch (process.env.ENVIRONMENT) {
             const source = socket.id;
             for(const client of clients) {
               if(client === source) {
-                socketIO.to(client).emit('owner-ack', {op: op});
+                socketIO.to(client).emit('owner-ack', {serverVersion: mapProjects[mapId].version, op: op});
               } else {
-                socketIO.to(client).emit('others-ack', {op: op});
+                socketIO.to(client).emit('others-ack', {serverVersion: mapProjects[mapId].version, op: op});
               } 
             }
           }
