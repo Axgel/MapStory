@@ -24,31 +24,6 @@ export default function Map() {
     return () => map.remove();
   },[mapRef])
 
-  // useEffect(() => {
-  //   if(!auth.user) return;
-  //   // init client version number
-  //   auth.socket.on('version', function(data){
-  //     if(data.version) {
-  //       file.setVersion(data.version)
-  //     }
-  //   }); 
-  
-  //   auth.socket.on('owner-ack', function(data){
-  //     console.log(file.version);
-  //     file.incrementVersion();
-  //   }); 
-  
-  //   auth.socket.on('others-ack', function(data){
-  //     const { op } = data;
-  //     console.log(file.version);
-  //     file.incrementVersionAndUpdateSubregions(op);
-  //   });
-
-  //   return () => {
-  //     auth.socket.removeAllListeners();
-  //   }
-  // }, [auth, file])
-
   // Load all subregions into map
   useEffect(()=>{
     if(!auth.user || !mapItem ) return;

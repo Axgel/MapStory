@@ -25,11 +25,11 @@ function GlobalFileContextProvider(props) {
   const navigate = useNavigate();
   
   const [isFree, setIsFree] = useState(true);
+  const [version, setVersion] = useState(1);
   const [queue, setQueue] = useState([]);   
   const [tmpSendOp, setTmpSendOp] = useState(null);
+
   const [file, setFile] = useState({
-    version: 1,
-    free: true,
     subregions: {},
     currentEditMode: EditMode.NONE,
     editRegions: {},
@@ -37,16 +37,7 @@ function GlobalFileContextProvider(props) {
   
   useEffect(() => {
     if(!tmpSendOp || !auth.user) return;
-    /* STEP 4: This useeffect is basically called everytime an edit is done to the map
-      It first makes the local changes in the call incrementVersionAndUpdateSubregions call
-      We want to increment the local version because we performed the edit localy 
-      and is already rendered on the screen. However, because this useEffect is only called whenever
-      we set the state for tmpSendOp, when we make the incrementVersionAndUpdateSubregions call, it wont actually be
-      pasing the updated version state to the server which is fine because in order for the server to emit the message to all the other users,
-      the local client needs to be on the same version.
-      We then emit the message with the operation. Remember this is still all happening on User A. User A can now see the updated
-      edit map region on the screen, but User B has not yet received that change.
-    */
+
     file.updateSubregions(tmpSendOp.op);
     file.sendOp({
       mapId: tmpSendOp.mapId,
@@ -68,57 +59,48 @@ function GlobalFileContextProvider(props) {
   }, [isFree])
 
   useEffect(() => {
-    if(!auth.user) return;
-    console.log(`queueLen: ${queue.length}`);
+    if(!auth.user || !auth.socket) return;
+
     auth.socket.on('version', (data) => {
       if(data.version) {
-        file.setVersion(data.version)
+        setVersion(data.version);
       }
     }); 
 
-    /* STEP 5: (interchangeable with Step 6): The server acks the local changes
-      Because the server and User A are now on the same version, you can clear the queue
-      There might be an issue with waiting for an ack and the user adding more edits 
-      (so maybe removed items in the queue only up to server version)
-    */
     auth.socket.on('owner-ack', (data) => {
       console.log(`owner: ${data.serverVersion}`);
-      file.incrementVersion();
-      setQueue(queue.slice(1));
+      setVersion((prev) => (prev + 1));
+      setQueue((prev) => (prev.slice(1)));
       setIsFree(true);
     })
   
-    /* STEP 6: All other users receive the change */
     auth.socket.on('others-ack', (data) => {
       const {serverVersion, op} = data
       console.log(`others: ${serverVersion}`);
       if(!queue.length) {
-        file.incrementVersionAndUpdateSubregions(op);
+        file.updateSubregions(op);
       } else {
-        file.transformOps(queue, op);
+        console.log(queue)
+        let composed = queue[0].op;
+        for(let i=1; i< queue.length; i++){
+          composed = json1.type.compose(composed, queue[i].op);
+        }
+        const newServerOp = json1.type.transform(op, composed, "left");
+    
+        const newQueue = queue.map(ops => ({...ops, op: json1.type.transform(ops.op, op, "right")}));
+        setQueue(newQueue);
+        file.updateSubregions(newServerOp);
       }
+      setVersion((prev) => (prev + 1));
       setIsFree(true);
-      
     });
 
     return () => {
       auth.socket.removeAllListeners();
     }
 
-  }, [auth, file, queue])
+  }, [auth, file, queue, version])
   
-  
-  file.transformOps = function(opsQueue, serverOp) {
-
-    let composed = opsQueue[0].op;
-    for(let i=1; i<opsQueue.length; i++){
-      composed = json1.type.compose(composed, opsQueue[i].op);
-    }
-
-    const newServerOp = json1.type.transform(serverOp, composed, "left");
-    file.incrementVersionAndUpdateSubregions(newServerOp);
-  }
-
   file.sendOp = function(msg){
     if(!queue.length || !isFree) return;
 
@@ -126,7 +108,7 @@ function GlobalFileContextProvider(props) {
       mapId: msg.mapId,
       subregionId: msg.subregionId,
       op : queue[0].op,
-      version : file.version
+      version : version
     })
   }
 
@@ -157,19 +139,6 @@ function GlobalFileContextProvider(props) {
         return setFile({
           ...file,
           subregions: payload.subregions,
-        })
-      }
-      case GlobalFileActionType.SET_VERSION: {
-        return setFile({
-          ...file,
-          version: payload.version
-        })
-      }
-      case GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS: {
-        return setFile({
-          ...file, 
-          version: payload.version,
-          subregions: payload.subregions
         })
       }
       default:
@@ -216,26 +185,6 @@ function GlobalFileContextProvider(props) {
     })
   }
 
-  file.setVersion = function(version) {
-    fileReducer({
-      type: GlobalFileActionType.SET_VERSION,
-      payload: {version: version}
-    })
-  }
-
-  file.incrementVersion = function() {
-    file.setVersion(file.version + 1);
-  }
-
-  file.incrementVersionAndUpdateSubregions = function(op) {
-    const newSubregions = json1.type.apply(file.subregions, op);
-    
-    fileReducer({
-      type: GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS,
-      payload: {subregions: newSubregions, version: file.version + 1}
-    })
-  }
-
   file.initMapContainer = function(mapRef) {
     const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
     const southWest = L.latLng(-89.98155760646617, -180);
@@ -273,19 +222,10 @@ function GlobalFileContextProvider(props) {
   file.handleVertexAdded = function(e, subregionId) {
     const data = [e.latlng.lat, e.latlng.lng];
     const path = createVertexOperationPath(subregionId, e.indexPath);
-    const op = json1.insertOp(path, data);
     
-    /* STEP 1: User A adds a vertex to subregion 1
-      Append the current local version and operation that was performed to the queue
-      The queue will store the local changes that has not yet been confirmed by the server
-    */
-    setQueue([...queue, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]);
+    const op = json1.insertOp(path, data);
+    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
-    /* STEP 2: Create the transaction and add it to the tps
-      When the transaction is added, it will call the doTransaction() (based in the jstps api) function, which performs
-      the doTransaction function in the Test_Transaction file. The doTransaction function in this case will make a call
-      to file.sendOpToServer()
-    */
     tps.addTransaction(transaction);
   }
 
@@ -306,7 +246,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, indexPath);
 
     const op = json1.replaceOp(path, oldVal, newVal);
-    setQueue([...queue, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]);
+    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -316,17 +256,12 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, e.indexPath);
     const op = json1.removeOp(path, data);
 
-    setQueue([...queue, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]);
+    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
 
-  file.sendOpToServer = function(subregionId, op) {
-    /* STEP 3: Transaction has been added to the transaction stack
-      Now we want to update the tmpSendOp state with proper info including the operation
-      which will rerender and be able to grab the fresh data getting rid of the stale data
-      when it was originally stored in the transaction stack
-    */
+  file.sendOpMiddleware = function(subregionId, op) {
     setTmpSendOp({
       mapId: file.subregions[subregionId].mapId,
       subregionId: subregionId,
