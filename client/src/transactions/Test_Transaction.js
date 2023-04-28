@@ -19,13 +19,13 @@ export class Test_Transaction extends jsTPS_Transaction {
 
     doTransaction() {
         // this.file.updateSubregions(this.subregionId, this.op);
-        this.file.sendOpToServer(this.subregionId, this.op);
+        this.file.sendOpMiddleware(this.subregionId, this.op);
     }
     
     undoTransaction() {
         const inverse = json1.type.invert(this.op);
         // this.file.updateSubregions(this.subregionId, inverse);
-        this.file.sendOpToServer(this.subregionId, inverse);
+        this.file.sendOpMiddleware(this.subregionId, inverse);
     }
 
     toString() {
