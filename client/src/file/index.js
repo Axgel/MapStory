@@ -58,7 +58,7 @@ function GlobalFileContextProvider(props) {
 
   useEffect(() => {
     if(!auth.user) return;
-    
+    console.log(`queueLen: ${queue.length}`);
     auth.socket.on('version', (data) => {
       if(data.version) {
         file.setVersion(data.version)
@@ -71,6 +71,7 @@ function GlobalFileContextProvider(props) {
       (so maybe removed items in the queue only up to server version)
     */
     auth.socket.on('owner-ack', (data) => {
+      console.log(`owner: ${data.serverVersion}`);
       file.incrementVersion();
       setQueue(queue.slice(1));
     })
@@ -78,6 +79,7 @@ function GlobalFileContextProvider(props) {
     /* STEP 6: All other users receive the change */
     auth.socket.on('others-ack', (data) => {
       const {serverVersion, op} = data
+      console.log(`others: ${serverVersion}`);
       if(!queue.length) {
         file.incrementVersionAndUpdateSubregions(op);
       } else {
