@@ -2,6 +2,8 @@ import React, { createContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "./auth-request-api";
 import { AuthActionType, CurrentModal } from "../enums";
+import socketIO from 'socket.io-client';
+
 const AuthContext = createContext();
 
 function AuthContextProvider(props) {
@@ -9,7 +11,8 @@ function AuthContextProvider(props) {
     currentModal: CurrentModal.NONE,
     user: null,
     loggedIn: false,
-    error: ""
+    error: "",
+    socket: null
   });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -32,7 +35,8 @@ function AuthContextProvider(props) {
         return setAuth({
           ...auth,
           user: payload.user,
-          loggedIn: payload.loggedIn
+          loggedIn: payload.loggedIn,
+          socket: payload.socket
         });
       }
       case AuthActionType.LOGIN_USER: {
@@ -87,13 +91,17 @@ function AuthContextProvider(props) {
     try {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
-        authReducer({
-          type: AuthActionType.GET_LOGGED_IN,
-          payload: {
-            loggedIn: response.data.loggedIn,
-            user: response.data.user
-          }
-        })
+        const socket = await socketIO.connect(process.env.REACT_APP_SOCKETIO);
+        socket.on("connect", () => {
+          authReducer({
+            type: AuthActionType.GET_LOGGED_IN,
+            payload: {
+              loggedIn: response.data.loggedIn,
+              user: response.data.user,
+              socket: socket
+            }
+          })
+        });
       }
     } catch (err) {
       auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);

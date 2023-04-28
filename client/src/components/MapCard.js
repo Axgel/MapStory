@@ -5,12 +5,10 @@ import { CurrentModal } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
-import GlobalFileContext from "../file";
 
 
 export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
-  const {file} = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
   const navigate = useNavigate();
@@ -25,13 +23,13 @@ export default function MapCard(props) {
     publishButtonCSS += 'hidden '
     publishedWrapper = <p className="text-xs text-green-500">Published: {mapDetails.publishedDate}</p>;
   }
-  if(!auth || mapDetails.owner != auth.user._id){
+  if(!auth || mapDetails.owner !== auth.user._id){
     deleteButtonCSS += 'hidden '
     publishButtonCSS += 'hidden '
   }
 
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
-  if(store.selectedMap && store.selectedMap._id == mapDetails._id){
+  if(store.selectedMap && store.selectedMap._id === mapDetails._id){
     mapCardWrapper += "bg-mapselectedfill"
   } else {
     mapCardWrapper += "bg-brownshade-700"
@@ -39,7 +37,7 @@ export default function MapCard(props) {
 
   function setSelectedMap(e){
     e.stopPropagation();
-    if(store.selectedMap && (store.selectedMap._id == mapDetails._id)){
+    if(store.selectedMap && (store.selectedMap._id === mapDetails._id)){
       store.setSelectedMap(null);
     }
     else{
@@ -50,7 +48,7 @@ export default function MapCard(props) {
   function handleOpenMap(e){
     e.stopPropagation();
     store.loadMapById(mapDetails._id);
-    file.setLoadedRegionOnce(false);
+    auth.socket.removeAllListeners();
     navigate(`/map/${mapDetails._id}`);
   }
 

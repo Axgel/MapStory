@@ -20,14 +20,14 @@ function GlobalStoreContextProvider(props) {
   const [store, setStore] = useState({
     currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
-    detailView: DetailView.NONE, 
+    detailView: DetailView.NONE,
     publishedMaps: [],
     personalMaps: [],
     sharedMaps: [],
     selectedMap: null,
-    mapIdMarkedForAction: null,
     collaborators: [],
     selectedMapOwner: null,
+    mapIdMarkedForAction: null,
   });
 
   const navigate = useNavigate();
@@ -202,8 +202,6 @@ function GlobalStoreContextProvider(props) {
     return false;
   }
 
-
-
   store.loadPersonalAndSharedMaps = async function(currentModal){
     let personalMaps = [];
     let sharedMaps = [];
@@ -232,8 +230,6 @@ function GlobalStoreContextProvider(props) {
       payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap, currentModal: currentModal, collaborators: collaborators, selectedMapOwner: selectedMapOwner},
     });
   }
-
-
 
   store.loadAllMaps = async function(){
     let personalMaps = [];
@@ -290,7 +286,7 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.publishMapByMarkedId = async function(){
-    if(store.mapIdMarkedForAction == null) return;
+    if(!store.mapIdMarkedForAction) return;
 
     let response = await api.publishMapById(store.mapIdMarkedForAction);
     if(response.status === 200){
@@ -304,7 +300,7 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.forkMapByMarkedId = async function(){
-    if(store.mapIdMarkedForAction == null) return;
+    if(!store.mapIdMarkedForAction) return;
     let response = await api.forkMapById(store.mapIdMarkedForAction, auth.user._id);
     if(response.status === 201){
       storeReducer({
@@ -317,7 +313,7 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.deleteMapByMarkedId = async function(){
-    if(store.mapIdMarkedForAction == null) return;
+    if(!store.mapIdMarkedForAction) return;
     let response = await api.deleteMapById(store.mapIdMarkedForAction);  
     if(response.status === 200){
       storeReducer({

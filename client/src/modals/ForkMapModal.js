@@ -18,7 +18,7 @@ export default function ForkMapModal(props) {
     store.forkMapByMarkedId();
   }
 
-  if(store.currentModal == CurrentModal.FORK_MAP){
+  if(store.currentModal === CurrentModal.FORK_MAP){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg w-96 text-center">

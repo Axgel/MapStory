@@ -35,10 +35,18 @@ export default function EditToolbar() {
 
   function setCurrentEditMode(e, currentEditMode){
     e.stopPropagation();
-    if(currentEditMode == file.currentEditMode){
+    if(currentEditMode === file.currentEditMode){
       currentEditMode = EditMode.NONE;
     }
     file.setCurrentEditMode(currentEditMode);
+  }
+
+  function handleUndo() {
+    file.handleUndo();
+  }
+
+  function handleRedo() {
+    file.handleRedo();
   }
 
   function handleUpdateTitle(e){
@@ -88,14 +96,14 @@ export default function EditToolbar() {
           <div className="w-[1px] bg-black h-full"></div>
 
           <div className="flex gap-4 px-3">
-            <img src={UndoIcon} alt=""></img>
-            <img src={RedoIcon} alt=""></img>
+            <img src={UndoIcon} onClick={handleUndo} alt=""></img>
+            <img src={RedoIcon} onClick={handleRedo} alt=""></img>
           </div>
 
           <div className="w-[1px] bg-black h-full"></div>
 
           <div className="flex gap-4 px-3">
-            <img src={AddVertexIcon} alt=""></img>
+            <img src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX)} alt=""></img>
             <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
           </div>
 
