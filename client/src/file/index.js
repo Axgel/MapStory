@@ -58,7 +58,7 @@ function GlobalFileContextProvider(props) {
 
   useEffect(() => {
     if(!auth.user) return;
-    
+    console.log(`queueLen: ${queue.length}`);
     auth.socket.on('version', (data) => {
       if(data.version) {
         file.setVersion(data.version)
