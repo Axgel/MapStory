@@ -91,7 +91,7 @@ function AuthContextProvider(props) {
     try {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
-        const socket = await socketIO.connect('http://localhost:4000');
+        const socket = await socketIO.connect(process.env.REACT_APP_SOCKETIO);
         socket.on("connect", () => {
           authReducer({
             type: AuthActionType.GET_LOGGED_IN,

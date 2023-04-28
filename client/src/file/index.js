@@ -71,7 +71,7 @@ function GlobalFileContextProvider(props) {
       (so maybe removed items in the queue only up to server version)
     */
     auth.socket.on('owner-ack', (data) => {
-      console.log(file.version, data.serverVersion);
+      // console.log(file.version, data.serverVersion);
       setQueue([]);
     })
   
@@ -91,7 +91,7 @@ function GlobalFileContextProvider(props) {
         that the current state will be synced with server instead of simply adding 1 to the version.
       */
       if(serverVersion > file.version){
-        console.log(`packet outdated -> serverVersion: ${serverVersion} | localVersion: ${file.version}`);
+        // console.log(`packet outdated -> serverVersion: ${serverVersion} | localVersion: ${file.version}`);
         const transformedOps = file.transformOps(queue, op);
         file.applyOps(file.subregions, transformedOps, serverVersion);
         setQueue([]);
