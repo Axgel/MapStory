@@ -46,7 +46,7 @@ function GlobalFileContextProvider(props) {
       We then emit the message with the operation. Remember this is still all happening on User A. User A can now see the updated
       edit map region on the screen, but User B has not yet received that change.
     */
-    file.incrementVersionAndUpdateSubregions(tmpSendOp.op);
+    file.updateSubregions(tmpSendOp.op);
     auth.socket.emit('sendOp', {
       mapId: tmpSendOp.mapId,
       subregionId: tmpSendOp.subregionId,
@@ -71,31 +71,19 @@ function GlobalFileContextProvider(props) {
       (so maybe removed items in the queue only up to server version)
     */
     auth.socket.on('owner-ack', (data) => {
-      // console.log(file.version, data.serverVersion);
-      setQueue([]);
+      file.incrementVersion();
+      setQueue(queue.slice(1));
     })
   
     /* STEP 6: All other users receive the change */
     auth.socket.on('others-ack', (data) => {
-      const {serverVersion, op} = data;
-
-      /* STEP 7: If the server is ahead of the local client (in this case lets say user B),
-        we need to properly transform the operations.
-        At this stage, user B could have some map edit changes LOCALLY that were not yet recognized by the server.
-        Thus these local changes are stored in User B's queue but not yet acknowledged by the server.
-        Because of this, to update User B's local client, some transforming might need to happen
-
-        We make a call to transformOps which will convert User A's changes and make it fit with User B's changes
-        Now that we have a new transformed operation, we need to apply it through the applyOps call.
-        applyOps is similar to incrementVersionAndUpd... but the version that we want to send to the state is that of the server, which means
-        that the current state will be synced with server instead of simply adding 1 to the version.
-      */
-      if(serverVersion > file.version){
-        // console.log(`packet outdated -> serverVersion: ${serverVersion} | localVersion: ${file.version}`);
-        const transformedOps = file.transformOps(queue, op);
-        file.applyOps(file.subregions, transformedOps, serverVersion);
-        setQueue([]);
+      const {serverVersion, op} = data
+      if(!queue.length) {
+        file.incrementVersionAndUpdateSubregions(op);
+      } else {
+        file.transformOps(queue, op);
       }
+      
     });
 
     return () => {
@@ -104,25 +92,11 @@ function GlobalFileContextProvider(props) {
 
   }, [auth, file, queue])
   
-  file.applyOps = function(subregions, ops, serverVersion){
-    const newSubregions = json1.type.apply(subregions, ops);
-
-    fileReducer({
-      type: GlobalFileActionType.INCREMENT_VERSION_AND_UPDATE_SUBREGIONS,
-      payload: {subregions: newSubregions, version: serverVersion}
-    })
-  }
   
-  file.transformOps = function(opsQueue, serverOp, currentVersion) {
-    let transformedOp = serverOp;
-    for(const { version: queuedVersion, op: queuedOp } of opsQueue){
-      if (queuedVersion > currentVersion) {
-        transformedOp = json1.type.compose(transformedOp, queuedOp);
-      } else {
-        transformedOp = json1.type.transform(transformedOp, queuedOp, "left");
-      }
-    }
-    return transformedOp;
+  file.transformOps = function(opsQueue, serverOp) {
+    const composed = opsQueue.reduce((total, op) => json1.type.compose(total, op));
+    const newServerOp = json1.type.transform(serverOp, composed, "left");
+    file.incrementVersionAndUpdateSubregions(newServerOp);
   }
 
   const fileReducer = (action) => {
@@ -274,7 +248,7 @@ function GlobalFileContextProvider(props) {
       Append the current local version and operation that was performed to the queue
       The queue will store the local changes that has not yet been confirmed by the server
     */
-    setQueue([...queue, {version: file.version, op: op}]);
+    setQueue([...queue, op]);
     const transaction = new Test_Transaction(file, subregionId, op);
     /* STEP 2: Create the transaction and add it to the tps
       When the transaction is added, it will call the doTransaction() (based in the jstps api) function, which performs
@@ -301,7 +275,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, indexPath);
 
     const op = json1.replaceOp(path, oldVal, newVal);
-    setQueue([...queue, {version: file.version, op: op}]);
+    setQueue([...queue, op]);
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -311,7 +285,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, e.indexPath);
     const op = json1.removeOp(path, data);
 
-    setQueue([...queue, {version: file.version, op: op}]);
+    setQueue([...queue, op]);
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
