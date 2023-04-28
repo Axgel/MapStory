@@ -109,7 +109,12 @@ function GlobalFileContextProvider(props) {
   
   
   file.transformOps = function(opsQueue, serverOp) {
-    const composed = opsQueue.reduce((total, op) => json1.type.compose(total, op.op));
+
+    let composed = opsQueue[0].op;
+    for(let i=1; i<opsQueue.length; i++){
+      composed = json1.type.compose(composed, opsQueue[i].op);
+    }
+
     const newServerOp = json1.type.transform(serverOp, composed, "left");
     file.incrementVersionAndUpdateSubregions(newServerOp);
   }
