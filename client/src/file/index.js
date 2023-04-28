@@ -24,6 +24,7 @@ function GlobalFileContextProvider(props) {
   const { store } = useContext(GlobalStoreContext);
   const navigate = useNavigate();
   
+  const [isFree, setIsFree] = useState(true);
   const [queue, setQueue] = useState([]);   
   const [tmpSendOp, setTmpSendOp] = useState(null);
   const [file, setFile] = useState({
@@ -47,14 +48,24 @@ function GlobalFileContextProvider(props) {
       edit map region on the screen, but User B has not yet received that change.
     */
     file.updateSubregions(tmpSendOp.op);
-    auth.socket.emit('sendOp', {
+    file.sendOp({
       mapId: tmpSendOp.mapId,
-      subregionId: tmpSendOp.subregionId,
-      op : tmpSendOp.op,
-      version : file.version
+      subregionId: tmpSendOp.subregionId
     })
     setTmpSendOp(null);
   }, [tmpSendOp])
+
+  useEffect(() => {
+    if(!queue.length || !isFree) return;
+
+    file.sendOp({
+      mapId: queue[0].mapId,
+      subregionId: queue[0].subregionId
+    })
+
+    setIsFree(false);
+
+  }, [isFree])
 
   useEffect(() => {
     if(!auth.user) return;
@@ -74,6 +85,7 @@ function GlobalFileContextProvider(props) {
       console.log(`owner: ${data.serverVersion}`);
       file.incrementVersion();
       setQueue(queue.slice(1));
+      setIsFree(true);
     })
   
     /* STEP 6: All other users receive the change */
@@ -85,6 +97,7 @@ function GlobalFileContextProvider(props) {
       } else {
         file.transformOps(queue, op);
       }
+      setIsFree(true);
       
     });
 
@@ -96,9 +109,20 @@ function GlobalFileContextProvider(props) {
   
   
   file.transformOps = function(opsQueue, serverOp) {
-    const composed = opsQueue.reduce((total, op) => json1.type.compose(total, op));
+    const composed = opsQueue.reduce((total, op) => json1.type.compose(total, op.op));
     const newServerOp = json1.type.transform(serverOp, composed, "left");
     file.incrementVersionAndUpdateSubregions(newServerOp);
+  }
+
+  file.sendOp = function(msg){
+    if(!queue.length || !isFree) return;
+
+    auth.socket.emit('sendOp', {
+      mapId: msg.mapId,
+      subregionId: msg.subregionId,
+      op : queue[0].op,
+      version : file.version
+    })
   }
 
   const fileReducer = (action) => {
@@ -250,7 +274,7 @@ function GlobalFileContextProvider(props) {
       Append the current local version and operation that was performed to the queue
       The queue will store the local changes that has not yet been confirmed by the server
     */
-    setQueue([...queue, op]);
+    setQueue([...queue, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]);
     const transaction = new Test_Transaction(file, subregionId, op);
     /* STEP 2: Create the transaction and add it to the tps
       When the transaction is added, it will call the doTransaction() (based in the jstps api) function, which performs
@@ -277,7 +301,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, indexPath);
 
     const op = json1.replaceOp(path, oldVal, newVal);
-    setQueue([...queue, op]);
+    setQueue([...queue, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]);
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -287,7 +311,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, e.indexPath);
     const op = json1.removeOp(path, data);
 
-    setQueue([...queue, op]);
+    setQueue([...queue, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]);
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
