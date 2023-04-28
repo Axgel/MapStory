@@ -224,7 +224,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, e.indexPath);
     
     const op = json1.insertOp(path, data);
-    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]));
+    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -246,7 +246,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, indexPath);
 
     const op = json1.replaceOp(path, oldVal, newVal);
-    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]));
+    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -256,7 +256,7 @@ function GlobalFileContextProvider(props) {
     const path = createVertexOperationPath(subregionId, e.indexPath);
     const op = json1.removeOp(path, data);
 
-    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapid, subregionId: subregionId, op: op}]));
+    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
   }
