@@ -11,9 +11,11 @@ export default function ForkMapModal(props) {
   const mapInfo = store.selectedMap;
 
   const collaboratorsUsernames = [];
-  store.collaborators.forEach(collaborator => {
-    collaboratorsUsernames.push(collaborator.userName)
-  }); 
+  if(store.collaborators){
+    store.collaborators.forEach(collaborator => {
+      collaboratorsUsernames.push(collaborator.userName)
+    }); 
+  }
 
   let titleElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.title}</p> : <></>; 
   let ownerElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.ownerName}</p> : <></>; 
