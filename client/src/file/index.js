@@ -99,7 +99,7 @@ function GlobalFileContextProvider(props) {
         for(const ops of queue){
           let tmpOp = ops.op;
           tmpOp = json1.type.transform(tmpOp, op, "right");
-          newQueue.push({op: tmpOp, mapId: ops.mapId, subregionid: ops.subregionId});
+          newQueue.push({op: tmpOp, mapId: ops.mapId, subregionId: ops.subregionId});
         }
         console.log(newQueue);
         setQueue(newQueue);
