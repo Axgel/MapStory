@@ -37,14 +37,14 @@ function GlobalFileContextProvider(props) {
   
   useEffect(() => {
     if(!tmpSendOp || !auth.user) return;
-
+    
     file.updateSubregions(tmpSendOp.op);
-    file.sendOp({
-      mapId: tmpSendOp.mapId,
-      subregionId: tmpSendOp.subregionId
-    })
+    // file.sendOp({
+    //   mapId: tmpSendOp.mapId,
+    //   subregionId: tmpSendOp.subregionId
+    // })
     setTmpSendOp(null);
-  }, [tmpSendOp])
+  }, [tmpSendOp, queue])
 
   useEffect(() => {
     if(!queue.length || !isFree[0]) return;
@@ -56,7 +56,7 @@ function GlobalFileContextProvider(props) {
 
     setIsFree([false]);
 
-  }, [isFree])
+  }, [isFree, queue])
 
   useEffect(() => {
     if(!auth.user || !auth.socket) return;
