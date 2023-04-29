@@ -53,7 +53,8 @@ function GlobalFileContextProvider(props) {
 
     file.sendOp({
       mapId: queue[0].mapId,
-      subregionId: queue[0].subregionId
+      subregionId: queue[0].subregionId,
+      op: queue[0].op
     })
 
     setIsFree([false]);
@@ -122,7 +123,7 @@ function GlobalFileContextProvider(props) {
     auth.socket.emit('sendOp', {
       mapId: msg.mapId,
       subregionId: msg.subregionId,
-      op : queue[0].op,
+      op : msg.op,
       version : version
     })
   }
