@@ -70,7 +70,7 @@ function GlobalFileContextProvider(props) {
     auth.socket.on('owner-ack', (data) => {
       console.log(`owner: ${data.serverVersion}`);
       setVersion((prev) => (prev + 1));
-      const tmpQueue = JSON.parse(JSON.stringify(queue));
+      const tmpQueue = [...queue];
       setQueue(tmpQueue.slice(1));
       setIsFree([true]);
     })
