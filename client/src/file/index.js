@@ -251,7 +251,7 @@ function GlobalFileContextProvider(props) {
     }
   
     const oldVal2 = [oldVal[0], oldVal[1]];
-
+    console.log(oldVal2, newVal);
     const path = createVertexOperationPath(subregionId, indexPath);
 
     const op = json1.replaceOp(path, oldVal2, newVal);
