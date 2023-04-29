@@ -53,6 +53,8 @@ switch (process.env.ENVIRONMENT) {
 
       socket.on('sendOp', async (packet) => {
         const { mapId, subregionId, op, version} = packet;
+        console.log("Current Version: " + mapProjects[mapId].version);
+        console.log("Incoming Version: " + version);
         if(mapProjects[mapId].version === version) {
           const done = await updateSubregions(subregionId, op);
           if(done) {
