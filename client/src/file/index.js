@@ -24,7 +24,7 @@ function GlobalFileContextProvider(props) {
   const { store } = useContext(GlobalStoreContext);
   const navigate = useNavigate();
   
-  const [isFree, setIsFree] = useState(true);
+  const [isFree, setIsFree] = useState([true]);
   const [version, setVersion] = useState(1);
   const [queue, setQueue] = useState([]);   
   const [tmpSendOp, setTmpSendOp] = useState(null);
@@ -47,14 +47,14 @@ function GlobalFileContextProvider(props) {
   }, [tmpSendOp])
 
   useEffect(() => {
-    if(!queue.length || !isFree) return;
+    if(!queue.length || !isFree[0]) return;
 
     file.sendOp({
       mapId: queue[0].mapId,
       subregionId: queue[0].subregionId
     })
 
-    setIsFree(false);
+    setIsFree([false]);
 
   }, [isFree])
 
@@ -71,7 +71,7 @@ function GlobalFileContextProvider(props) {
       console.log(`owner: ${data.serverVersion}`);
       setVersion((prev) => (prev + 1));
       setQueue((prev) => (prev.slice(1)));
-      setIsFree(true);
+      setIsFree([true]);
     })
   
     auth.socket.on('others-ack', (data) => {
@@ -99,7 +99,7 @@ function GlobalFileContextProvider(props) {
         file.updateSubregions(newServerOp);
       }
       setVersion((prev) => (prev + 1));
-      setIsFree(true);
+      setIsFree([true]);
     });
 
     return () => {
@@ -109,7 +109,7 @@ function GlobalFileContextProvider(props) {
   }, [auth, file, queue, version])
   
   file.sendOp = function(msg){
-    if(!queue.length || !isFree) return;
+    if(!queue.length || !isFree[0]) return;
 
     auth.socket.emit('sendOp', {
       mapId: msg.mapId,
