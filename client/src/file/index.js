@@ -128,6 +128,13 @@ function GlobalFileContextProvider(props) {
     })
   }
 
+
+  file.clearEverything = function(v){
+    setQueue([]);
+    version = v;
+    setIsFree([true]);
+  }
+
   const fileReducer = (action) => {
     const { type, payload } = action;
     switch (type) {

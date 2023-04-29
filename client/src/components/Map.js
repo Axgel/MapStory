@@ -7,11 +7,13 @@ import GlobalFileContext from "../file";
 import { EditMode } from "../enums";
 import AuthContext from "../auth";
 import { useParams } from "react-router-dom";
+import GlobalStoreContext from "../store";
 const json1 = require('ot-json1');
 
 export default function Map() {
   const { auth } = useContext(AuthContext);
   const { file } = useContext(GlobalFileContext);
+  const { store } = useContext(GlobalStoreContext);
   const [mapRef, setMapRef] = useState(null);
   const [mapItem, setMapItem] = useState(null);
   const { mapId } = useParams();
@@ -27,6 +29,16 @@ export default function Map() {
   // Load all subregions into map
   useEffect(()=>{
     if(!auth.user || !mapItem ) return;
+
+    auth.socket.on('resync-op', (data) => {
+      console.log('resync-happened');
+      file.clearQueue();
+      file.setVersion(data.version);
+      file.loadAllSubregionsFromDb(mapId);
+      store.loadMapById(mapId);
+      file.loadAllRegionsToMap(mapItem);
+    })
+
 
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
