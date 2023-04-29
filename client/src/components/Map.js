@@ -32,8 +32,7 @@ export default function Map() {
 
     auth.socket.on('resync-op', (data) => {
       console.log('resync-happened');
-      file.clearQueue();
-      file.setVersion(data.version);
+      file.clearEverything(data.version);
       file.loadAllSubregionsFromDb(mapId);
       store.loadMapById(mapId);
       file.loadAllRegionsToMap(mapItem);
