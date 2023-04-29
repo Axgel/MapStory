@@ -249,10 +249,12 @@ function GlobalFileContextProvider(props) {
     for(const i of indexPath) {
       oldVal = oldVal[i];
     }
+  
+    const oldVal2 = [oldVal[0], oldVal[1]];
 
     const path = createVertexOperationPath(subregionId, indexPath);
 
-    const op = json1.replaceOp(path, oldVal, newVal);
+    const op = json1.replaceOp(path, oldVal2, newVal);
     setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
     const transaction = new Test_Transaction(file, subregionId, op);
     tps.addTransaction(transaction);
