@@ -44,7 +44,7 @@ function GlobalFileContextProvider(props) {
     //   subregionId: tmpSendOp.subregionId
     // })
     setTmpSendOp(null);
-  }, [tmpSendOp, queue])
+  }, [tmpSendOp])
 
   useEffect(() => {
     if(!queue.length || !isFree[0]) return;
