@@ -80,7 +80,7 @@ function GlobalFileContextProvider(props) {
       if(!queue.length) {
         file.updateSubregions(op);
       } else {
-        console.log(queue)
+        console.log(queue, op);
         let composed = queue[0].op;
         for(let i=1; i< queue.length; i++){
           composed = json1.type.compose(composed, queue[i].op);
