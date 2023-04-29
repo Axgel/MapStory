@@ -70,7 +70,8 @@ function GlobalFileContextProvider(props) {
     auth.socket.on('owner-ack', (data) => {
       console.log(`owner: ${data.serverVersion}`);
       setVersion((prev) => (prev + 1));
-      setQueue((prev) => (prev.slice(1)));
+      const tmpQueue = JSON.parse(JSON.stringify(queue));
+      setQueue(tmpQueue.slice(1));
       setIsFree([true]);
     })
   
@@ -86,7 +87,7 @@ function GlobalFileContextProvider(props) {
           composed = json1.type.compose(composed, queue[i].op);
         }
         const newServerOp = json1.type.transform(op, composed, "left");
-    
+        
         // const newQueue = queue.map(ops => ({...ops, op: json1.type.transform(ops.op, op, "right")}));
         const newQueue = [];
         for(const ops of queue){
