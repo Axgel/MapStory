@@ -68,6 +68,13 @@ switch (process.env.ENVIRONMENT) {
                 socketIO.to(client).emit('others-ack', {serverVersion: mapProjects[mapId].version, op: op});
               } 
             }
+          } else {
+            console.log("resyncing");
+            const clients = mapProjects[mapId].clients;
+            for(const client of clients) {
+              const version = {version : mapProjects[mapId].version};
+              socketIO.to(client).emit('resync-op', {'version': version});
+            }
           }
         }
       })
