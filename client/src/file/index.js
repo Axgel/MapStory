@@ -87,7 +87,14 @@ function GlobalFileContextProvider(props) {
         }
         const newServerOp = json1.type.transform(op, composed, "left");
     
-        const newQueue = queue.map(ops => ({...ops, op: json1.type.transform(ops.op, op, "right")}));
+        // const newQueue = queue.map(ops => ({...ops, op: json1.type.transform(ops.op, op, "right")}));
+        const newQueue = [];
+        for(const ops of queue){
+          let tmpOp = ops.op;
+          tmpOp = json1.type.transform(tmpOp, op, "right");
+          newQueue.push({op: tmpOp, mapId: ops.mapId, subregionid: ops.subregionId});
+        }
+        console.log(newQueue);
         setQueue(newQueue);
         file.updateSubregions(newServerOp);
       }
