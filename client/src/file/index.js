@@ -18,6 +18,8 @@ export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
 
 const tps = new jsTPS();
+let version = 1;
+
 
 function GlobalFileContextProvider(props) {
   const { auth } = useContext(AuthContext);
@@ -25,7 +27,7 @@ function GlobalFileContextProvider(props) {
   const navigate = useNavigate();
   
   const [isFree, setIsFree] = useState([true]);
-  const [version, setVersion] = useState(1);
+  // const [version, setVersion] = useState(1);
   const [queue, setQueue] = useState([]);   
   const [tmpSendOp, setTmpSendOp] = useState(null);
 
@@ -63,13 +65,16 @@ function GlobalFileContextProvider(props) {
 
     auth.socket.on('version', (data) => {
       if(data.version) {
-        setVersion(data.version);
+        // setVersion(data.version);
+        version = data.version
       }
     }); 
 
     auth.socket.on('owner-ack', (data) => {
       console.log(`owner: ${data.serverVersion}`);
-      setVersion((prev) => (prev + 1));
+      // setVersion((prev) => (prev + 1));
+      version += 1;
+      console.log("owner: ", version);
       const tmpQueue = [...queue];
       setQueue(tmpQueue.slice(1));
       setIsFree([true]);
@@ -99,7 +104,9 @@ function GlobalFileContextProvider(props) {
         setQueue(newQueue);
         file.updateSubregions(newServerOp);
       }
-      setVersion((prev) => (prev + 1));
+      // setVersion((prev) => (prev + 1));
+      version += 1;
+      console.log("others: ", version);
       setIsFree([true]);
     });
 
@@ -107,7 +114,7 @@ function GlobalFileContextProvider(props) {
       auth.socket.removeAllListeners();
     }
 
-  }, [auth, file, queue, version])
+  }, [auth, file, queue])
   
   file.sendOp = function(msg){
     if(!queue.length || !isFree[0]) return;
