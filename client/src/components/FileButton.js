@@ -29,13 +29,11 @@ export default function FileButton() {
   function toggleViewingMode(e){
     e.stopPropagation();
     document.getElementById("file-by-dd").classList.toggle("hidden");
-    //set EditMode === VIEW
     file.setCurrentEditMode(EditMode.VIEW);
   }
   function toggleEditingMode(e){
     e.stopPropagation();
     document.getElementById("file-by-dd").classList.toggle("hidden");
-    //set EditMode === VIEW
     file.setCurrentEditMode(EditMode.NONE);
   }
 
