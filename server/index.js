@@ -23,7 +23,7 @@ switch (process.env.ENVIRONMENT) {
     const wsServer = new WebSocketServer({server: httpsServer})
 
     wsServer.on('connection', (socket) => {
-      console.log('WebSocket client connected', socket);
+      console.log('WebSocket client connected');
     
     
       socket.on('close', () => {
