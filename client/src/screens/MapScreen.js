@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
-const json1 = require('ot-json1');
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);

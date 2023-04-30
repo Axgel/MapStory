@@ -8,7 +8,6 @@ import { EditMode } from "../enums";
 import AuthContext from "../auth";
 import { useParams } from "react-router-dom";
 import GlobalStoreContext from "../store";
-const json1 = require('ot-json1');
 
 export default function Map() {
   const { auth } = useContext(AuthContext);

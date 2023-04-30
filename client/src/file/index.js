@@ -12,8 +12,8 @@ import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
 import { Test_Transaction } from "../transactions";
 import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
-const json1 = require('ot-json1');
-
+//const json1 = require('ot-json1');
+const json0 = require('ot-json0');
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
 
@@ -39,22 +39,22 @@ function GlobalFileContextProvider(props) {
   
   useEffect(() => {
     if(!tmpSendOp || !auth.user) return;
+
+    const {mapId, subregionId, op} = tmpSendOp;
+    setQueue((prev) => ([...prev, {mapId: mapId, subregionId: subregionId, op: op}]));
+    file.updateSubregions(op);
     
-    file.updateSubregions(tmpSendOp.op);
-    // file.sendOp({
-    //   mapId: tmpSendOp.mapId,
-    //   subregionId: tmpSendOp.subregionId
-    // })
     setTmpSendOp(null);
   }, [tmpSendOp])
 
   useEffect(() => {
     if(!queue.length || !isFree[0]) return;
 
+    const {mapId, subregionId, op} = queue[0];
     file.sendOp({
-      mapId: queue[0].mapId,
-      subregionId: queue[0].subregionId,
-      op: queue[0].op
+      mapId: mapId,
+      subregionId: subregionId,
+      op: op
     })
 
     setIsFree([false]);
@@ -66,16 +66,14 @@ function GlobalFileContextProvider(props) {
 
     auth.socket.on('version', (data) => {
       if(data.version) {
-        // setVersion(data.version);
         version = data.version
       }
     }); 
 
     auth.socket.on('owner-ack', (data) => {
-      console.log(`owner: ${data.serverVersion}`);
-      // setVersion((prev) => (prev + 1));
+      const {serverVersion, op} = data
+      console.log(`owner: ${serverVersion}`);
       version += 1;
-      console.log("owner: ", version);
       const tmpQueue = [...queue];
       setQueue(tmpQueue.slice(1));
       setIsFree([true]);
@@ -87,27 +85,23 @@ function GlobalFileContextProvider(props) {
       if(!queue.length) {
         file.updateSubregions(op);
       } else {
-        console.log(queue, op);
         let composed = queue[0].op;
         for(let i=1; i< queue.length; i++){
-          composed = json1.type.compose(composed, queue[i].op);
+          composed = json0.type.compose(composed, queue[i].op);
         }
-        const newServerOp = json1.type.transform(op, composed, "left");
+        const newServerOp = json0.type.transform(op, composed, "left");
         
-        // const newQueue = queue.map(ops => ({...ops, op: json1.type.transform(ops.op, op, "right")}));
         const newQueue = [];
         for(const ops of queue){
           let tmpOp = ops.op;
-          tmpOp = json1.type.transform(tmpOp, op, "right");
+          tmpOp = json0.type.transform(tmpOp, op, "right");
           newQueue.push({op: tmpOp, mapId: ops.mapId, subregionId: ops.subregionId});
         }
-        console.log(newQueue);
         setQueue(newQueue);
         file.updateSubregions(newServerOp);
       }
-      // setVersion((prev) => (prev + 1));
+      tps.transformAllTransactions(op);
       version += 1;
-      console.log("others: ", version);
       setIsFree([true]);
     });
 
@@ -127,7 +121,6 @@ function GlobalFileContextProvider(props) {
       version : version
     })
   }
-
 
   file.clearEverything = function(v){
     setQueue([]);
@@ -201,7 +194,7 @@ function GlobalFileContextProvider(props) {
   }
 
   file.updateSubregions = function(op) {
-    const newSubregions = json1.type.apply(file.subregions, op);    
+    const newSubregions = json0.type.apply(file.subregions, op);    
     fileReducer({
       type: GlobalFileActionType.UPDATE_SUBREGIONS,
       payload: {subregions: newSubregions}
@@ -243,12 +236,13 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleVertexAdded = function(e, subregionId) {
-    const data = [e.latlng.lat, e.latlng.lng];
     const path = createVertexOperationPath(subregionId, e.indexPath);
-    
-    const op = json1.insertOp(path, data);
-    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
-    const transaction = new Test_Transaction(file, subregionId, op);
+    const data = [e.latlng.lat, e.latlng.lng];
+
+    const mapId = file.subregions[subregionId].mapId
+    //const op = json1.insertOp(path, data);
+    const op = [{p:path, li:data}]
+    const transaction = new Test_Transaction(file, mapId, subregionId, op);
     tps.addTransaction(transaction);
   }
 
@@ -265,30 +259,29 @@ function GlobalFileContextProvider(props) {
     for(const i of indexPath) {
       oldVal = oldVal[i];
     }
-  
-    const oldVal2 = [oldVal[0], oldVal[1]];
-    console.log(oldVal2, newVal);
-    const path = createVertexOperationPath(subregionId, indexPath);
 
-    const op = json1.replaceOp(path, oldVal2, newVal);
-    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
-    const transaction = new Test_Transaction(file, subregionId, op);
+    const path = createVertexOperationPath(subregionId, indexPath);
+    
+    const mapId = file.subregions[subregionId].mapId
+    const op = [{p:path, ld:oldVal, li:newVal}]
+    const transaction = new Test_Transaction(file, mapId, subregionId, op);
     tps.addTransaction(transaction);
   }
 
   file.handleVertexRemoved = function(e, subregionId) {
-    const data = [e.marker._latlng.lat, e.marker._latlng.lng];
     const path = createVertexOperationPath(subregionId, e.indexPath);
-    const op = json1.removeOp(path, data);
+    const data = [e.marker._latlng.lat, e.marker._latlng.lng];
 
-    setQueue((prev) => ([...prev, {mapId: file.subregions[subregionId].mapId, subregionId: subregionId, op: op}]));
-    const transaction = new Test_Transaction(file, subregionId, op);
+    const mapId = file.subregions[subregionId].mapId
+    // const op = json1.removeOp(path, data);
+    const op = [{p:path, ld:data}]
+    const transaction = new Test_Transaction(file, mapId, subregionId, op);
     tps.addTransaction(transaction);
   }
 
-  file.sendOpMiddleware = function(subregionId, op) {
+  file.sendOpMiddleware = function(mapId, subregionId, op) {
     setTmpSendOp({
-      mapId: file.subregions[subregionId].mapId,
+      mapId: mapId,
       subregionId: subregionId,
       op : op
     });
