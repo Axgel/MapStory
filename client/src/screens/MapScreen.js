@@ -14,14 +14,18 @@ export default function MapScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
+  const [items, setItems] = useState([]);
   const fileState = useSyncedStore(fileStore);
   const ydoc = getYjsValue(fileState);
-  const array2 = getYjsValue()
+  const array2 = getYjsValue(fileState.items);
   const array = ydoc.getArray('items');
-  const undoManager = new Y.UndoManager(array)
+  // const undoManager = new Y.UndoManager(array)
+  const [undoManager] = useState(() => new Y.UndoManager(array));
 
   function handleClick(e){
-    array.insert(0, ["qq"]);
+    ydoc.transact(() => {
+      array.insert(0, ["kk"]);
+    });
     undoManager.stopCapturing()
     console.log(JSON.stringify(array));
   }
@@ -53,7 +57,7 @@ export default function MapScreen() {
       <button onClick={pop}>pop</button>
       <br></br>
       
-        {array.map((item, i) => {
+        {array2.map((item, i) => {
           return (
             <p key={i}>{item}</p>
           );
