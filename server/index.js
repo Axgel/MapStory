@@ -3,6 +3,8 @@ const app = require('./app')
 const http = require("http");
 const https = require("https");
 const fs = require("fs");
+const { WebSocketServer } = require('ws');
+const ReconnectingWebSocket = require('reconnecting-websocket');
 
 
 // CREATE OUR SERVER
@@ -25,7 +27,23 @@ switch (process.env.ENVIRONMENT) {
     break;
   default:
     // server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-    const httpSocketServer = http.createServer(app);
-    httpSocketServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
+    const httpWSServer = http.createServer(app);
+
+    const wsServer = new WebSocketServer({server: httpWSServer})
+
+    wsServer.on('connection', (socket) => {
+      console.log('WebSocket client connected');
+    
+      socket.on('message', (data) => {
+        console.log('Received data:');
+        // Handle incoming data from the client
+      });
+    
+      socket.on('close', () => {
+        console.log('WebSocket client disconnected');
+      });
+    });
+
+    httpWSServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
     break;
   }

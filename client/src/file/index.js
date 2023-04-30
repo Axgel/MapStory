@@ -10,8 +10,10 @@ import AuthContext from "../auth";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
-import { Test_Transaction } from "../transactions";
-import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
+import { fileStore } from "./file";
+import { useSyncedStore } from '@syncedstore/react';
+import { boxed, getYjsValue } from "@syncedstore/core";
+
 
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
@@ -30,7 +32,6 @@ function GlobalFileContextProvider(props) {
     editRegions: {},
   });
 
-  
 
   const fileReducer = (action) => {
     const { type, payload } = action;
