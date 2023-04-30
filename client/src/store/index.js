@@ -24,6 +24,7 @@ function GlobalStoreContextProvider(props) {
     publishedMaps: [],
     personalMaps: [],
     sharedMaps: [],
+    comments: [],
     selectedMap: null,
     collaborators: [],
     selectedMapOwner: null,
@@ -100,6 +101,12 @@ function GlobalStoreContextProvider(props) {
           ...store,
           currentModal: CurrentModal.NONE,
           mapIdMarkedForAction: null,
+        })
+      }
+      case GlobalStoreActionType.LOAD_MAP_COMMENTS:{
+        return setStore({
+          ...store,
+          comments: payload.comments,
         })
       }
       default:
@@ -285,6 +292,24 @@ function GlobalStoreContextProvider(props) {
     })
   }
 
+  store.loadCommentsByMap = async function () {
+    let asyncComments = [];
+    const comments = [];
+    if(this.selectedMap){
+      for(const commentId of this.selectedMap.comments){
+        asyncComments.push(api.getCommentById(commentId));
+      }
+    }
+    asyncComments = await Promise.all(asyncComments);
+    for(const res of asyncComments){
+      comments.push(res.data);
+    }
+    storeReducer({
+      type: GlobalStoreActionType.LOAD_MAP_COMMENTS,
+      payload: {comments: comments},
+    });
+  }
+
   store.publishMapByMarkedId = async function(){
     if(!store.mapIdMarkedForAction) return;
 
@@ -386,6 +411,13 @@ function GlobalStoreContextProvider(props) {
     }
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.NONE);
+    }
+  }
+
+  store.addComment = async function (newComment){
+    let response = await api.addCommentById(store.selectedMap._id, auth.user._id, newComment);
+    if(response.status === 200){
+      store.loadCommentsByMap();
     }
   }
   

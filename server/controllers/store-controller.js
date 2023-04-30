@@ -1,6 +1,7 @@
 const User = require("../models/user-model");
 const Subregion = require("../models/subregion-model");
 const MapProject = require("../models/mapproject-model");
+const Comment = require("../models/comment-model");
 
 createSubregion = (req, res) => {
   const body = req.body;
@@ -411,6 +412,60 @@ updateVote = async(req,res) =>{
   }
 }
 
+getCommentById = async(req,res) => {
+  try{
+    Comment.findOne({ _id: req.params.commentId}, async (err, comment) => {
+      let username = await User.findOne({_id: comment.user});
+      console.log(username.userName);
+      console.log(comment.comment)
+      return res.status(200).json({
+        username: username.userName,
+        comment: comment.comment
+      })
+    })
+  } catch(err){
+    return res.status(400).json({
+      error: 'Unable to get comment'
+    })
+  }
+}
+
+addComment = async(req,res) =>{
+  try{
+    const body = req.body;
+    if(!body){
+      return res.status(400).json({
+        error: 'You must provide a comment to input'
+      })
+    }
+    console.log('before creation')
+    //create the comment 
+    const newComment = new Comment({
+      user: body.userId, 
+      comment: body.comment
+    });
+    newComment.save();
+    console.log(newComment)
+    //append the id of new comment to the map.comments array
+    await MapProject.findOne({_id: req.params.mapId}, (err, mapProject) => {
+      mapProject.comments.push(newComment._id);
+      console.log(mapProject);
+      mapProject.save().then(() => {
+        newComment.save();
+      })
+    })
+    
+    return res.status(200).json({
+      message: "Map project comment added"
+    })
+
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured adding comment'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
@@ -427,5 +482,7 @@ module.exports = {
   addCollaborators,
   removeCollaborators,
   getUserById,
-  updateVote
+  updateVote, 
+  getCommentById, 
+  addComment
 };
