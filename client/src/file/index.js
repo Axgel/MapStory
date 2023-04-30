@@ -12,8 +12,8 @@ import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
 import { Test_Transaction } from "../transactions";
 import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
-const json1 = require('ot-json1');
-
+//const json1 = require('ot-json1');
+const json0 = require('ot-json0');
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
 
@@ -87,14 +87,14 @@ function GlobalFileContextProvider(props) {
       } else {
         let composed = queue[0].op;
         for(let i=1; i< queue.length; i++){
-          composed = json1.type.compose(composed, queue[i].op);
+          composed = json0.type.compose(composed, queue[i].op);
         }
-        const newServerOp = json1.type.transform(op, composed, "left");
+        const newServerOp = json0.type.transform(op, composed, "left");
         
         const newQueue = [];
         for(const ops of queue){
           let tmpOp = ops.op;
-          tmpOp = json1.type.transform(tmpOp, op, "right");
+          tmpOp = json0.type.transform(tmpOp, op, "right");
           newQueue.push({op: tmpOp, mapId: ops.mapId, subregionId: ops.subregionId});
         }
         setQueue(newQueue);
@@ -194,7 +194,7 @@ function GlobalFileContextProvider(props) {
   }
 
   file.updateSubregions = function(op) {
-    const newSubregions = json1.type.apply(file.subregions, op);    
+    const newSubregions = json0.type.apply(file.subregions, op);    
     fileReducer({
       type: GlobalFileActionType.UPDATE_SUBREGIONS,
       payload: {subregions: newSubregions}
@@ -240,7 +240,8 @@ function GlobalFileContextProvider(props) {
     const data = [e.latlng.lat, e.latlng.lng];
 
     const mapId = file.subregions[subregionId].mapId
-    const op = json1.insertOp(path, data);
+    //const op = json1.insertOp(path, data);
+    const op = [{p:path, li:data}]
     const transaction = new Test_Transaction(file, mapId, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -258,13 +259,11 @@ function GlobalFileContextProvider(props) {
     for(const i of indexPath) {
       oldVal = oldVal[i];
     }
-  
-    const oldVal2 = [oldVal[0], oldVal[1]];
 
     const path = createVertexOperationPath(subregionId, indexPath);
     
     const mapId = file.subregions[subregionId].mapId
-    const op = json1.replaceOp(path, oldVal2, newVal);
+    const op = [{p:path, ld:oldVal, li:newVal}]
     const transaction = new Test_Transaction(file, mapId, subregionId, op);
     tps.addTransaction(transaction);
   }
@@ -274,7 +273,8 @@ function GlobalFileContextProvider(props) {
     const data = [e.marker._latlng.lat, e.marker._latlng.lng];
 
     const mapId = file.subregions[subregionId].mapId
-    const op = json1.removeOp(path, data);
+    // const op = json1.removeOp(path, data);
+    const op = [{p:path, ld:data}]
     const transaction = new Test_Transaction(file, mapId, subregionId, op);
     tps.addTransaction(transaction);
   }
