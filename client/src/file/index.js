@@ -10,15 +10,16 @@ import AuthContext from "../auth";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
-import { Test_Transaction } from "../transactions";
-import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
-//const json1 = require('ot-json1');
-const json0 = require('ot-json0');
+
+import { fileStore } from "./file";
+import { useSyncedStore } from '@syncedstore/react';
+import { boxed, getYjsValue } from "@syncedstore/core";
+import * as Y from 'yjs'
+
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
 
 const tps = new jsTPS();
-let version = 1;
 
 
 function GlobalFileContextProvider(props) {
@@ -26,107 +27,31 @@ function GlobalFileContextProvider(props) {
   const { store } = useContext(GlobalStoreContext);
   const navigate = useNavigate();
   
-  const [isFree, setIsFree] = useState([true]);
-  // const [version, setVersion] = useState(1);
-  const [queue, setQueue] = useState([]);   
-  const [tmpSendOp, setTmpSendOp] = useState(null);
-
   const [file, setFile] = useState({
-    subregions: {},
     currentEditMode: EditMode.NONE,
     editRegions: {},
   });
-  
-  useEffect(() => {
-    if(!tmpSendOp || !auth.user) return;
 
-    const {mapId, subregionId, op} = tmpSendOp;
-    setQueue((prev) => ([...prev, {mapId: mapId, subregionId: subregionId, op: op}]));
-    file.updateSubregions(op);
-    
-    setTmpSendOp(null);
-  }, [tmpSendOp])
+  const fileState = useSyncedStore(fileStore);
+  const ydoc = getYjsValue(fileState);
+  const fileStateSubregions = ydoc.getMap('subregions');
+  const refresh = ydoc.getArray('refresh');
 
-  useEffect(() => {
-    if(!queue.length || !isFree[0]) return;
-
-    const {mapId, subregionId, op} = queue[0];
-    file.sendOp({
-      mapId: mapId,
-      subregionId: subregionId,
-      op: op
+  const [undoManager] = useState(() => {
+    console.log("ran once");
+    return new Y.UndoManager(fileStateSubregions, {
+      trackedOrigins: new Set([42])
     })
+  });
 
-    setIsFree([false]);
-
-  }, [isFree, queue])
-
-  useEffect(() => {
-    if(!auth.user || !auth.socket) return;
-
-    auth.socket.on('version', (data) => {
-      if(data.version) {
-        version = data.version
-      }
-    }); 
-
-    auth.socket.on('owner-ack', (data) => {
-      const {serverVersion, op} = data
-      console.log(`owner: ${serverVersion}`);
-      version += 1;
-      const tmpQueue = [...queue];
-      setQueue(tmpQueue.slice(1));
-      setIsFree([true]);
-    })
+  undoManager.on('stack-item-added', event => {
+    console.log(undoManager.undoStack.length);
+  })
   
-    auth.socket.on('others-ack', (data) => {
-      const {serverVersion, op} = data
-      console.log(`others: ${serverVersion}`);
-      if(!queue.length) {
-        file.updateSubregions(op);
-      } else {
-        let composed = queue[0].op;
-        for(let i=1; i< queue.length; i++){
-          composed = json0.type.compose(composed, queue[i].op);
-        }
-        const newServerOp = json0.type.transform(op, composed, "left");
-        
-        const newQueue = [];
-        for(const ops of queue){
-          let tmpOp = ops.op;
-          tmpOp = json0.type.transform(tmpOp, op, "right");
-          newQueue.push({op: tmpOp, mapId: ops.mapId, subregionId: ops.subregionId});
-        }
-        setQueue(newQueue);
-        file.updateSubregions(newServerOp);
-      }
-      tps.transformAllTransactions(op);
-      version += 1;
-      setIsFree([true]);
-    });
+  undoManager.on('stack-item-popped', event => {
+    console.log(event);
+  })
 
-    return () => {
-      auth.socket.removeAllListeners();
-    }
-
-  }, [auth, file, queue])
-  
-  file.sendOp = function(msg){
-    if(!queue.length || !isFree[0]) return;
-
-    auth.socket.emit('sendOp', {
-      mapId: msg.mapId,
-      subregionId: msg.subregionId,
-      op : msg.op,
-      version : version
-    })
-  }
-
-  file.clearEverything = function(v){
-    setQueue([]);
-    version = v;
-    setIsFree([true]);
-  }
 
   const fileReducer = (action) => {
     const { type, payload } = action;
@@ -134,7 +59,6 @@ function GlobalFileContextProvider(props) {
       case GlobalFileActionType.LOAD_SUBREGIONS: {
         return setFile({
           ...file,
-          subregions: payload.subregions,
           currentEditMode: EditMode.NONE,
           editRegions: [],
         })
@@ -151,10 +75,9 @@ function GlobalFileContextProvider(props) {
           editRegions: payload.editRegions
         })
       }
-      case GlobalFileActionType.UPDATE_SUBREGIONS: {
+      case GlobalFileActionType.REFRESH: {
         return setFile({
-          ...file,
-          subregions: payload.subregions,
+          ...file
         })
       }
       default:
@@ -165,10 +88,15 @@ function GlobalFileContextProvider(props) {
   file.loadAllSubregionsFromDb = async function(mapId) {
     let response = await api.getAllSubregions(mapId);
     if(response.status === 200){
-      fileReducer({
-        type: GlobalFileActionType.LOAD_SUBREGIONS,
-        payload: {subregions: response.data.subregions}
-      })
+      for(const [key, value] of Object.entries(response.data.subregions)){
+        if(fileStateSubregions.has(key)){
+          ydoc.transact(() => {
+            fileStateSubregions.delete(key);
+          })
+        }
+        fileStateSubregions.set(key, value);
+        
+      }
     }
   }
 
@@ -186,20 +114,13 @@ function GlobalFileContextProvider(props) {
     } else {
       newEditRegions[subregionId] = e.target;
     }
-
+    console.log("s");
     fileReducer({
       type: GlobalFileActionType.UPDATE_EDIT_REGIONS,
       payload: {editRegions: newEditRegions}
     })
   }
 
-  file.updateSubregions = function(op) {
-    const newSubregions = json0.type.apply(file.subregions, op);    
-    fileReducer({
-      type: GlobalFileActionType.UPDATE_SUBREGIONS,
-      payload: {subregions: newSubregions}
-    })
-  }
 
   file.initMapContainer = function(mapRef) {
     const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
@@ -213,20 +134,21 @@ function GlobalFileContextProvider(props) {
   }
 
   file.loadAllRegionsToMap = function(mapItem) {
-    for(const subregionId in file.subregions){
-      const region = file.subregions[subregionId];
+    if(Object.keys(fileStateSubregions).length == 0) return;
+    for(const subregion of fileStateSubregions){
+      const region = subregion[1];
+      if(!region || Object.keys(region).length == 0) continue;
       const layer = L.polygon(region.coordinates).addTo(mapItem);
-      file.initLayerHandlers(layer, subregionId);
-
-      if (file.editRegions[subregionId]) {
+      file.initLayerHandlers(layer, region._id);
+      if(file.editRegions[region._id]){
         layer.setStyle({ fillColor: 'red'});   
         if(file.currentEditMode === EditMode.ADD_VERTEX || file.currentEditMode === EditMode.EDIT_VERTEX) {
           file.enableLayerOptions(layer);
         }
       }
-
     }
   }
+
 
   file.initLayerHandlers = function(layer, subregionId) {
     layer.on('click', (e) => file.handleClickLayer(e, subregionId));
@@ -236,55 +158,54 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleVertexAdded = function(e, subregionId) {
-    const path = createVertexOperationPath(subregionId, e.indexPath);
-    const data = [e.latlng.lat, e.latlng.lng];
 
-    const mapId = file.subregions[subregionId].mapId
-    //const op = json1.insertOp(path, data);
-    const op = [{p:path, li:data}]
-    const transaction = new Test_Transaction(file, mapId, subregionId, op);
-    tps.addTransaction(transaction);
+    const [i,j,k] = e.indexPath;
+    const newVal = [e.latlng.lat, e.latlng.lng];
+
+    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
+    newSubregion["coordinates"][i][j].splice(k, 0, newVal);
+
+    ydoc.transact(() => {
+      fileStateSubregions.set(subregionId, newSubregion);
+      undoManager.stopCapturing();
+    }, 42)   
+
+    return;
+
   }
 
   file.handleMarkerDragEnd = function(e, subregionId) {
-    if(!e.indexPath) return;
-    let indexPath = e.indexPath;
-    let temp = e.layer.getLatLngs();
-    for(const i of indexPath) {
-      temp = temp[i];
-    }
+    const [i,j,k] = e.indexPath;
+    let temp = e.layer.getLatLngs()[i][j][k];
     const newVal = [temp.lat, temp.lng];
     
-    let oldVal = file.subregions[subregionId].coordinates;
-    for(const i of indexPath) {
-      oldVal = oldVal[i];
-    }
+    // fileStateSubregions.get(subregionId)["coordinates"][i][j][k] = newVal;
+    // fileStateSubregions.get(subregionId)["coordinates"][i][j][k] = [36, -88];
+    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
+    newSubregion["coordinates"][i][j][k] = newVal;
 
-    const path = createVertexOperationPath(subregionId, indexPath);
-    
-    const mapId = file.subregions[subregionId].mapId
-    const op = [{p:path, ld:oldVal, li:newVal}]
-    const transaction = new Test_Transaction(file, mapId, subregionId, op);
-    tps.addTransaction(transaction);
+    ydoc.transact(() => {
+      console.log(JSON.stringify(refresh));
+      // refresh.insert(0, ['a']);
+      fileStateSubregions.set(subregionId, newSubregion);
+      undoManager.stopCapturing();
+    }, 42)
   }
 
   file.handleVertexRemoved = function(e, subregionId) {
-    const path = createVertexOperationPath(subregionId, e.indexPath);
-    const data = [e.marker._latlng.lat, e.marker._latlng.lng];
+    const [i,j,k] = e.indexPath;
+    const newVal =  [e.marker._latlng.lat, e.marker._latlng.lng];
+    
+    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
+    newSubregion["coordinates"][i][j].splice(k, 1);
 
-    const mapId = file.subregions[subregionId].mapId
-    // const op = json1.removeOp(path, data);
-    const op = [{p:path, ld:data}]
-    const transaction = new Test_Transaction(file, mapId, subregionId, op);
-    tps.addTransaction(transaction);
-  }
+    ydoc.transact(() => {
+      fileStateSubregions.set(subregionId, newSubregion);
+      undoManager.stopCapturing();
+    }, 42)
 
-  file.sendOpMiddleware = function(mapId, subregionId, op) {
-    setTmpSendOp({
-      mapId: mapId,
-      subregionId: subregionId,
-      op : op
-    });
+    return;
+
   }
 
   file.enableLayerOptions = function(layer) {
@@ -310,15 +231,37 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleUndo = function() {
-    if(tps.hasTransactionToUndo()) {
-      tps.undoTransaction();
-    }
+    console.log("undo");
+    undoManager.undo();
   }
 
   file.handleRedo = function() {
-    if(tps.hasTransactionToRedo()) {
-      tps.doTransaction();
+    undoManager.redo();
+  }
+
+  file.reset = function() {
+    const ids = [];
+    for(const subregion of fileStateSubregions){
+      const region = subregion[1];
+      if(!region || Object.keys(region).length == 0) continue;
+      ids.push(region._id);
     }
+
+    for(const id of ids){
+      fileStateSubregions.delete(id);
+    }
+  }
+  
+  file.save = async function(){
+    const response = await api.saveSubregions(JSON.stringify(fileStateSubregions));
+    console.log(response);
+  }
+
+  file.printStackLen = function(){
+    console.log("Undostack: ", undoManager.undoStack.length);
+    console.log("Redostack: ", undoManager.redoStack.length);
+    console.log(JSON.stringify(fileStateSubregions));
+    console.log(JSON.stringify(refresh));
   }
 
   return (
