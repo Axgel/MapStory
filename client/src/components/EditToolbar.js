@@ -82,7 +82,9 @@ export default function EditToolbar() {
     e.stopPropagation();
     store.updateVotes(store.selectedMap, 1);
   }
+  //--------------------------------------------------------------------------------------
   
+  let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
   if(editActive){
     titleElement = <input 
     id="inputNewUsername" 
@@ -94,10 +96,8 @@ export default function EditToolbar() {
     onKeyDown={handleKeyPress}
     ></input>
   }
-  
-  let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
   let editingTools = (file.currentEditMode === EditMode.VIEW) ? <></> :
-    <>
+  <>
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-3">
