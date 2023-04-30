@@ -77,7 +77,7 @@ export const updateVotesById = (mapId, userId, voteType, value) => api.put(`/upd
 
 export const getCommentById = (commentId) => api.get(`/comments/${commentId}`);
 
-export const addCommentById = (mapId, userId, comment) => api.post(`/comment/${mapId}`, {userId: userId, comment: comment});
+export const addCommentById = (mapId, userId, comment) => api.post(`/comment/${mapId}`, {user: userId, comment: comment});
 
 const apis = {
   createSubregion,

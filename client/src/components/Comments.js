@@ -14,10 +14,10 @@ export default function Comments(props) {
   let commentCard = <></>;
   if(store.selectedMap && store.comments){
     commentCard = store.comments.map((comment, index) => {
-      return <div>
-                <p className="font-semibold text-base">comment.username</p>
-                <p className="text-sm text-publishmodalsubtext">comment.comment</p>
-              </div>;
+      return <div key={index}>
+                <p className="font-semibold text-base">{comment.username}</p>
+                <p className="text-sm text-publishmodalsubtext">{comment.comment}</p>
+             </div>;
     })
   }
 

@@ -106,7 +106,8 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.LOAD_MAP_COMMENTS:{
         return setStore({
           ...store,
-          comments: payload.comments,
+          comments: payload.comments, 
+          selectedMap: payload.selectedMap
         })
       }
       default:
@@ -293,6 +294,7 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.loadCommentsByMap = async function () {
+    //reload personal and shared maps in order to update comments array
     let asyncComments = [];
     const comments = [];
     if(this.selectedMap){
@@ -304,6 +306,9 @@ function GlobalStoreContextProvider(props) {
     for(const res of asyncComments){
       comments.push(res.data);
     }
+   
+    // return comments;
+    console.log(this.selectedMap)
     storeReducer({
       type: GlobalStoreActionType.LOAD_MAP_COMMENTS,
       payload: {comments: comments},

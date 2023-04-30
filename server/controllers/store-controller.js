@@ -180,6 +180,8 @@ deleteMap = async (req, res) => {
     await User.updateMany({}, { $pull: {sharedMaps: mapId}}) //remove map id from user schema(shared maps[])
     await User.updateMany({}, { $pull: {personalMaps: mapId}});//remove mapId from user schema(personalmaps[])
     await Subregion.deleteMany({ mapId: mapId }); //get all subregionId -> delete subregionId object
+    const mapProject = await MapProject.findById(req.params.mapId);
+    await Comment.deleteMany({ _id: { $in: mapProject.comment }});//delete all comments
     await MapProject.remove({_id: mapId}); //delete mapproject
 
     return res.status(200).json({
@@ -416,8 +418,6 @@ getCommentById = async(req,res) => {
   try{
     Comment.findOne({ _id: req.params.commentId}, async (err, comment) => {
       let username = await User.findOne({_id: comment.user});
-      console.log(username.userName);
-      console.log(comment.comment)
       return res.status(200).json({
         username: username.userName,
         comment: comment.comment
@@ -438,18 +438,15 @@ addComment = async(req,res) =>{
         error: 'You must provide a comment to input'
       })
     }
-    console.log('before creation')
+    const usernameId = await User.findById(body.user);
     //create the comment 
     const newComment = new Comment({
-      user: body.userId, 
+      user: usernameId._id,
       comment: body.comment
     });
-    newComment.save();
-    console.log(newComment)
     //append the id of new comment to the map.comments array
     await MapProject.findOne({_id: req.params.mapId}, (err, mapProject) => {
       mapProject.comments.push(newComment._id);
-      console.log(mapProject);
       mapProject.save().then(() => {
         newComment.save();
       })

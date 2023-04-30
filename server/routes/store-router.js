@@ -20,7 +20,7 @@ router.put('/addCollaborators/:mapId', StoreController.addCollaborators);
 router.put('/removeCollaborators/:mapId', StoreController.removeCollaborators);
 router.get('/user/:userId', StoreController.getUserById);
 router.put('/updateVote/:mapId', StoreController.updateVote);
-router.get('/comments/:mapId', StoreController.getCommentById);
+router.get('/comments/:commentId', StoreController.getCommentById);
 router.post('/comment/:mapId', StoreController.addComment);
 
 module.exports = router;
