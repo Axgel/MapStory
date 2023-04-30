@@ -17,26 +17,32 @@ export default function MapScreen() {
   const refresh = getYjsValue(fileState.refresh);
 
   useEffect(() => {
+    file.reset();
     file.loadAllSubregionsFromDb(mapId);
     store.loadMapById(mapId);
   }, []);
 
-  function undo(e){
-    file.testUndo();
+  function reset(e){
+    file.reset();
   }
 
-  function redo(e){
-    file.testRedo();
+  function save(e){
+    file.save();
   }
 
+
+  function printStackLen(e){
+    file.printStackLen();
+  }
 
   return (
     <div>
-      <button onClick={undo}>undo</button>
-      <button onClick={redo}>redo</button>
-      <Header />
+      <button onClick={save}>save map</button>
+      <button onClick={reset}>reset map</button>
+      <button onClick={printStackLen}>printStackLen</button>
+      <Header /> 
       <EditToolbar />
-      <Map refresh={refresh}/>
+      <Map />
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
         <MapDetailCard mapDetails={store.personalMaps[0]}/>
       </div> */}

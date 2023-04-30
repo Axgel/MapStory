@@ -32,18 +32,19 @@ function GlobalFileContextProvider(props) {
   });
 
   const fileState = useSyncedStore(fileStore);
-  const [ydoc] = useState(() => getYjsValue(fileState));
-  const [fileStateSubregions] = useState(() => ydoc.getMap('subregions'));
-  const fileStateRefresh = getYjsValue(fileState.refresh);
-  // const undoManager = new Y.UndoManager(array)
+  const ydoc = getYjsValue(fileState);
+  const fileStateSubregions = ydoc.getMap('subregions');
+  const refresh = ydoc.getArray('refresh');
+
   const [undoManager] = useState(() => {
     console.log("ran once");
-    return new Y.UndoManager(fileStateSubregions)
+    return new Y.UndoManager(fileStateSubregions, {
+      trackedOrigins: new Set([42])
+    })
   });
 
-
   undoManager.on('stack-item-added', event => {
-    console.log(event);
+    console.log(undoManager.undoStack.length);
   })
   
   undoManager.on('stack-item-popped', event => {
@@ -87,7 +88,13 @@ function GlobalFileContextProvider(props) {
     let response = await api.getAllSubregions(mapId);
     if(response.status === 200){
       for(const [key, value] of Object.entries(response.data.subregions)){
+        if(fileStateSubregions.has(key)){
+          ydoc.transact(() => {
+            fileStateSubregions.delete(key);
+          })
+        }
         fileStateSubregions.set(key, value);
+        
       }
     }
   }
@@ -106,7 +113,7 @@ function GlobalFileContextProvider(props) {
     } else {
       newEditRegions[subregionId] = e.target;
     }
-
+    console.log("s");
     fileReducer({
       type: GlobalFileActionType.UPDATE_EDIT_REGIONS,
       payload: {editRegions: newEditRegions}
@@ -131,7 +138,6 @@ function GlobalFileContextProvider(props) {
       if(!region || Object.keys(region).length == 0) continue;
       const layer = L.polygon(region.coordinates).addTo(mapItem);
       file.initLayerHandlers(layer, region._id);
-
       if(file.editRegions[region._id]){
         layer.setStyle({ fillColor: 'red'});   
         if(file.currentEditMode === EditMode.ADD_VERTEX || file.currentEditMode === EditMode.EDIT_VERTEX) {
@@ -150,6 +156,17 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleVertexAdded = function(e, subregionId) {
+    const [i,j,k] = e.indexPath;
+    const newVal = [e.latlng.lat, e.latlng.lng];
+
+    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
+    newSubregion["coordinates"][i][j].splice(k, 0, newVal);
+
+    ydoc.transact(() => {
+      fileStateSubregions.set(subregionId, newSubregion);
+      undoManager.stopCapturing()
+    }, 42)   
+
     return;
   }
 
@@ -157,14 +174,18 @@ function GlobalFileContextProvider(props) {
     const [i,j,k] = e.indexPath;
     let temp = e.layer.getLatLngs()[i][j][k];
     const newVal = [temp.lat, temp.lng];
-
+    
     // fileStateSubregions.get(subregionId)["coordinates"][i][j][k] = newVal;
-    const newSubregion = fileStateSubregions.get(subregionId);
-    newSubregion["coordinates"][i][j][k] = [36, -88];
-    fileStateSubregions.delete(subregionId);
-    fileStateSubregions.set(subregionId, newSubregion);
-    fileStateRefresh.insert(0, ['a']);
-    return;
+    // fileStateSubregions.get(subregionId)["coordinates"][i][j][k] = [36, -88];
+    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
+    newSubregion["coordinates"][i][j][k] = newVal;
+
+    ydoc.transact(() => {
+      console.log(JSON.stringify(refresh));
+      // refresh.insert(0, ['a']);
+      fileStateSubregions.set(subregionId, newSubregion);
+      undoManager.stopCapturing()
+    }, 42)
   }
 
   file.handleVertexRemoved = function(e, subregionId) {
@@ -194,15 +215,37 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleUndo = function() {
-    console.log(JSON.stringify(fileStateSubregions))
     console.log("undo");
     undoManager.undo();
-    fileStateRefresh.insert(0, ['a']);
-    console.log(JSON.stringify(fileStateSubregions))
   }
 
   file.handleRedo = function() {
     undoManager.redo();
+  }
+
+  file.reset = function() {
+    const ids = [];
+    for(const subregion of fileStateSubregions){
+      const region = subregion[1];
+      if(!region || Object.keys(region).length == 0) continue;
+      ids.push(region._id);
+    }
+
+    for(const id of ids){
+      fileStateSubregions.delete(id);
+    }
+  }
+  
+  file.save = async function(){
+    const response = await api.saveSubregions(JSON.stringify(fileStateSubregions));
+    console.log(response);
+  }
+
+  file.printStackLen = function(){
+    console.log("Undostack: ", undoManager.undoStack.length);
+    console.log("Redostack: ", undoManager.redoStack.length);
+    console.log(JSON.stringify(fileStateSubregions));
+    console.log(JSON.stringify(refresh));
   }
 
   return (

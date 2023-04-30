@@ -35,9 +35,26 @@ updateSubregions = async (subregionId) => {
   }
 }
 
+saveSubregions = async (req, res) => {
+  const subregions = JSON.parse(req.body['subregionsStr']);
+  
+  
+  const asyncSaves = [];
+  for(const [subregionId, subregion] of  Object.entries(subregions)){
+    const updatedSubregion = {
+      properties: subregion['properties'],
+      coordinates: subregion['coordinates']
+    }
+    asyncSaves.push(Subregion.findOneAndUpdate({_id: subregionId}, updatedSubregion));
+  }
+  await Promise.all(asyncSaves);
+
+  return true;
+}
 
 
 
 module.exports = {
-  getAllSubregions
+  getAllSubregions,
+  saveSubregions
 };

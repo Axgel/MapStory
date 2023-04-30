@@ -4,8 +4,9 @@ import * as Y from 'yjs'
 
 export const fileStore = syncedStore({
   subregions: {},
-  refresh: []
+  refresh: [],
 });
+
 
 const ydoc = getYjsDoc(fileStore);
 export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: ['ws://localhost:4000'] });
