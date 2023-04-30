@@ -73,6 +73,8 @@ export const removeCollaborator = (mapId, collaboratorEmail) => {
 
 export const getUserById = (userId) => api.get(`/user/${userId}`);
 
+export const updateVotesById = (mapId, userId, voteType, value) => api.put(`/updateVote/${mapId}`, {userId: userId, voteType:voteType, value:value });
+
 
 const apis = {
   createSubregion,
@@ -89,7 +91,8 @@ const apis = {
   getMapById,
   addCollaborator,
   removeCollaborator,
-  getUserById
+  getUserById, 
+  updateVotesById
 };
 
 export default apis;

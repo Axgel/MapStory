@@ -369,6 +369,25 @@ function GlobalStoreContextProvider(props) {
 
     return collaborators;
   }
+
+  store.updateVotes = async function(voteType){
+    //voteType: 0=downvote, 1=upvote; value: 0=remove, 1=add
+    let response;
+    if(voteType === 0){ //downvotes
+      if(store.selectedMap.downvotes.includes(auth.user._id))
+        response = await api.updateVotesById(store.selectedMap._id, auth.user._id, 0, 0);
+      else
+        response = await api.updateVotesById(store.selectedMap._id, auth.user._id, 0, 1);
+    } else { //upvotes
+      if(store.selectedMap.upvotes.includes(auth.user._id))
+        response = await api.updateVotesById(store.selectedMap._id, auth.user._id, 1, 0);
+      else
+        response = await api.updateVotesById(store.selectedMap._id, auth.user._id, 1, 1);
+    }
+    if(response.status === 200){
+      store.loadPersonalAndSharedMaps(CurrentModal.NONE);
+    }
+  }
   
 
 

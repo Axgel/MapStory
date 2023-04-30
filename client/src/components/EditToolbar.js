@@ -10,6 +10,8 @@ import RemoveSubregionIcon from "../assets/RemoveSubregionIcon.png"
 import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
 import closeIcon from "../assets/closeIcon.png"
+import downvoteFilledIcon from "../assets/downvoteFilledIcon.png"
+import upvoteFilledIcon from "../assets/upvoteFilledIcon.png"
 import { useNavigate } from "react-router-dom";
 import { CurrentModal, EditMode } from "../enums";
 import FileButton from "./FileButton";
@@ -71,7 +73,15 @@ export default function EditToolbar() {
   }
 
   //------------------------------VOTING ONCLICK FUNCTIONS-------------------------------------
+  function handleDownvote(e){
+    e.stopPropagation();
+    store.updateVotes(0);
+  }
   
+  function handleUpvote(e){
+    e.stopPropagation();
+    store.updateVotes(1);
+  }
   
   if(editActive){
     titleElement = <input 
@@ -84,7 +94,6 @@ export default function EditToolbar() {
     onKeyDown={handleKeyPress}
     ></input>
   }
-  //if  file.currentEditMode == EditMode.VIEW -> (REMOVE ALL EDITING THINGS AND ADD UPVOTE AND DOWNVOTE)
   
   let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
   let editingTools = (file.currentEditMode === EditMode.VIEW) ? <></> :
@@ -114,20 +123,22 @@ export default function EditToolbar() {
       <div className="w-[1px] bg-black h-full"></div>
     </>;
 
+  let upvoteImg = (store.selectedMap.upvotes.includes(auth.user._id)) ? upvoteFilledIcon : upvoteOutlineIcon;
+  let downvoteImg = (store.selectedMap.downvotes.includes(auth.user._id)) ? downvoteFilledIcon : downvoteOutlineIcon;
+
   let voting = (file.currentEditMode === EditMode.VIEW) ?
     <>
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-3 py-2 items-center">
-        <img src={upvoteOutlineIcon} alt=""></img>
-        <p className="font-bold">-</p>
-        <img src={downvoteOutlineIcon} alt=""></img>
-        <p className="font-bold pr-3">-</p>
+        <img className="w-8 h-8" src={upvoteImg} onClick={handleUpvote} alt=""></img>
+        <p className="font-bold">{store.selectedMap.upvotes.length}</p>
+        <img className="w-8 h-8" src={downvoteImg} onClick={handleDownvote} alt=""></img>
+        <p className="font-bold pr-3">{store.selectedMap.downvotes.length}</p>
       </div>
-
     </>
     :<></>;
-  
+
   return (
     <div className="flex border-solid border bg-modalbgfill justify-between">
       <div className="flex">

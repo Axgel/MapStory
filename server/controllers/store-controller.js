@@ -384,6 +384,30 @@ getUserById = async(req,res) => {
   }
 }
 
+updateVote = async(req,res) =>{
+  try{
+    const body = req.body; //voteType: 0=downvote, 1=upvote; value: 0=remove, 1=add
+    if(body.voteType === 0){
+      if(body.value === 0)
+        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"downvotes": body.userId}})
+      else 
+        await MapProject.updateOne({_id: req.params.mapId}, {$push: {"downvotes": body.userId}})
+    } else {
+      if(body.value === 0)
+        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"upvotes": body.userId}})
+      else 
+        await MapProject.updateOne({_id: req.params.mapId}, {$push: {"upvotes": body.userId}})
+    }
+    return res.status(200).json({
+      message: "Map project voting updated"
+    })
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured when updating the voting'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
@@ -399,5 +423,6 @@ module.exports = {
   getMapById,
   addCollaborators,
   removeCollaborators,
-  getUserById
+  getUserById,
+  updateVote
 };
