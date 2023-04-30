@@ -1,7 +1,6 @@
 const User = require("../models/user-model");
 const Subregion = require("../models/subregion-model");
 const MapProject = require("../models/mapproject-model");
-const json1 = require('ot-json1');
 
 getAllSubregions = async (req, res) => {
   try{
@@ -22,21 +21,12 @@ getAllSubregions = async (req, res) => {
   }
 }
 
-updateSubregions = async (subregionId, op) => {
+updateSubregions = async (subregionId) => {
   try{
     const subregion = await Subregion.findOne({ _id: subregionId});
     if(!subregion) return false;
 
-    const subregionJson = subregion.toJSON();
-    const tmpSubregionObj = {};
-    tmpSubregionObj[subregion._id] = subregionJson;
-    const newSubregionJson = json1.type.apply(tmpSubregionObj, op);
-
-    await Subregion.findOneAndUpdate(
-      { _id: subregionId},
-      newSubregionJson[subregionId],
-      {new: true}
-    );
+    console.log("do the updating of subregions here")
 
     return true;
   } catch (err) {

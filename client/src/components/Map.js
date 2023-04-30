@@ -8,7 +8,6 @@ import { EditMode } from "../enums";
 import AuthContext from "../auth";
 import { useParams } from "react-router-dom";
 import GlobalStoreContext from "../store";
-const json1 = require('ot-json1');
 
 export default function Map() {
   const { auth } = useContext(AuthContext);
@@ -28,23 +27,14 @@ export default function Map() {
 
   // Load all subregions into map
   useEffect(()=>{
-    if(!auth.user || !mapItem ) return;
-
-    auth.socket.on('resync-op', (data) => {
-      console.log('resync-happened');
-      file.clearEverything(data.version);
-      file.loadAllSubregionsFromDb(mapId);
-      store.loadMapById(mapId);
-      file.loadAllRegionsToMap(mapItem);
-    })
-
+    if(!mapItem ) return;
 
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
     });
     
     file.loadAllRegionsToMap(mapItem);
-  }, [auth, file, mapItem])
+  }, [file, mapItem])
 
 
   // get div of screen on page load to add map to

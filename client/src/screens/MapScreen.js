@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
-const json1 = require('ot-json1');
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
@@ -16,19 +15,6 @@ export default function MapScreen() {
     file.loadAllSubregionsFromDb(mapId);
     store.loadMapById(mapId);
   }, []);
-
-  useEffect(() => {
-    if (!auth.user) return;
-    if (!auth.socket) return;
-    
-    auth.socket.emit('openProject', {
-        mapId: mapId,
-    })
-
-    return () => {
-      auth.socket.emit('closeProject');
-    }
-  }, [auth]);
   
   return (
     <div>
