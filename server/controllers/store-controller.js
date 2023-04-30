@@ -387,17 +387,20 @@ getUserById = async(req,res) => {
 updateVote = async(req,res) =>{
   try{
     const body = req.body; //voteType: 0=downvote, 1=upvote; value: 0=remove, 1=add
-    if(body.voteType === 0){
-      if(body.value === 0)
-        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"downvotes": body.userId}})
-      else 
+    if(body.value === 0){//removing
+      if(body.voteType === 0)
+        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"downvotes": body.userId}});
+      else
+        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"upvotes": body.userId}});
+    } else{ //adding
+      await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"upvotes": body.userId}});
+      await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"downvotes": body.userId}});
+      if(body.voteType === 0)
         await MapProject.updateOne({_id: req.params.mapId}, {$push: {"downvotes": body.userId}})
-    } else {
-      if(body.value === 0)
-        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"upvotes": body.userId}})
-      else 
+      else
         await MapProject.updateOne({_id: req.params.mapId}, {$push: {"upvotes": body.userId}})
     }
+    
     return res.status(200).json({
       message: "Map project voting updated"
     })
