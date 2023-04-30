@@ -164,7 +164,7 @@ function GlobalFileContextProvider(props) {
 
     ydoc.transact(() => {
       fileStateSubregions.set(subregionId, newSubregion);
-      undoManager.stopCapturing()
+      undoManager.stopCapturing();
     }, 42)   
 
     return;
@@ -184,11 +184,22 @@ function GlobalFileContextProvider(props) {
       console.log(JSON.stringify(refresh));
       // refresh.insert(0, ['a']);
       fileStateSubregions.set(subregionId, newSubregion);
-      undoManager.stopCapturing()
+      undoManager.stopCapturing();
     }, 42)
   }
 
   file.handleVertexRemoved = function(e, subregionId) {
+    const [i,j,k] = e.indexPath;
+    const newVal =  [e.marker._latlng.lat, e.marker._latlng.lng];
+    
+    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
+    newSubregion["coordinates"][i][j].splice(k, 1);
+
+    ydoc.transact(() => {
+      fileStateSubregions.set(subregionId, newSubregion);
+      undoManager.stopCapturing();
+    }, 42)
+
     return;
   }
 

@@ -9,9 +9,22 @@ export const fileStore = syncedStore({
 
 
 const ydoc = getYjsDoc(fileStore);
-export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: ['ws://localhost:4000'] });
+export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: ['wss://test.emailgravely.com/'] });
 export const disconnect = () => webrtcProvider.disconnect();
 export const connect = () => webrtcProvider.connect();
 
+
 webrtcProvider.connect();
 // Connect to the provider to start synchronization
+
+webrtcProvider.on('peers', (changedPeers, peer) => {
+  console.log('A new peer has connected:', peer, changedPeers);
+});
+
+webrtcProvider.on('sync', () => {
+  console.log('Connected to at least one peer');
+});
+
+webrtcProvider.on('disconnect', () => {
+  console.log('No peers connected');
+});
