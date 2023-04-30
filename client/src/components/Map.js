@@ -8,10 +8,10 @@ import { EditMode } from "../enums";
 import AuthContext from "../auth";
 import { useParams } from "react-router-dom";
 import GlobalStoreContext from "../store";
+
 import { fileStore } from "../file/file";
 import { useSyncedStore } from '@syncedstore/react';
 import { getYjsValue } from "@syncedstore/core";
-
 
 export default function Map() {
   const { auth } = useContext(AuthContext);

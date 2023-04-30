@@ -25,9 +25,7 @@ updateSubregions = async (subregionId) => {
   try{
     const subregion = await Subregion.findOne({ _id: subregionId});
     if(!subregion) return false;
-
     console.log("do the updating of subregions here")
-
     return true;
   } catch (err) {
     console.log(err);

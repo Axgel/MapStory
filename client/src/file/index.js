@@ -10,6 +10,7 @@ import AuthContext from "../auth";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
+
 import { fileStore } from "./file";
 import { useSyncedStore } from '@syncedstore/react';
 import { boxed, getYjsValue } from "@syncedstore/core";
@@ -120,6 +121,7 @@ function GlobalFileContextProvider(props) {
     })
   }
 
+
   file.initMapContainer = function(mapRef) {
     const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
     const southWest = L.latLng(-89.98155760646617, -180);
@@ -156,6 +158,7 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleVertexAdded = function(e, subregionId) {
+
     const [i,j,k] = e.indexPath;
     const newVal = [e.latlng.lat, e.latlng.lng];
 
@@ -168,6 +171,7 @@ function GlobalFileContextProvider(props) {
     }, 42)   
 
     return;
+
   }
 
   file.handleMarkerDragEnd = function(e, subregionId) {
@@ -201,6 +205,7 @@ function GlobalFileContextProvider(props) {
     }, 42)
 
     return;
+
   }
 
   file.enableLayerOptions = function(layer) {

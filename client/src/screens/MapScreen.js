@@ -8,6 +8,7 @@ import { fileStore } from "../file/file";
 import { useSyncedStore } from '@syncedstore/react';
 import { getYjsValue } from "@syncedstore/core";
 
+
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
