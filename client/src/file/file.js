@@ -13,7 +13,7 @@ export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signalin
 export const disconnect = () => webrtcProvider.disconnect();
 export const connect = () => webrtcProvider.connect();
 
-
+console.log("a");
 // webrtcProvider.connect();
 // Connect to the provider to start synchronization
 
