@@ -11,7 +11,7 @@ import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
 
-import { fileStore } from "./file";
+import { fileStore, connect, disconnect } from "./file";
 import { useSyncedStore } from '@syncedstore/react';
 import { boxed, getYjsValue } from "@syncedstore/core";
 import * as Y from 'yjs'
@@ -43,6 +43,14 @@ function GlobalFileContextProvider(props) {
       trackedOrigins: new Set([42])
     })
   });
+
+  useEffect(() => {
+    connect();
+    
+    return () => {
+      disconnect();
+    }
+  }, [])
 
   undoManager.on('stack-item-added', event => {
     console.log(undoManager.undoStack.length);
