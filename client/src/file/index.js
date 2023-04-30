@@ -45,9 +45,11 @@ function GlobalFileContextProvider(props) {
   });
 
   useEffect(() => {
+    console.log("connecting");
     connect();
     
     return () => {
+      console.log("disconnecting");
       disconnect();
     }
   }, [])
