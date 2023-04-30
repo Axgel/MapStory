@@ -123,8 +123,12 @@ export default function EditToolbar() {
       <div className="w-[1px] bg-black h-full"></div>
     </>;
 
-  let upvoteImg = (store.selectedMap.upvotes.includes(auth.user._id)) ? upvoteFilledIcon : upvoteOutlineIcon;
-  let downvoteImg = (store.selectedMap.downvotes.includes(auth.user._id)) ? downvoteFilledIcon : downvoteOutlineIcon;
+  let upvoteImg = upvoteOutlineIcon;
+  if(store.selectedMap!= null && store.selectedMap.upvotes.includes(auth.user._id)) 
+    upvoteImg = upvoteFilledIcon;
+  let downvoteImg = downvoteOutlineIcon;
+  if(store.selectedMap!= null && store.selectedMap.downvotes.includes(auth.user._id)) 
+    downvoteImg = downvoteFilledIcon ;
 
   let voting = (file.currentEditMode === EditMode.VIEW) ?
     <>
