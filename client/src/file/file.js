@@ -9,7 +9,7 @@ export const fileStore = syncedStore({
 
 
 const ydoc = getYjsDoc(fileStore);
-export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: ['wss://test.emailgravely.com/'] });
+export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: ['wss://test.emailgravely.com:443'] });
 export const disconnect = () => webrtcProvider.disconnect();
 export const connect = () => webrtcProvider.connect();
 
