@@ -14,7 +14,7 @@ export const disconnect = () => webrtcProvider.disconnect();
 export const connect = () => webrtcProvider.connect();
 
 
-webrtcProvider.connect();
+// webrtcProvider.connect();
 // Connect to the provider to start synchronization
 
 webrtcProvider.on('peers', (changedPeers, peer) => {
