@@ -75,12 +75,12 @@ export default function EditToolbar() {
   //------------------------------VOTING ONCLICK FUNCTIONS-------------------------------------
   function handleDownvote(e){
     e.stopPropagation();
-    store.updateVotes(0);
+    store.updateVotes(store.selectedMap, 0);
   }
   
   function handleUpvote(e){
     e.stopPropagation();
-    store.updateVotes(1);
+    store.updateVotes(store.selectedMap, 1);
   }
   
   if(editActive){

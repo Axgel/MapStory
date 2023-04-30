@@ -32,6 +32,12 @@ export default function FileButton() {
     //set EditMode === VIEW
     file.setCurrentEditMode(EditMode.VIEW);
   }
+  function toggleEditingMode(e){
+    e.stopPropagation();
+    document.getElementById("file-by-dd").classList.toggle("hidden");
+    //set EditMode === VIEW
+    file.setCurrentEditMode(EditMode.NONE);
+  }
 
 
 
@@ -46,7 +52,7 @@ export default function FileButton() {
 
             <div id="view-by-dd" className="absolute ml-[100%] w-[150px] bg-modalbgfill shadow-md hidden">
               <p onClick={toggleViewingMode} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onMouseLeave={toggleModeByDD}>Viewing Mode</p>
-              <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onMouseLeave={toggleModeByDD}>Editing Mode</p>
+              <p onClick={toggleEditingMode} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onMouseLeave={toggleModeByDD}>Editing Mode</p>
             </div>
 
           </div>
