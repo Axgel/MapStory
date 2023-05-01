@@ -28,7 +28,7 @@ export default function Map() {
   // Load all subregions into map
   useEffect(()=>{
     if(!mapItem ) return;
-
+    console.log("Reloading from map screen");
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
     });

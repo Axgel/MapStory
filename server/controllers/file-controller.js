@@ -47,9 +47,9 @@ getAllSubregionsServer = async(mapId) => {
     for(const subregion of subregions){
       subregionsDict[subregion._id] = subregion;
     }
-    return res.status(200).json({
+    return {
       subregions: subregionsDict
-    })
+    }
     
   } catch (err) {
     console.log(err);

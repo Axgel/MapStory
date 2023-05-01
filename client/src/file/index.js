@@ -12,25 +12,114 @@ import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
 import { Test_Transaction } from "../transactions";
 import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
+import * as Y from 'yjs'
 
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
 
 const tps = new jsTPS();
+// const ydoc = new Y.Doc();
+// let ymap = ydoc.getMap(); 
+// let ymap2 = ydoc.getMap('subregions');
 
+// ydoc.on('update', (update) => {
+//   console.log('send update');
+//   let arr = Array.from(update);
+//   let str = JSON.stringify(arr);
+//   console.log('update sent');
+// })
 
 function GlobalFileContextProvider(props) {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
   const navigate = useNavigate();
-  
+  const [sync, setSync] = useState(false);
+  const [ydoc, setYdoc] = useState(null);
+  const [fileStateSubregions, setFileStateSubregions] = useState(null);
+  const [undoManager, setUndoManager] = useState(null);
+  const [update, setUpdate] = useState(null);
+
   const [file, setFile] = useState({
     subregions: {},
     currentEditMode: EditMode.NONE,
     editRegions: {},
   });
 
-  
+  useEffect(() => {
+    const ydoc = new Y.Doc();
+    const fileStateSubregions2 = ydoc.getMap('state');
+    setYdoc(ydoc);
+    setFileStateSubregions(fileStateSubregions2);
+    setUndoManager(new Y.UndoManager(fileStateSubregions2, {trackedOrigins: new Set([42])}));
+  }, []);
+
+  // useEffect(() => {
+  //   if(!auth.user || !auth.socket || !sync || !store.selectedMap) return;
+
+  //   ydoc.on('update', (update) => {
+  //     let arr = Array.from(update);
+  //     let str = JSON.stringify(arr);
+      
+  //     auth.socket.emit('op', {
+  //       arr: str,
+  //       mapId: store.selectedMap._id
+  //     })
+  //   })
+  // }, [auth, store, sync, ydoc]);
+
+  useEffect(() => {
+    if(!auth.user || !auth.socket) return;
+
+    auth.socket.on('sync', (data) => {
+      const obj = JSON.parse(data);
+      const ymap = ydoc.getMap("state");
+      let uarr = Uint8Array.from(obj);
+      Y.applyUpdate(ydoc, uarr);
+
+      const subregions = {};
+      const tmpItems = ymap.toJSON();
+      for(const [k,v] of Object.entries(tmpItems)){
+        subregions[k] = v;
+      }
+
+      fileReducer({
+        type: GlobalFileActionType.UPDATE_SUBREGIONS,
+        payload: {subregions: subregions}
+      })
+      setSync(true);
+    }); 
+
+    auth.socket.on('update', (data) => {
+      console.log("item received");
+      const obj = JSON.parse(data);
+      const ymap = ydoc.getMap("state");
+      let uarr = Uint8Array.from(obj);
+      Y.applyUpdate(ydoc, uarr);
+      const subregions = {};
+      const tmpItems = ymap.toJSON();
+      for(const [k,v] of Object.entries(tmpItems)){
+        subregions[k] = v;
+      }
+
+      fileReducer({
+        type: GlobalFileActionType.UPDATE_SUBREGIONS,
+        payload: {subregions: subregions}
+      })
+
+    })
+
+
+    return () => {
+      auth.socket.removeAllListeners();
+    }
+
+  }, [auth, file, ydoc])
+
+  file.reloadYDoc = () => {
+    const ydoc = new Y.Doc();
+    setYdoc(ydoc);
+    setUndoManager(new Y.UndoManager(ydoc.getMap("state"), {trackedOrigins: new Set([42])}));
+  }
 
   const fileReducer = (action) => {
     const { type, payload } = action;
@@ -118,6 +207,7 @@ function GlobalFileContextProvider(props) {
   file.loadAllRegionsToMap = function(mapItem) {
     for(const subregionId in file.subregions){
       const region = file.subregions[subregionId];
+      // console.log(JSON.parse(region));
       const layer = L.polygon(region.coordinates).addTo(mapItem);
       file.initLayerHandlers(layer, subregionId);
 
@@ -143,6 +233,46 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleMarkerDragEnd = function(e, subregionId) {
+    console.log("marker dragged");
+    const newSubregion = file.subregions[subregionId];
+    const [i,j,k] = e.indexPath;
+    let temp = e.layer.getLatLngs()[i][j][k];
+    const newVal = [temp.lat, temp.lng];
+
+    newSubregion["coordinates"][i][j][k] = newVal;
+    console.log(newVal);
+
+    const ydocEdit = new Y.Doc();
+    const ymapEdit = ydocEdit.getMap('state');
+
+    for(const [k,v] of Object.entries(file.subregions)){
+      if(subregionId == k) ymapEdit.set(subregionId, newSubregion);
+      else ymapEdit.set(k, v);
+    }
+    
+    let uState = Y.encodeStateAsUpdate(ydocEdit);
+    let uState2 = Uint8Array.from(uState);
+    
+    ydoc.transact(() => {
+      Y.applyUpdate(ydoc, uState2);
+    })   
+
+    const ymap = ydoc.getMap('state');
+    const tmpItems = ymap.toJSON();
+    for(const [k, v] of Object.entries(tmpItems)){
+      ymap.set(k, v);
+    }
+
+
+    let state = Y.encodeStateAsUpdate(ydoc);
+    let arr = Array.from(state);
+    // let obj = {
+      //   state: arr
+      // };
+
+    let str = JSON.stringify(arr);
+    auth.socket.emit('op', {obj: str, mapId: store.selectedMap._id});
+
     return;
   }
 
@@ -173,16 +303,14 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleUndo = function() {
-    if(tps.hasTransactionToUndo()) {
-      tps.undoTransaction();
-    }
+    console.log(undoManager.undo.length);
+    undoManager.undo();
   }
 
   file.handleRedo = function() {
-    if(tps.hasTransactionToRedo()) {
-      tps.doTransaction();
-    }
+    undoManager.redo();
   }
+
 
   return (
     <GlobalFileContext.Provider value={{ file }}>

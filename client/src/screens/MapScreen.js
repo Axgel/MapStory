@@ -12,10 +12,24 @@ export default function MapScreen() {
   const { mapId } = useParams();
 
   useEffect(() => {
-    file.loadAllSubregionsFromDb(mapId);
-    store.loadMapById(mapId);
+    // file.loadAllSubregionsFromDb(mapId);
+    // store.loadMapById(mapId);  
+    file.reloadYDoc();
   }, []);
-  
+
+  useEffect(() => {
+    if (!auth.user) return;
+    if (!auth.socket) return;
+
+    auth.socket.emit('openProject', {
+        mapId: mapId,
+    })
+
+    return () => {
+      auth.socket.emit('closeProject');
+    }
+  }, [auth]);
+
   return (
     <div>
       <Header />
