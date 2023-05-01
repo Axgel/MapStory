@@ -49,15 +49,15 @@ export default function ViewModeButtons() {
   return (
     <div className="flex gap-x-4">
       <div className={personalIconClassName} onClick={(e) => setViewMode(e, ViewMode.PERSONAL)}>
-        <img className="p-1.5" src={PersonalIcon} alt=""></img>
+        <img id="personalMapIcon" className="p-1.5" src={PersonalIcon} alt=""></img>
       </div>
 
       <div className={sharedIconClassName} onClick={(e) => setViewMode(e, ViewMode.SHARED)}>
-        <img className="p-1.5" src={SharedIcon} alt=""></img>
+        <img id="sharedMapIcon" className="p-1.5" src={SharedIcon} alt=""></img>
       </div>
       
       <div className={publishedIconClassName} onClick={(e) => setViewMode(e, ViewMode.PUBLISHED)}>
-        <img className="p-1.5" src={PublishedIcon} alt=""></img>
+        <img id="publishedMapIcon" className="p-1.5" src={PublishedIcon} alt=""></img>
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export default function Comments(props) {
   }
 
   return (
-    <div className="flex flex-col pl-5 pt-4 gap-2">
+    <div id="commentView" className="flex flex-col pl-5 pt-4 gap-2">
       {commentCard}
       {/* <div>
         <p className="font-semibold text-base">janeD43</p>
@@ -39,7 +39,7 @@ export default function Comments(props) {
       </div> */}
       <div className="absolute bottom-2 left-3">
         <input id="input_comment" className="w-[230px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-2 text-base" type="text"></input>
-        <img className="h-[35px] absolute bottom-0" src={paperPlaneIcon} onClick={handleComment} alt=""></img>
+        <img id="submit_comment" className="h-[35px] absolute bottom-0" src={paperPlaneIcon} onClick={handleComment} alt=""></img>
       </div>
     </div>
   );

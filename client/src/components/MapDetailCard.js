@@ -80,9 +80,9 @@ export default function MapDetailCard(props) {
         <div className="h-[1px] bg-black"></div>
 
         <div className="flex">
-          <p className={propertyTabCSS} onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
+          <p id="propertyDetailView" className={propertyTabCSS} onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
           <div className="w-[1px] bg-black"></div>
-          <p className={commentTabCSS} onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
+          <p id="commentDetailView" className={commentTabCSS} onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
         </div>
 
         <div className="h-[1px] bg-black"></div>
