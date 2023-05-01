@@ -206,33 +206,7 @@ function GlobalFileContextProvider(props) {
     layer.on('pm:vertexremoved', (e) => file.handleVertexRemoved(e, subregionId));
   }
 
-  file.handleVertexAdded = function(e, subregionId) {
-
-    const [i,j,k] = e.indexPath;
-    const newVal = [e.latlng.lat, e.latlng.lng];
-
-    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
-    newSubregion["coordinates"][i][j].splice(k, 0, newVal);
-
-    ydoc.transact(() => {
-      fileStateSubregions.set(subregionId, newSubregion);
-      undoManager.stopCapturing();
-    }, 42)   
-
-    return;
-
-  }
-
-  file.handleMarkerDragEnd = function(e, subregionId) {
-    console.log("marker dragged");
-    const newSubregion = file.subregions[subregionId];
-    const [i,j,k] = e.indexPath;
-    let temp = e.layer.getLatLngs()[i][j][k];
-    const newVal = [temp.lat, temp.lng];
-
-    newSubregion["coordinates"][i][j][k] = newVal;
-    console.log(newVal);
-
+  file.saveToCollabEdit = function(newSubregion, subregionId){
     const ydocEdit = new Y.Doc();
     const ymapEdit = ydocEdit.getMap('state');
 
@@ -267,17 +241,40 @@ function GlobalFileContextProvider(props) {
     return;
   }
 
+  file.handleVertexAdded = function(e, subregionId) {
+    const [i,j,k] = e.indexPath;
+    const newSubregion = file.subregions[subregionId];
+    const newVal = [e.latlng.lat, e.latlng.lng];
+    newSubregion["coordinates"][i][j].splice(k, 0, newVal);
+
+    file.saveToCollabEdit(newSubregion, subregionId);
+
+    return;
+
+  }
+
+  file.handleMarkerDragEnd = function(e, subregionId) {
+    console.log("marker dragged");
+    const newSubregion = file.subregions[subregionId];
+    const [i,j,k] = e.indexPath;
+    let temp = e.layer.getLatLngs()[i][j][k];
+    const newVal = [temp.lat, temp.lng];
+
+    newSubregion["coordinates"][i][j][k] = newVal;
+    console.log(newVal);
+
+    file.saveToCollabEdit(newSubregion, subregionId);
+
+    return;
+  }
+
   file.handleVertexRemoved = function(e, subregionId) {
     const [i,j,k] = e.indexPath;
+    const newSubregion = file.subregions[subregionId];
     const newVal =  [e.marker._latlng.lat, e.marker._latlng.lng];
-    
-    const newSubregion = JSON.parse(JSON.stringify(fileStateSubregions.get(subregionId)));
     newSubregion["coordinates"][i][j].splice(k, 1);
 
-    ydoc.transact(() => {
-      fileStateSubregions.set(subregionId, newSubregion);
-      undoManager.stopCapturing();
-    }, 42)
+    file.saveToCollabEdit(newSubregion, subregionId);
 
     return;
 
