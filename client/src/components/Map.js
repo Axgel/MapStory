@@ -36,7 +36,7 @@ export default function Map() {
 
     file.loadAllRegionsToMap(mapItem)
 
-  })
+  }, [file, mapItem])
 
   // get div of screen on page load to add map to
   function handleInitMapLoad(e){

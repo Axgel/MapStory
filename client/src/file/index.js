@@ -236,6 +236,7 @@ function GlobalFileContextProvider(props) {
       // };
 
     let str = JSON.stringify(arr);
+    if(!store.selectedMap._id) return;
     auth.socket.emit('op', {obj: str, mapId: store.selectedMap._id});
 
     return;
