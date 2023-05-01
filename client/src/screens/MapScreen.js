@@ -18,23 +18,24 @@ export default function MapScreen() {
   const refresh = getYjsValue(fileState.refresh);
 
   useEffect(() => {
-    file.reset();
-    file.loadAllSubregionsFromDb(mapId);
-    store.loadMapById(mapId);
+    // file.loadAllSubregionsFromDb(mapId);
+    // store.loadMapById(mapId);  
+    file.reloadYDoc();
   }, []);
 
-  function reset(e){
-    file.reset();
-  }
+  useEffect(() => {
+    if (!auth.user) return;
+    if (!auth.socket) return;
 
-  function save(e){
-    file.save();
-  }
+    auth.socket.emit('openProject', {
+        mapId: mapId,
+    })
 
+    return () => {
+      auth.socket.emit('closeProject');
+    }
+  }, [auth]);
 
-  function printStackLen(e){
-    file.printStackLen();
-  }
 
   return (
     <div>

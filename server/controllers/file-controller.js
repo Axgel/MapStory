@@ -33,21 +33,26 @@ updateSubregions = async (subregionId) => {
   }
 }
 
-saveSubregions = async (req, res) => {
-  const subregions = JSON.parse(req.body['subregionsStr']);
-  
-  
-  const asyncSaves = [];
-  for(const [subregionId, subregion] of  Object.entries(subregions)){
-    const updatedSubregion = {
-      properties: subregion['properties'],
-      coordinates: subregion['coordinates']
-    }
-    asyncSaves.push(Subregion.findOneAndUpdate({_id: subregionId}, updatedSubregion));
-  }
-  await Promise.all(asyncSaves);
+getAllSubregionsServer = async(mapId) => {
+  try {
+    const subregions = await Subregion.find({ mapId: mapId });
+    console.log(subregions);
+    
+    if(!subregions || subregions.length == 0) return false;
 
-  return true;
+    const subregionsDict = {};
+
+    for(const subregion of subregions){
+      subregionsDict[subregion._id] = subregion;
+    }
+    return {
+      subregions: subregionsDict
+    }
+    
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 }
 
 
