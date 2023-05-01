@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "./auth-request-api";
 import { AuthActionType, CurrentModal } from "../enums";
+
 const AuthContext = createContext();
 
 function AuthContextProvider(props) {
@@ -91,7 +92,7 @@ function AuthContextProvider(props) {
           type: AuthActionType.GET_LOGGED_IN,
           payload: {
             loggedIn: response.data.loggedIn,
-            user: response.data.user
+            user: response.data.user,
           }
         })
       }

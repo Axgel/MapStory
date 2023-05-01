@@ -43,6 +43,7 @@ jobs:
           envkey_REACT_APP_AUTH: '${{ vars.REACT_APP_AUTH }}'
           envkey_REACT_APP_STORE: "${{ vars.REACT_APP_STORE }}"
           envkey_REACT_APP_FILE: "${{ vars.REACT_APP_FILE }}"
+          envkey_REACT_APP_SOCKETIO: "${{ vars.REACT_APP_SOCKETIO }}"
           file_name: ./client/.env.development
           fail_on_empty: true
       

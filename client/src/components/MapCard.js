@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
 import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
+import downvoteFilledIcon from "../assets/downvoteFilledIcon.png"
+import upvoteFilledIcon from "../assets/upvoteFilledIcon.png"
 import { CurrentModal } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
-import GlobalFileContext from "../file";
 
 
 export default function MapCard(props) {
   const { store } = useContext(GlobalStoreContext);
-  const {file} = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
   const navigate = useNavigate();
@@ -25,13 +25,13 @@ export default function MapCard(props) {
     publishButtonCSS += 'hidden '
     publishedWrapper = <p className="text-xs text-green-500">Published: {mapDetails.publishedDate}</p>;
   }
-  if(!auth || mapDetails.owner != auth.user._id){
+  if(!auth || mapDetails.owner !== auth.user._id){
     deleteButtonCSS += 'hidden '
     publishButtonCSS += 'hidden '
   }
 
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
-  if(store.selectedMap && store.selectedMap._id == mapDetails._id){
+  if(store.selectedMap && store.selectedMap._id === mapDetails._id){
     mapCardWrapper += "bg-mapselectedfill"
   } else {
     mapCardWrapper += "bg-brownshade-700"
@@ -39,7 +39,7 @@ export default function MapCard(props) {
 
   function setSelectedMap(e){
     e.stopPropagation();
-    if(store.selectedMap && (store.selectedMap._id == mapDetails._id)){
+    if(store.selectedMap && (store.selectedMap._id === mapDetails._id)){
       store.setSelectedMap(null);
     }
     else{
@@ -50,7 +50,6 @@ export default function MapCard(props) {
   function handleOpenMap(e){
     e.stopPropagation();
     store.loadMapById(mapDetails._id);
-    file.setLoadedRegionOnce(false);
     navigate(`/map/${mapDetails._id}`);
   }
 
@@ -59,17 +58,30 @@ export default function MapCard(props) {
     store.setMapProjectAction(currentModal, mapDetails._id);
   }
 
+  let upvoteImg = mapDetails.upvotes.includes(auth.user._id)? upvoteFilledIcon : upvoteOutlineIcon;
+  let downvoteImg = mapDetails.downvotes.includes(auth.user._id)? downvoteFilledIcon : downvoteOutlineIcon;
+
+  function handleDownvote(e){
+    e.stopPropagation();
+    store.updateVotes(mapDetails, 0);
+  }
+  
+  function handleUpvote(e){
+    e.stopPropagation();
+    store.updateVotes(mapDetails, 1);
+  }
+
   return (
     <div className={mapCardWrapper} onClick={setSelectedMap} onDoubleClick={handleOpenMap}>
       <div className="flex">
         {/* Section for upvote/downvote */}
         <div id="votingInfo" className="flex flex-col justify-center px-2">
           <div className="flex items-center gap-2">
-            <img id="upvoteIcon" src={upvoteOutlineIcon} alt=""></img>
+            <img className="w-8 h-8" id="upvoteIcon" src={upvoteImg} onClick={handleUpvote} alt=""></img>
             <p id="upvoteCount">{mapDetails.upvotes.length}</p>
           </div>
           <div className="flex items-center gap-2">
-            <img id="downvoteIcon" src={downvoteOutlineIcon} alt=""></img>
+            <img className="w-8 h-8" id="downvoteIcon" src={downvoteImg} onClick={handleDownvote} alt=""></img>
             <p id="downvoteCount">{mapDetails.downvotes.length}</p>
           </div>
         </div>

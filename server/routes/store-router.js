@@ -19,5 +19,8 @@ router.get('/map/:mapId', StoreController.getMapById);
 router.put('/addCollaborators/:mapId', StoreController.addCollaborators);
 router.put('/removeCollaborators/:mapId', StoreController.removeCollaborators);
 router.get('/user/:userId', StoreController.getUserById);
+router.put('/updateVote/:mapId', StoreController.updateVote);
+router.get('/comment/:mapId', StoreController.getComments);
+router.post('/comment/:mapId', StoreController.addComment);
 
 module.exports = router;

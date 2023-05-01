@@ -20,7 +20,7 @@ export default function ForgotPasswordModal() {
 
   function handleRecoverPassword(e) {
     e.stopPropagation();
-    if(email.length == 0){
+    if(email.length === 0){
       auth.setCurrentModal(CurrentModal.NONE, '');
       return;
     }
@@ -29,7 +29,7 @@ export default function ForgotPasswordModal() {
     auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, 'You will receive an email shortly.');
   }
   
-  if(auth.currentModal == CurrentModal.FORGOT_PASSWORD){
+  if(auth.currentModal === CurrentModal.FORGOT_PASSWORD){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 

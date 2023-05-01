@@ -20,14 +20,15 @@ function GlobalStoreContextProvider(props) {
   const [store, setStore] = useState({
     currentModal: CurrentModal.NONE,
     viewMode: ViewMode.PERSONAL,
-    detailView: DetailView.NONE, 
+    detailView: DetailView.NONE,
     publishedMaps: [],
     personalMaps: [],
     sharedMaps: [],
+    comments: [],
     selectedMap: null,
-    mapIdMarkedForAction: null,
     collaborators: [],
     selectedMapOwner: null,
+    mapIdMarkedForAction: null,
   });
 
   const navigate = useNavigate();
@@ -50,7 +51,8 @@ function GlobalStoreContextProvider(props) {
           selectedMap: payload.selectedMap,
           detailView: payload.detailView,
           collaborators: payload.collaborators,
-          selectedMapOwner: payload.selectedMapOwner
+          selectedMapOwner: payload.selectedMapOwner,
+          comments: payload.comments
         })
       }
       case GlobalStoreActionType.SET_DETAIL_VIEW: {
@@ -102,6 +104,12 @@ function GlobalStoreContextProvider(props) {
           mapIdMarkedForAction: null,
         })
       }
+      case GlobalStoreActionType.ADD_COMMENTS:{
+        return setStore({
+          ...store,
+          comments: payload.comments
+        })
+      }
       default:
         return store;
     }
@@ -138,10 +146,10 @@ function GlobalStoreContextProvider(props) {
     const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
     const collaborators = await store.getAllCollaboratorsByMap(map);
     const selectedMapOwner = await store.getSelectedMapOwner(map);
-
+    const comments = await store.getComments(map);
     storeReducer({
-      type: GlobalStoreActionType.SET_SELECTED_MAP,
-      payload: {selectedMap: map, detailView: detailView, collaborators: collaborators, selectedMapOwner: selectedMapOwner},
+        type: GlobalStoreActionType.SET_SELECTED_MAP,
+        payload: {selectedMap: map, detailView: detailView, collaborators: collaborators, selectedMapOwner: selectedMapOwner, comments: comments},
     });
   }
 
@@ -202,8 +210,6 @@ function GlobalStoreContextProvider(props) {
     return false;
   }
 
-
-
   store.loadPersonalAndSharedMaps = async function(currentModal){
     let personalMaps = [];
     let sharedMaps = [];
@@ -232,8 +238,6 @@ function GlobalStoreContextProvider(props) {
       payload: {personalMaps: personalMaps, sharedMaps: sharedMaps, selectedMap: selectedMap, currentModal: currentModal, collaborators: collaborators, selectedMapOwner: selectedMapOwner},
     });
   }
-
-
 
   store.loadAllMaps = async function(){
     let personalMaps = [];
@@ -289,8 +293,17 @@ function GlobalStoreContextProvider(props) {
     })
   }
 
+  store.getComments = async function(map) {
+    if(!map) return [];
+    const response = await api.getComments(map._id);
+    if(response.status === 200) {
+      return response.data.comments;
+    }
+    return [];
+  }
+
   store.publishMapByMarkedId = async function(){
-    if(store.mapIdMarkedForAction == null) return;
+    if(!store.mapIdMarkedForAction) return;
 
     let response = await api.publishMapById(store.mapIdMarkedForAction);
     if(response.status === 200){
@@ -304,7 +317,7 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.forkMapByMarkedId = async function(){
-    if(store.mapIdMarkedForAction == null) return;
+    if(!store.mapIdMarkedForAction) return;
     let response = await api.forkMapById(store.mapIdMarkedForAction, auth.user._id);
     if(response.status === 201){
       storeReducer({
@@ -317,7 +330,7 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.deleteMapByMarkedId = async function(){
-    if(store.mapIdMarkedForAction == null) return;
+    if(!store.mapIdMarkedForAction) return;
     let response = await api.deleteMapById(store.mapIdMarkedForAction);  
     if(response.status === 200){
       storeReducer({
@@ -358,12 +371,12 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.getAllCollaboratorsByMap = async function(map){
+    if(!map) return [];
     let asyncCollaborators = [];
     const collaborators = [];
-    if(map){
-      for(const userId of map.collaborators){
-        asyncCollaborators.push(api.getUserById(userId));
-      }
+    
+    for(const userId of map.collaborators){
+      asyncCollaborators.push(api.getUserById(userId));
     }
 
     asyncCollaborators = await Promise.all(asyncCollaborators)
@@ -372,6 +385,36 @@ function GlobalStoreContextProvider(props) {
     }
 
     return collaborators;
+  }
+
+  store.updateVotes = async function(map, voteType){
+    //voteType: 0=downvote, 1=upvote; value: 0=remove, 1=add
+    let response;
+    if(voteType === 0){ //downvotes
+      if(map.downvotes.includes(auth.user._id))
+        response = await api.updateVotesById(map._id, auth.user._id, 0, 0);
+      else
+        response = await api.updateVotesById(map._id, auth.user._id, 0, 1);
+    } else { //upvotes
+      if(map.upvotes.includes(auth.user._id))
+        response = await api.updateVotesById(map._id, auth.user._id, 1, 0);
+      else
+        response = await api.updateVotesById(map._id, auth.user._id, 1, 1);
+    }
+    if(response.status === 200){
+      store.loadPersonalAndSharedMaps(CurrentModal.NONE);
+    }
+  }
+
+  store.addComment = async function (newComment){
+    const response = await api.addComment(store.selectedMap._id, auth.user._id, newComment);
+    if(response.status === 200) {
+      const newComments = [...store.comments, response.data.comment];
+      storeReducer({
+        type: GlobalStoreActionType.ADD_COMMENTS,
+        payload: {comments : newComments},
+      });
+    }
   }
   
 

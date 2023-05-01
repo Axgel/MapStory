@@ -7,6 +7,7 @@ import { SearchMode } from "./SearchMode"
 import { DetailView } from "./DetailView"
 import { AuthActionType } from "./AuthActionType"
 import { EditMode } from "./EditMode"
+import { OTOperations } from "./OTOperations"
 
 export {
   GlobalStoreActionType,
@@ -17,5 +18,6 @@ export {
   SearchMode,
   DetailView,
   AuthActionType,
-  EditMode
+  EditMode,
+  OTOperations
 }

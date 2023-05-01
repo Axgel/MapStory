@@ -22,11 +22,11 @@ export default function ChangeUsernameModal() {
 
   function handleChangeUsername(e) {
     e.stopPropagation();
-    if(username == auth.user.userName || document.getElementById("inputNewUsername").value == auth.user.userName){
+    if(username === auth.user.userName || document.getElementById("inputNewUsername").value === auth.user.userName){
       store.setCurrentModal(CurrentModal.NONE);
       return;
     };
-    if(username.length == 0) {
+    if(username.length === 0) {
       setErrMsg('Username cannot be empty');
       return;
     }
@@ -35,7 +35,7 @@ export default function ChangeUsernameModal() {
     setErrMsg("");
   }
   
-  if(store.currentModal == CurrentModal.CHANGE_USERNAME){
+  if(store.currentModal === CurrentModal.CHANGE_USERNAME){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 

@@ -9,8 +9,7 @@ export default function Properties() {
   const collaboratorsUsernames = [];
   store.collaborators.forEach(collaborator => {
     collaboratorsUsernames.push(collaborator.userName)
-  });  
-  
+  });    
 
   return (
     <div className="flex flex-col pl-5 pt-4 gap-2">
@@ -27,6 +26,21 @@ export default function Properties() {
       <div>
         <p className="font-semibold text-base">Published</p>
         <p className="text-sm text-publishmodalsubtext">{(mapInfo.isPublished) ? mapInfo.publishedDate : "Map Not Published"}</p>
+      </div>
+
+      <div>
+        <p className="font-semibold text-base">Upvotes</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.upvotes.length}</p>
+      </div>
+
+      <div>
+        <p className="font-semibold text-base">Downvotes</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.downvotes.length}</p>
+      </div>
+
+      <div>
+        <p className="font-semibold text-base">Tags</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.tags.join(", ")}</p>
       </div>
     </div>
   );

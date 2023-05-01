@@ -30,6 +30,7 @@ export default function ChangePasswordModal() {
       case "confirm":
         setCfmPwd(target.value)
         break;
+      default:
     }
   };
 
@@ -40,7 +41,7 @@ export default function ChangePasswordModal() {
       return;
     }
 
-    if(newPwd != cfmPwd){
+    if(newPwd !== cfmPwd){
       setErrMsg("Passwords do not match");
       return;
     }
@@ -50,7 +51,7 @@ export default function ChangePasswordModal() {
     setErrMsg("");
   }
 
-  if(store.currentModal == CurrentModal.CHANGE_PASSWORD){
+  if(store.currentModal === CurrentModal.CHANGE_PASSWORD){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
 

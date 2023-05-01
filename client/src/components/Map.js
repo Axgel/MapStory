@@ -2,96 +2,135 @@ import React, { useEffect, useState, useContext } from "react";
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free';  
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';  
-import usastates from '../data/usastates.json'
-import { GlobalStoreContext } from '../store'
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 import GlobalFileContext from "../file";
 import { EditMode } from "../enums";
+import AuthContext from "../auth";
+import { useParams } from "react-router-dom";
+import GlobalStoreContext from "../store";
+
+import { fileStore } from "../file/file";
+import { useSyncedStore } from '@syncedstore/react';
+import { getYjsValue } from "@syncedstore/core";
 
 export default function Map() {
-  const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
   const { file } = useContext(GlobalFileContext);
-  const [mapRef, setMapRef] = useState("");
+  const { store } = useContext(GlobalStoreContext);
+  const [mapRef, setMapRef] = useState(null);
   const [mapItem, setMapItem] = useState(null);
-  const [tmpRegion, setTmpRegion] = useState(null);
+  const { mapId } = useParams();
+  const [editRegions, setEditRegions] = useState({});
+  const [tmpEditRegions, setTmpEditRegions] = useState({});
 
-  // Initializes leaflet map reference
-  useEffect(()=> {
+  // need these two lines below to refresh component
+  const fileState = useSyncedStore(fileStore);
+  const fileStateSubregions = getYjsValue(fileState.subregions);
+  const refresh = getYjsValue(fileState.refresh);
+
+  useEffect(() => {
     if(!mapRef) return;
-
-    const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
-    const southWest = L.latLng(-89.98155760646617, -180);
-    const northEast = L.latLng(89.99346179538875, 180);
-    const bounds = L.latLngBounds(southWest, northEast);
-    map.setMaxBounds(bounds);
+    const map = file.initMapContainer(mapRef);
     setMapItem(map);
+    return () => map.remove();
   },[mapRef])
 
-  // Load all subregions into map
-  useEffect(()=>{
-    if(!mapItem || !file.subregions) return;
-    if(file.loadedRegionOnce) return;
-    // remove all preexisting layers
-    console.log("here");
-    mapItem.eachLayer(function (layer) {
+  // useEffect(() => {
+  //   if(!tmpEditRegions || Object.keys(tmpEditRegions).length == 0) return;
+
+  //   const subregionId = tmpEditRegions["subregionId"];
+  //   const eTarget = tmpEditRegions["eTarget"];
+
+  //   let newEditRegions = editRegions;
+  //   if(editRegions[subregionId]){
+  //     eTarget.setStyle({ fillColor: '#A4BFEA'});  
+  //     delete newEditRegions[subregionId];
+  //   } else {
+  //     newEditRegions[subregionId] = eTarget;
+  //   }
+  //   console.log(newEditRegions)
+  //   setEditRegions(newEditRegions);
+
+  //   for (const [key, layer] of Object.entries(editRegions)) {
+  //     mapItem.removeLayer(layer);
+  //     initLayerHandlers(layer, key);
+  //     layer.setStyle({ fillColor: 'red'});   
+  //     if(file.currentEditMode === EditMode.ADD_VERTEX || file.currentEditMode === EditMode.EDIT_VERTEX) {
+  //       file.enableLayerOptions(layer);
+  //     }
+  //   }
+
+  //   setTmpEditRegions(null);
+  // }, [tmpEditRegions])
+
+  // useEffect(() => {
+    
+  //   console.log(editRegions);
+  //   // const keys = Object.keys(editRegions);
+  //   // console.log(keys);
+  //   // for (const [key, value] of Object.entries(editRegions)) {
+  //   //   console.log("as");
+  //   //   console.log(key, value);
+  //   // }
+
+  //   // if(editRegions[region._id]){
+  //   //   layer.setStyle({ fillColor: 'red'});   
+  //   //   if(file.currentEditMode === EditMode.ADD_VERTEX || file.currentEditMode === EditMode.EDIT_VERTEX) {
+  //   //     file.enableLayerOptions(layer);
+  //   //   }
+  //   // }
+
+  // }, [editRegions])
+
+  // function initLayerHandlers(layer, subregionId) {
+  //   layer.on('click', (e) => handleClickLayer(e, subregionId));
+  //   layer.on('pm:vertexadded', (e) => file.handleVertexAdded(e, subregionId));
+  //   layer.on('pm:markerdragend', (e) => file.handleMarkerDragEnd(e, subregionId));
+  //   layer.on('pm:vertexremoved', (e) => file.handleVertexRemoved(e, subregionId));
+  // }
+
+  // function handleClickLayer(e, subregionId) {
+  //   setTmpEditRegions({"subregionId":subregionId, "eTarget":e.target});
+  // }
+
+
+
+  if(mapItem){
+    mapItem.eachLayer(function (layer){
       mapItem.removeLayer(layer);
-    });
-    
-    let tmp = false;
-    // Add all new subregion layers
-    for(const region of file.subregions){
-      const poly = L.polygon(region.coordinates).addTo(mapItem);
-      poly.on('click', selectRegion)
-      tmp = true;
-    }
+    })
 
-    if(tmp){
-      file.setLoadedRegionOnce(true);
-    }
+    file.loadAllRegionsToMap(mapItem)
 
-  }, [mapItem, file])
-
-  useEffect(() => {
-    if(!tmpRegion || !file || !tmpRegion) return;
-
-    if(file.editRegions.includes(tmpRegion)){
-      tmpRegion.setStyle({ fillColor: '#3387FF'});
-      tmpRegion.pm.disable();
-      file.updateEditRegions(file.editRegions.filter(item => item != tmpRegion));
-    }
-    else {
-      file.updateEditRegions([...file.editRegions, tmpRegion]);
-    }
-    
-    setTmpRegion(null);
-  }, [tmpRegion])
-
-  useEffect(() => {
-    for(const region of file.editRegions){
-      region.setStyle({ fillColor: 'red'});
-      region.pm.disable();
-      if(file.currentEditMode == EditMode.EDIT_VERTEX){
-        region.pm.enable({
-          limitMarkersToCount: 10,
-          draggable: false,
-          // removeVertexOn: 'click',
-          // removeVertexValidation: store.removeVertexValidate,
-          addVertexOn: 'click',
-          addVertexValidation: addVertexValidate
-        }) 
-      }
-    }
-  }, [file])
+    // if(Object.keys(fileStateSubregions).length == 0) return;
+    // for(const subregion of fileStateSubregions){
+    //   const region = subregion[1];
+    //   if(!region || Object.keys(region).length == 0) continue;
+    //   const layer = L.polygon(region.coordinates).addTo(mapItem);
+    //   initLayerHandlers(layer, region._id);
+    //   if(file.editRegions[region._id]){
+    //     layer.setStyle({ fillColor: 'red'});   
+    //     if(file.currentEditMode === EditMode.ADD_VERTEX || file.currentEditMode === EditMode.EDIT_VERTEX) {
+    //       file.enableLayerOptions(layer);
+    //     }
+    //   }
+    // }
 
 
-  function addVertexValidate(e){
-    console.log(e.event.latlng);
-    return false;
   }
+  console.log("outside refresh");
 
-  function selectRegion(e){
-    setTmpRegion(e.target);
-  }
+  // Load all subregions into map
+  // useEffect(()=>{
+  //   if(!mapItem ) return;
+  //   console.log("refreshing");
+  //   mapItem.eachLayer(function (layer) {
+  //     mapItem.removeLayer(layer);
+  //   });
+    
+  //   file.loadAllRegionsToMap(mapItem);
+  // }, [mapItem, file])
+
 
   // get div of screen on page load to add map to
   function handleInitMapLoad(e){
@@ -99,7 +138,10 @@ export default function Map() {
   }
 
   return (
-    <div className="w-full h-[700px] z-10" id="map" ref={handleInitMapLoad}>
-    </div>
+    <>
+      <div className="w-full h-[700px] z-10" id="map" ref={handleInitMapLoad}>
+      </div>
+      <p>{JSON.stringify(refresh)}</p>
+    </>
   );
 }

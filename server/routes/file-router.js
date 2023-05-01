@@ -4,7 +4,6 @@ const FileController = require("../controllers/file-controller");
 const auth = require('../auth');
 
 router.get('/subregion/:mapId', FileController.getAllSubregions);
-router.get('/connect/:userId/:mapId', FileController.connectNewClient);
-
+router.put('/savesubregion', FileController.saveSubregions)
 
 module.exports = router;

@@ -3,36 +3,12 @@ const app = require('./app')
 const http = require("http");
 const https = require("https");
 const fs = require("fs");
-// const WebSocket = require('ws');
-// const ReconnectingWebSocket = require('reconnecting-websocket');
-// const sharedb = require('sharedb/lib/client')
-const sdb = require("./db/sharedb");
+const { WebSocketServer } = require('ws');
+const ReconnectingWebSocket = require('reconnecting-websocket');
+
 
 // CREATE OUR SERVER
 const PORT = 4000;
-let server;
-
-  // const options = {
-    //    WebSocket: WebSocket,
-    //    connectionTimeout: 1000,
-    //    maxRetries: 10,
-    // };
-    
-    // let socket = new ReconnectingWebSocket('ws://localhost:5050', [], options);
-    // let connection = new sharedb.Connection(socket);
-    // doc = connection.get('documents', "testdocument");
-    // doc.subscribe((error) => {
-      //   if (error) throw error;
-      //   // If doc.type is undefined, the document has not been created, so let's create it
-      //   if (!doc.type) {
-        //      doc.create([], (error) => {
-//         if (error) console.error(error);
-//      });
-//   };
-// });
-
-
-
 switch (process.env.ENVIRONMENT) {
   case "PRODUCTION":
     const httpServer = http.createServer(app);
@@ -42,19 +18,39 @@ switch (process.env.ENVIRONMENT) {
         cert: fs.readFileSync("/home/ubuntu/Keys/fullchain.pem"),
       },
       app
-      );
-      httpServer.listen(80, () => console.log("HTTP Server running on port 80!"));
-      httpsServer.listen(443, () =>
+    );
+    
+    const wsServer = new WebSocketServer({server: httpsServer})
+
+    wsServer.on('connection', (socket) => {
+      console.log('WebSocket client connected');
+    
+    
+      socket.on('close', () => {
+        console.log('WebSocket client disconnected');
+      });
+    });
+
+    httpServer.listen(80, () => console.log("HTTP Server running on port 80!"));
+    httpsServer.listen(443, () =>
       console.log("HTTPS Server running on port 443!")
-      );
-      break;
-    default:
-      server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-      break;
-    }
+    );
+    break;
+  default:
+    // server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const httpWSServer = http.createServer(app);
+
+    // const wsServer = new WebSocketServer({server: httpWSServer})
+
+    // wsServer.on('connection', (socket) => {
+    //   console.log('WebSocket client connected', socket);
     
-// async function close_all_connections(){
-//   db.close();
-//   server.close();
-// }
     
+    //   socket.on('close', () => {
+    //     console.log('WebSocket client disconnected');
+    //   });
+    // });
+
+    httpWSServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
+    break;
+  }

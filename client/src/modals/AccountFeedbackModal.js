@@ -13,7 +13,7 @@ export default function AccountFeedbackModal(props) {
     auth.setCurrentModal(CurrentModal.NONE, "");
   }
 
-  if(auth.currentModal == CurrentModal.ACCOUNT_FEEDBACK){
+  if(auth.currentModal === CurrentModal.ACCOUNT_FEEDBACK){
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center z-50">
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg w-80 text-center">

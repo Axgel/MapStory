@@ -19,7 +19,7 @@ export default function HomeScreen() {
   if (store.selectedMap && store.personalMaps) {
     let selectedMap;
     for(let i=0; i<store.personalMaps.length; i++){
-      if(store.personalMaps[i]._id == store.selectedMap._id){
+      if(store.personalMaps[i]._id === store.selectedMap._id){
         selectedMap = store.personalMaps[i];
         break;
       }
@@ -33,15 +33,15 @@ export default function HomeScreen() {
   }
 
   let mapCards = <></>
-  if(store.viewMode == ViewMode.PERSONAL && store.personalMaps) {
+  if(store.viewMode === ViewMode.PERSONAL && store.personalMaps) {
       mapCards = store.personalMaps.map((map, index) => {
         return <MapCard key={index} mapDetails={map} />;
       })
-  } else if(store.viewMode == ViewMode.SHARED && store.sharedMaps) {
+  } else if(store.viewMode === ViewMode.SHARED && store.sharedMaps) {
       mapCards = store.sharedMaps.map((map, index) => {
         return <MapCard key={index} mapDetails={map} />;
       })
-  } else if(store.viewMode == ViewMode.PUBLISHED && store.publishedMaps) {
+  } else if(store.viewMode === ViewMode.PUBLISHED && store.publishedMaps) {
     mapCards = store.publishedMaps.map((map, index) => {
       return <MapCard key={index} mapDetails={map} />;
       })

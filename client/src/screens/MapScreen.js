@@ -1,55 +1,47 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { Header, EditToolbar, Map, MapProperties, MapDetailCard } from "../components";
 import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
-const json1 = require('ot-json1');
+import { fileStore } from "../file/file";
+import { useSyncedStore } from '@syncedstore/react';
+import { getYjsValue } from "@syncedstore/core";
+
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
-
-  const queue = [];
-  let free = true;
-  let version = 1;
+  const fileState = useSyncedStore(fileStore);
+  const refresh = getYjsValue(fileState.refresh);
 
   useEffect(() => {
-    file.loadAllSubregions(mapId);
+    file.reset();
+    file.loadAllSubregionsFromDb(mapId);
     store.loadMapById(mapId);
   }, []);
 
-  useEffect(() => {
-    // if (file.subregions.length === 0) return;
-    if (!auth.user) return;
-    const userId = auth.user._id;
-    const baseURL = process.env.REACT_APP_FILE;
-    const evtSource = new EventSource(baseURL + '/connect/' + userId + "/" + mapId, { withCredentials: true });
-    console.log(evtSource.readyState)
-    // const subregion = file.subregions[0]
-    // const doc = json1.type.create(subregion)
-    // console.log(doc)
-    // const op = json1.replaceOp(["properties", "NAME"], "ALABAMA", "TEST_STATE");
-    // console.log(json1.type.apply(doc, op));
+  function reset(e){
+    file.reset();
+  }
 
-    evtSource.onmessage = function(event) {
-      const parsedData = JSON.parse(event.data);
-      console.log(parsedData)
-    }
-
-    evtSource.onerror = () => {
-      console.log("eventsource error");
-      evtSource.close();
-    }
-  }, [auth]);
+  function save(e){
+    file.save();
+  }
 
 
-  
+  function printStackLen(e){
+    file.printStackLen();
+  }
+
   return (
     <div>
-      <Header />
+      <button onClick={save}>save map</button>
+      <button onClick={reset}>reset map</button>
+      <button onClick={printStackLen}>printStackLen</button>
+      <Header /> 
       <EditToolbar />
       <Map />
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">

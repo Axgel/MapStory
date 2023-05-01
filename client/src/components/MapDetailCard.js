@@ -5,11 +5,9 @@ import Comments from "./Comments";
 import { DetailView } from "../enums";
 
 import { GlobalStoreContext } from '../store'
-import AuthContext from "../auth";
 
 export default function MapDetailCard(props) {
   const { store } = useContext(GlobalStoreContext);
-  const { auth } = useContext(AuthContext);
   const { mapDetails } = props;
   const [editActive, setEditActive] = useState(false);
 
@@ -17,12 +15,12 @@ export default function MapDetailCard(props) {
   let commentTabCSS = "px-9 py-2.5 font-semibold ";
   let detailTab;
 
-  if(store.detailView == DetailView.PROPERTIES){
+  if(store.detailView === DetailView.PROPERTIES){
     // add to properties, show properties
     propertyTabCSS += "bg-mapselectedfill";
     detailTab = <Properties />;
 
-  } else if(store.detailView == DetailView.COMMENTS){
+  } else if(store.detailView === DetailView.COMMENTS){
     commentTabCSS += "bg-mapselectedfill";
     detailTab = <Comments />;
   }
@@ -71,7 +69,7 @@ export default function MapDetailCard(props) {
   }
 
 
-  if(store.detailView != DetailView.NONE){
+  if(store.detailView !== DetailView.NONE){
     return (
       <div className="w-[300px] h-[550px] border-solid border flex flex-col bg-brownshade-700">
         <div className="h-12 flex items-center px-2 gap-4">
