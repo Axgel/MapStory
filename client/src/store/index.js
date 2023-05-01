@@ -51,7 +51,8 @@ function GlobalStoreContextProvider(props) {
           selectedMap: payload.selectedMap,
           detailView: payload.detailView,
           collaborators: payload.collaborators,
-          selectedMapOwner: payload.selectedMapOwner
+          selectedMapOwner: payload.selectedMapOwner,
+          comments: payload.comments
         })
       }
       case GlobalStoreActionType.SET_DETAIL_VIEW: {
@@ -103,11 +104,10 @@ function GlobalStoreContextProvider(props) {
           mapIdMarkedForAction: null,
         })
       }
-      case GlobalStoreActionType.LOAD_MAP_COMMENTS:{
+      case GlobalStoreActionType.ADD_COMMENTS:{
         return setStore({
           ...store,
-          comments: payload.comments, 
-          selectedMap: payload.selectedMap
+          comments: payload.comments
         })
       }
       default:
@@ -146,10 +146,10 @@ function GlobalStoreContextProvider(props) {
     const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
     const collaborators = await store.getAllCollaboratorsByMap(map);
     const selectedMapOwner = await store.getSelectedMapOwner(map);
-
+    const comments = await store.getComments(map);
     storeReducer({
-      type: GlobalStoreActionType.SET_SELECTED_MAP,
-      payload: {selectedMap: map, detailView: detailView, collaborators: collaborators, selectedMapOwner: selectedMapOwner},
+        type: GlobalStoreActionType.SET_SELECTED_MAP,
+        payload: {selectedMap: map, detailView: detailView, collaborators: collaborators, selectedMapOwner: selectedMapOwner, comments: comments},
     });
   }
 
@@ -293,26 +293,13 @@ function GlobalStoreContextProvider(props) {
     })
   }
 
-  store.loadCommentsByMap = async function () {
-    //reload personal and shared maps in order to update comments array
-    let asyncComments = [];
-    const comments = [];
-    if(this.selectedMap){
-      for(const commentId of this.selectedMap.comments){
-        asyncComments.push(api.getCommentById(commentId));
-      }
+  store.getComments = async function(map) {
+    if(!map) return [];
+    const response = await api.getComments(map._id);
+    if(response.status === 200) {
+      return response.data.comments;
     }
-    asyncComments = await Promise.all(asyncComments);
-    for(const res of asyncComments){
-      comments.push(res.data);
-    }
-   
-    // return comments;
-    console.log(this.selectedMap)
-    storeReducer({
-      type: GlobalStoreActionType.LOAD_MAP_COMMENTS,
-      payload: {comments: comments},
-    });
+    return [];
   }
 
   store.publishMapByMarkedId = async function(){
@@ -384,12 +371,12 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.getAllCollaboratorsByMap = async function(map){
+    if(!map) return [];
     let asyncCollaborators = [];
     const collaborators = [];
-    if(map){
-      for(const userId of map.collaborators){
-        asyncCollaborators.push(api.getUserById(userId));
-      }
+    
+    for(const userId of map.collaborators){
+      asyncCollaborators.push(api.getUserById(userId));
     }
 
     asyncCollaborators = await Promise.all(asyncCollaborators)
@@ -420,9 +407,13 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.addComment = async function (newComment){
-    let response = await api.addCommentById(store.selectedMap._id, auth.user._id, newComment);
-    if(response.status === 200){
-      store.loadCommentsByMap();
+    const response = await api.addComment(store.selectedMap._id, auth.user._id, newComment);
+    if(response.status === 200) {
+      const newComments = [...store.comments, response.data.comment];
+      storeReducer({
+        type: GlobalStoreActionType.ADD_COMMENTS,
+        payload: {comments : newComments},
+      });
     }
   }
   

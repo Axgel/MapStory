@@ -7,10 +7,6 @@ export default function Comments(props) {
   //display comments
   const { store } = useContext(GlobalStoreContext);
 
-  // useEffect(() => {
-  //   store.loadCommentsByMap();
-  // }, [])
-
   let commentCard = <></>;
   if(store.selectedMap && store.comments){
     commentCard = store.comments.map((comment, index) => {

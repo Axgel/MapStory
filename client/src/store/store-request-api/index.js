@@ -23,7 +23,6 @@ export const createMap = (user, mapTitle) => {
     collaborators: [],
     upvotes: [],
     downvotes: [],
-    comments: [],
     tags: [],
     isPublished: false,
     publishedDate: Date.now()
@@ -75,9 +74,9 @@ export const getUserById = (userId) => api.get(`/user/${userId}`);
 
 export const updateVotesById = (mapId, userId, voteType, value) => api.put(`/updateVote/${mapId}`, {userId: userId, voteType:voteType, value:value });
 
-export const getCommentById = (commentId) => api.get(`/comments/${commentId}`);
+export const getComments = (mapId) => api.get(`/comment/${mapId}`);
 
-export const addCommentById = (mapId, userId, comment) => api.post(`/comment/${mapId}`, {user: userId, comment: comment});
+export const addComment = (mapId, userId, comment) => api.post(`/comment/${mapId}`, {userId: userId, comment: comment});
 
 const apis = {
   createSubregion,
@@ -96,8 +95,8 @@ const apis = {
   removeCollaborator,
   getUserById, 
   updateVotesById, 
-  getCommentById, 
-  addCommentById
+  getComments, 
+  addComment
 };
 
 export default apis;
