@@ -8,7 +8,7 @@ export default function PublishMapModal(props) {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
 
-  const mapInfo = store.selectedMap;
+  const mapInfo = store.mapMarkedForAction;
 
   const collaboratorsUsernames = [];
   if(store.collaborators){
