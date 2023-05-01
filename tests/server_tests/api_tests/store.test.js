@@ -40,6 +40,23 @@ describe ("POST /login", () => {
     })
 })
 
+describe ("POST /createMap", () => {
+    describe("Checking for endpoint", () =>{
+        it("should return 400", async() => {
+        const response = await agent.post("/store/map").set("Cookie", cookies).send()
+        expect(response.status).toBe(400);
+        expect(response.body.error).toEqual('Invalid Map');
+        })
+    });
+    describe("Checking for endpoint", () =>{
+        it("should return 400", async() => {
+        const response = await agent.post("/store/subregion").set("Cookie", cookies).send()
+        expect(response.status).toBe(400);
+        expect(response.body.error).toEqual('You must provide a subregion');
+        })
+    });
+});
+
 describe ("Cleaning up database", ()=>{
     describe("Cleaning up data", () =>{
         it("Should clean up testing user", async () => {

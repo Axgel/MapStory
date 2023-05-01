@@ -6,7 +6,7 @@ const Comment = require("../models/comment-model");
 createSubregion = (req, res) => {
   const body = req.body;
 
-  if(!body) {
+  if(!body.mapId || !body) {
     return res.status(400).json({
       success: false,
       error: 'You must provide a subregion',
@@ -27,7 +27,7 @@ createSubregion = (req, res) => {
 createMap = (req, res) => {
   const body = req.body;
 
-  if(!body){
+  if(!body.owner || !body){
     return res.status(400).json({
       success: false,
       error: 'Invalid Map'

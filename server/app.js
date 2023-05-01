@@ -43,7 +43,8 @@ const storeRouter = require("./routes/store-router");
 app.use("/store", storeRouter);
 const fileRouter = require("./routes/file-router");
 app.use("/file", fileRouter);
-
+const utilRouter = require("./routes/util-router");
+app.use("/util", utilRouter);
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
