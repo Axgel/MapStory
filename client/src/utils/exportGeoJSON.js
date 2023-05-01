@@ -19,10 +19,16 @@ export function createGeoJSON(subregions){
         "features":[]
     };
 
-    subregions.forEach(element => {
-        let subregionFeature = addSubregion(element);
+    // subregions.forEach(element => {
+    //     let subregionFeature = addSubregion(element);
+    //     geojsonObj.features.push(subregionFeature);
+    // });
+    for(const key in subregions){
+        // console.log(key)
+        let subregionFeature = addSubregion(subregions[key]);
         geojsonObj.features.push(subregionFeature);
-    });
+    }
+    console.log(geojsonObj)
     
     //for loop through subregions of map
         //pass subregion id to addSubregion(let newFeature = addSubregion(subregionID))
@@ -59,7 +65,7 @@ function addSubregion(subregion){ //convert from subregion schema into GEOJSON f
         let coordinate = parsePolygon(subregion.coordinates[i]);
         coordinates.push(coordinate);
     }
-    console.log(coordinates)
+    // console.log(coordinates)
     feature.geometry.coordinates = coordinates;
     // console.log(feature.geometry.coordinates)
     return feature;

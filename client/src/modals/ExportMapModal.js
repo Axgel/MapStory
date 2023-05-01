@@ -1,12 +1,26 @@
 import React, { useContext } from "react";
 import { CurrentModal } from "../enums";
-
+import GlobalFileContext from "../file";
+import { exportSHPDBF } from "../utils/exportSHP";
+import{exportGeoJSON} from "../utils/exportGeoJSON";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
 export default function ExportMapModal() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
+  const { file } = useContext(GlobalFileContext);
+
+  function handleExport(e){
+    let compression = document.getElementById("compression").value
+    if (document.getElementById("fileType").value.toLowerCase() === "geojson"){
+      exportGeoJSON(file.subregions, compression);
+    }
+    if (document.getElementById("fileType").value.toLowerCase() === "shp"){
+      exportSHPDBF(file.subregions, compression);
+    }
+    store.setCurrentModal(CurrentModal.NONE);
+  }
 
   function handleCloseModal(e){
     e.stopPropagation();
@@ -21,18 +35,18 @@ export default function ExportMapModal() {
 
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
             <p>File Type</p>
-            <input className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="GeoJSON"></input>
+            <input id="fileType" className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="GeoJSON"></input>
           </div>
 
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
             <p>Compression %</p>
-            <input className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="-"></input>
+            <input id="compression" className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="-"></input>
           </div>
 
 
 
           <div className="flex flex-row-reverse mx-12 gap-3 mt-7">
-            <button className="bg-brownshade-800 text-white mb-3 px-3 py-1.5 rounded-md border-brownshade-850" onClick={handleCloseModal}>OK</button>
+            <button className="bg-brownshade-800 text-white mb-3 px-3 py-1.5 rounded-md border-brownshade-850" onClick={handleExport}>OK</button>
             <button className="bg-brownshade-800 text-white mb-3 px-3 py-1.5 rounded-md border-brownshade-850" onClick={handleCloseModal}>Cancel</button>
           </div>
         </div>
