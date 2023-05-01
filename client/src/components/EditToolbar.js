@@ -124,10 +124,10 @@ export default function EditToolbar() {
     </>;
 
   let upvoteImg = upvoteOutlineIcon;
-  if(store.selectedMap!= null && store.selectedMap.upvotes.includes(auth.user._id)) 
+  if(store.selectedMap && auth.user && store.selectedMap.upvotes.includes(auth.user._id)) 
     upvoteImg = upvoteFilledIcon;
   let downvoteImg = downvoteOutlineIcon;
-  if(store.selectedMap!= null && store.selectedMap.downvotes.includes(auth.user._id)) 
+  if(store.selectedMap && auth.user && store.selectedMap.downvotes.includes(auth.user._id)) 
     downvoteImg = downvoteFilledIcon ;
 
   let numUpvotes = 0;

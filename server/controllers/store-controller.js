@@ -292,9 +292,9 @@ addCollaborators = async(req, res) => {
       })
     }
 
-    const collaborator = await User.findOne({ email : body.collaboratorEmail });   
+    const collaborator = await User.findOne({ email : body.collaboratorEmail }); 
     const map = await MapProject.findOne({ _id: req.params.mapId }); 
-
+    
     if (map.collaborators.includes(collaborator._id)) {
       return res.status(400).json({
         error: "Collaborator already added"
@@ -344,7 +344,7 @@ removeCollaborators = async(req, res) => {
       })
     }
 
-    let temp = map.collaborators.filter(userid => userid === collaborator._id);
+    let temp = map.collaborators.filter(userId => userId.toString() !== collaborator._id.toString());
     map.collaborators = temp
     await map.save();
 
@@ -354,7 +354,7 @@ removeCollaborators = async(req, res) => {
       })
     }
 
-    temp = collaborator.sharedMaps.filter(mapid => mapid === map._id);
+    temp = collaborator.sharedMaps.filter(mapId => mapId.toString() !== map._id.toString());
     collaborator.sharedMaps = temp;
     await collaborator.save();
 

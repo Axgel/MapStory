@@ -23,11 +23,11 @@ switch (process.env.ENVIRONMENT) {
     const wssServer = new WebSocketServer({server: httpsServer})
 
     wssServer.on('connection', (socket) => {
-      console.log('WebSocket client connected');
+      //console.log('WebSocket client connected');
     
     
       socket.on('close', () => {
-        console.log('WebSocket client disconnected');
+        //console.log('WebSocket client disconnected');
       });
     });
 
@@ -43,11 +43,11 @@ switch (process.env.ENVIRONMENT) {
     const wsServer = new WebSocketServer({server: httpWSServer})
 
     wsServer.on('connection', (socket) => {
-      console.log('WebSocket client connected', socket);
+      //console.log('WebSocket client connected');
     
     
       socket.on('close', () => {
-        console.log('WebSocket client disconnected');
+        //console.log('WebSocket client disconnected');
       });
     });
 

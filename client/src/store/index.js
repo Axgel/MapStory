@@ -402,7 +402,7 @@ function GlobalStoreContextProvider(props) {
         response = await api.updateVotesById(map._id, auth.user._id, 1, 1);
     }
     if(response.status === 200){
-      store.loadPersonalAndSharedMaps(CurrentModal.NONE);
+      store.loadAllMaps();
     }
   }
 
