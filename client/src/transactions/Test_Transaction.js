@@ -1,4 +1,5 @@
 import jsTPS_Transaction from "../common/jsTPS.js"
+
 /**
  * CreateSong_Transaction
  * 
@@ -9,9 +10,11 @@ import jsTPS_Transaction from "../common/jsTPS.js"
  * @author ?
  */
 export class Test_Transaction extends jsTPS_Transaction {
+
     constructor(initFile, initSubregionId) {
         super();
         this.file = initFile;
+        this.mapId = initMapId;
         this.subregionId = initSubregionId;
     }
 

@@ -17,7 +17,7 @@ export default function Map() {
   const [mapItem, setMapItem] = useState(null);
   const { mapId } = useParams();
 
-  // Initializes leaflet map reference
+
   useEffect(() => {
     if(!mapRef) return;
     const map = file.initMapContainer(mapRef);
@@ -25,17 +25,18 @@ export default function Map() {
     return () => map.remove();
   },[mapRef])
 
+
   // Load all subregions into map
   useEffect(()=>{
     if(!mapItem ) return;
     console.log("Reloading from map screen");
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
-    });
-    
-    file.loadAllRegionsToMap(mapItem);
-  }, [file, mapItem])
+    })
 
+    file.loadAllRegionsToMap(mapItem)
+
+  }
 
   // get div of screen on page load to add map to
   function handleInitMapLoad(e){
@@ -43,7 +44,9 @@ export default function Map() {
   }
 
   return (
-    <div className="w-full h-[700px] z-10" id="map" ref={handleInitMapLoad}>
-    </div>
+    <>
+      <div className="w-full h-[700px] z-10" id="map" ref={handleInitMapLoad}>
+      </div>
+    </>
   );
 }

@@ -4,12 +4,18 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
+import { fileStore } from "../file/file";
+import { useSyncedStore } from '@syncedstore/react';
+import { getYjsValue } from "@syncedstore/core";
+
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
+  const fileState = useSyncedStore(fileStore);
+  const refresh = getYjsValue(fileState.refresh);
 
   useEffect(() => {
     // file.loadAllSubregionsFromDb(mapId);
@@ -30,9 +36,13 @@ export default function MapScreen() {
     }
   }, [auth]);
 
+
   return (
     <div>
-      <Header />
+      <button onClick={save}>save map</button>
+      <button onClick={reset}>reset map</button>
+      <button onClick={printStackLen}>printStackLen</button>
+      <Header /> 
       <EditToolbar />
       <Map />
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">

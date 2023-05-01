@@ -19,6 +19,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.5",
     "nodemailer": "^6.9.1",
+    "ot-json0": "^1.1.0",
     "ot-json1": "^1.0.2",
     "reconnecting-websocket": "^4.4.0",
     "sharedb": "^2.2.5",

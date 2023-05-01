@@ -4,10 +4,11 @@ const ObjectId = Schema.Types.ObjectId;
 
 const CommentSchema = new Schema(
   {
-    user: {type: ObjectId, ref: 'User'},
+    mapId: {type: ObjectId, ref: 'MapProject'},
+    userId: {type: ObjectId, ref: 'User'},
     comment: {type: String, required: true},
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.modelNames('Comment', CommentSchema)
+module.exports = mongoose.model('Comment', CommentSchema)
