@@ -35,6 +35,28 @@ updateSubregions = async (subregionId) => {
   }
 }
 
+getAllSubregionsServer = async(mapId) => {
+  try {
+    const subregions = await Subregion.find({ mapId: mapId });
+    console.log(subregions);
+    
+    if(!subregions || subregions.length == 0) return false;
+
+    const subregionsDict = {};
+
+    for(const subregion of subregions){
+      subregionsDict[subregion._id] = subregion;
+    }
+    return res.status(200).json({
+      subregions: subregionsDict
+    })
+    
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
 
 
 
