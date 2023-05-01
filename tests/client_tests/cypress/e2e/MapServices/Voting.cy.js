@@ -11,10 +11,10 @@ describe('Voting', () => {
     
     //success
     it('success upvoting', () => {
-        cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(1) > #upvoteCount").then((upvoteCount)=>{
+        cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(1) > #upvoteCount").invoke('text').then((upvoteCount)=>{
             cy.get(':nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(1) > #upvoteIcon').click()
             //value should be plus one
-            cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(1) > #upvoteCount").should('not.eq', upvoteCount)
+            cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(1) > #upvoteCount").invoke('text').should('not.eq', upvoteCount)
         })
         // cy.get(':nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(1) > #upvoteCount')   
         //     .invoke('val')                                 
@@ -28,10 +28,10 @@ describe('Voting', () => {
     });
     //success
     it('success downvoting', () => {
-        cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(2) > #downvoteIcon").then((upvoteCount)=>{
+        cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(2) > #downvoteIcon").invoke('text').then((downvoteCount)=>{
             cy.get(':nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(2) > #downvoteIcon').click()
             //value should be plus one
-            cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(2) > #downvoteCount").should('not.eq', upvoteCount)
+            cy.get(":nth-child(2) > :nth-child(1) > #votingInfo > :nth-child(2) > #downvoteCount").invoke('text').should('not.eq', downvoteCount)
         })
     });
 
