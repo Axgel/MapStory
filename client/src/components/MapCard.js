@@ -63,14 +63,14 @@ export default function MapCard(props) {
     <div className={mapCardWrapper} onClick={setSelectedMap} onDoubleClick={handleOpenMap}>
       <div className="flex">
         {/* Section for upvote/downvote */}
-        <div className="flex flex-col justify-center px-2">
+        <div id="votingInfo" className="flex flex-col justify-center px-2">
           <div className="flex items-center gap-2">
-            <img src={upvoteOutlineIcon} alt=""></img>
-            <p>{mapDetails.upvotes.length}</p>
+            <img id="upvoteIcon" src={upvoteOutlineIcon} alt=""></img>
+            <p id="upvoteCount">{mapDetails.upvotes.length}</p>
           </div>
           <div className="flex items-center gap-2">
-            <img src={downvoteOutlineIcon} alt=""></img>
-            <p>{mapDetails.downvotes.length}</p>
+            <img id="downvoteIcon" src={downvoteOutlineIcon} alt=""></img>
+            <p id="downvoteCount">{mapDetails.downvotes.length}</p>
           </div>
         </div>
 
