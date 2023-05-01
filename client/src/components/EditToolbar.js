@@ -130,15 +130,22 @@ export default function EditToolbar() {
   if(store.selectedMap!= null && store.selectedMap.downvotes.includes(auth.user._id)) 
     downvoteImg = downvoteFilledIcon ;
 
+  let numUpvotes = 0;
+  let numDownvotes = 0;
+  if(store.selectedMap !== null){
+    numUpvotes = store.selectedMap.upvotes.length;
+    numDownvotes = store.selectedMap.downvotes.length;
+  }
+
   let voting = (file.currentEditMode === EditMode.VIEW) ?
     <>
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-3 py-2 items-center">
         <img className="w-8 h-8" src={upvoteImg} onClick={handleUpvote} alt=""></img>
-        <p className="font-bold">{store.selectedMap.upvotes.length}</p>
+        <p className="font-bold">{numUpvotes}</p>
         <img className="w-8 h-8" src={downvoteImg} onClick={handleDownvote} alt=""></img>
-        <p className="font-bold pr-3">{store.selectedMap.downvotes.length}</p>
+        <p className="font-bold pr-3">{numDownvotes}</p>
       </div>
     </>
     :<></>;
