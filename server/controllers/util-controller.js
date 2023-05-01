@@ -5,7 +5,7 @@ const os = require("os");
 exportSHPDBF = async(req,res) =>{
     try{
         const {geojson} = req.body
-        let path = `${os.tmpdir()}\\file_shp.zip`;
+        let path = `${os.tmpdir()}/file_shp.zip`;
         console.log(path)
         const options = {
             layer: 'file'

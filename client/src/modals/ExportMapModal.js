@@ -35,7 +35,7 @@ export default function ExportMapModal() {
 
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
             <p>File Type</p>
-            <input id="fileType" className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="GeoJSON"></input>
+            <input id="fileType" className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="geojson/shp"></input>
           </div>
 
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
