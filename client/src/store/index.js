@@ -28,7 +28,7 @@ function GlobalStoreContextProvider(props) {
     selectedMap: null,
     collaborators: [],
     selectedMapOwner: null,
-    mapIdMarkedForAction: null,
+    mapMarkedForAction: null,
   });
 
   const navigate = useNavigate();
@@ -94,14 +94,14 @@ function GlobalStoreContextProvider(props) {
         return setStore({
           ...store,
           currentModal: payload.currentModal,
-          mapIdMarkedForAction: payload.mapIdMarkedForAction
+          mapMarkedForAction: payload.mapMarkedForAction
         })
       }
       case GlobalStoreActionType.MAP_ACTION: {
         return setStore({
           ...store,
           currentModal: CurrentModal.NONE,
-          mapIdMarkedForAction: null,
+          mapMarkedForAction: null,
         })
       }
       case GlobalStoreActionType.ADD_COMMENTS:{
@@ -283,12 +283,12 @@ function GlobalStoreContextProvider(props) {
     }
   }
 
-  store.setMapProjectAction = function(currentModal, mapId){
+  store.setMapProjectAction = function(currentModal, map){
     storeReducer({
       type: GlobalStoreActionType.SET_MAP_PROJECT_ACTION,
       payload: {
         currentModal: currentModal,
-        mapIdMarkedForAction: mapId
+        mapMarkedForAction: map
       }
     })
   }
@@ -303,9 +303,9 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.publishMapByMarkedId = async function(){
-    if(!store.mapIdMarkedForAction) return;
+    if(!store.mapMarkedForAction) return;
 
-    let response = await api.publishMapById(store.mapIdMarkedForAction);
+    let response = await api.publishMapById(store.mapMarkedForAction._id);
     if(response.status === 200){
       storeReducer({
         type: GlobalStoreActionType.MAP_ACTION,
@@ -317,8 +317,8 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.forkMapByMarkedId = async function(){
-    if(!store.mapIdMarkedForAction) return;
-    let response = await api.forkMapById(store.mapIdMarkedForAction, auth.user._id);
+    if(!store.mapMarkedForAction) return;
+    let response = await api.forkMapById(store.mapMarkedForAction._id, auth.user._id);
     if(response.status === 201){
       storeReducer({
         type: GlobalStoreActionType.MAP_ACTION,
@@ -330,8 +330,8 @@ function GlobalStoreContextProvider(props) {
   }
 
   store.deleteMapByMarkedId = async function(){
-    if(!store.mapIdMarkedForAction) return;
-    let response = await api.deleteMapById(store.mapIdMarkedForAction);  
+    if(!store.mapMarkedForAction) return;
+    let response = await api.deleteMapById(store.mapMarkedForAction._id);  
     if(response.status === 200){
       storeReducer({
         type: GlobalStoreActionType.MAP_ACTION,

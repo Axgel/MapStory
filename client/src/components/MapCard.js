@@ -55,7 +55,7 @@ export default function MapCard(props) {
 
   function setMapProjectAction(e, currentModal){
     e.stopPropagation();
-    store.setMapProjectAction(currentModal, mapDetails._id);
+    store.setMapProjectAction(currentModal, mapDetails);
   }
 
   let upvoteImg = mapDetails.upvotes.includes(auth.user._id)? upvoteFilledIcon : upvoteOutlineIcon;

@@ -205,7 +205,6 @@ forkMap = async (req, res) => {
       collaborators: [],
       upvotes: [],
       downvotes: [],
-      comments: [],
       tags: [],
       isPublished: false,
       publishedDate: Date.now()
