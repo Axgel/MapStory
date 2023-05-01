@@ -22,17 +22,6 @@ switch (process.env.ENVIRONMENT) {
       },
       app
     );
-    
-    const wssServer = new WebSocketServer({server: httpsServer})
-
-    wssServer.on('connection', (socket) => {
-      //console.log('WebSocket client connected');
-    
-    
-      socket.on('close', () => {
-        //console.log('WebSocket client disconnected');
-      });
-    });
 
     socketIO = new Server(httpSocketServer, {
       cors: {
