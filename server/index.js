@@ -23,7 +23,7 @@ switch (process.env.ENVIRONMENT) {
       app
     );
 
-    socketIO = new Server(httpSocketServer, {
+    socketIO = new Server(httpsServer, {
       cors: {
         origin: proess.env.PROD_CORS
       },
