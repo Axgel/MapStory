@@ -20,9 +20,9 @@ switch (process.env.ENVIRONMENT) {
       app
     );
     
-    const wsServer = new WebSocketServer({server: httpsServer})
+    const wssServer = new WebSocketServer({server: httpsServer})
 
-    wsServer.on('connection', (socket) => {
+    wssServer.on('connection', (socket) => {
       console.log('WebSocket client connected');
     
     
@@ -40,16 +40,16 @@ switch (process.env.ENVIRONMENT) {
     // server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     const httpWSServer = http.createServer(app);
 
-    // const wsServer = new WebSocketServer({server: httpWSServer})
+    const wsServer = new WebSocketServer({server: httpWSServer})
 
-    // wsServer.on('connection', (socket) => {
-    //   console.log('WebSocket client connected', socket);
+    wsServer.on('connection', (socket) => {
+      console.log('WebSocket client connected', socket);
     
     
-    //   socket.on('close', () => {
-    //     console.log('WebSocket client disconnected');
-    //   });
-    // });
+      socket.on('close', () => {
+        console.log('WebSocket client disconnected');
+      });
+    });
 
     httpWSServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
     break;

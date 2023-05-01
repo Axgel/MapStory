@@ -9,7 +9,8 @@ export const fileStore = syncedStore({
 
 
 const ydoc = getYjsDoc(fileStore);
-export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: ['wss://test.emailgravely.com:443'] });
+const server = process.env.REACT_APP_SOCKETIO;
+export const webrtcProvider = new WebrtcProvider('syncedstore', ydoc, { signaling: [server] });
 export const disconnect = () => webrtcProvider.disconnect();
 export const connect = () => webrtcProvider.connect();
 
