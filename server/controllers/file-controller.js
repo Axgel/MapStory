@@ -58,6 +58,5 @@ getAllSubregionsServer = async(mapId) => {
 
 
 module.exports = {
-  getAllSubregions,
-  saveSubregions
+  getAllSubregions
 };

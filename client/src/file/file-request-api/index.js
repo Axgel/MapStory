@@ -7,13 +7,9 @@ const api = axios.create({
 
 export const getAllSubregions = (mapId) => api.get(`/subregion/${mapId}`);
 
-export const saveSubregions = (subregionsStr) => api.put(`/savesubregion`, {
-  subregionsStr: subregionsStr
-}) 
 
 const apis = {
   getAllSubregions,
-  saveSubregions
 };
 
 export default apis;

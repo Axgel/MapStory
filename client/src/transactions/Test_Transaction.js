@@ -14,7 +14,6 @@ export class Test_Transaction extends jsTPS_Transaction {
     constructor(initFile, initSubregionId) {
         super();
         this.file = initFile;
-        this.mapId = initMapId;
         this.subregionId = initSubregionId;
     }
 

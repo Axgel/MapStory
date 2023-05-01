@@ -124,6 +124,12 @@ function GlobalFileContextProvider(props) {
           ...file
         })
       }
+      case GlobalFileActionType.UPDATE_SUBREGIONS: {
+        return setFile({
+          ...file,
+          subregions: payload.subregions
+        })
+      }
       default:
         return file;
     }
@@ -308,19 +314,6 @@ function GlobalFileContextProvider(props) {
     undoManager.redo();
   }
   
-  file.save = async function(){
-    const response = await api.saveSubregions(JSON.stringify(fileStateSubregions));
-    console.log(response);
-  }
-
-  file.printStackLen = function(){
-    console.log("Undostack: ", undoManager.undoStack.length);
-    console.log("Redostack: ", undoManager.redoStack.length);
-    console.log(JSON.stringify(fileStateSubregions));
-    console.log(JSON.stringify(refresh));
-  }
-
-
   return (
     <GlobalFileContext.Provider value={{ file }}>
       {props.children}
