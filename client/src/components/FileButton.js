@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { DetailView, EditMode } from "../enums";
+import { CurrentModal, DetailView, EditMode } from "../enums";
 
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
@@ -37,7 +37,11 @@ export default function FileButton() {
     file.setCurrentEditMode(EditMode.NONE);
   }
 
-
+  function setMapProjectAction(e, currentModal){
+    e.stopPropagation();
+    toggleFileByDD(e)
+    store.setMapProjectAction(currentModal, store.selectedMap);
+  }
 
   return (
     <div className="cursor-pointer m-3 z-50">
@@ -59,9 +63,9 @@ export default function FileButton() {
           <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
           <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
           <div className="h-px bg-lightgrey bg-opacity-30"></div>
-          <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80">Fork</p>
-          <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80">Publish</p>
-          <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80">Delete</p>
+          <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>Fork</p>
+          <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>Publish</p>
+          <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>Delete</p>
           <div className="h-px bg-lightgrey bg-opacity-30"></div>
           <p onClick={toggleFileByDD} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80">Save</p>
       </div>

@@ -1,12 +1,13 @@
 import React, { useContext } from "react";
 import { CurrentModal } from "../enums";
-
+import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
 export default function DeleteMapModal(props) {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const mapInfo = store.mapMarkedForAction;
   let titleElement = mapInfo ? <h1 className="text-xl text-center mt-4 mb-2 mx-9">{mapInfo.title}</h1> : <></>;
@@ -20,6 +21,7 @@ export default function DeleteMapModal(props) {
   function handleDeleteMap(e){
     e.stopPropagation();
     store.deleteMapByMarkedId();
+    navigate("/");
   }
 
   if(store.currentModal === CurrentModal.DELETE_MAP){
