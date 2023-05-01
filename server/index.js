@@ -25,7 +25,7 @@ switch (process.env.ENVIRONMENT) {
 
     socketIO = new Server(httpsServer, {
       cors: {
-        origin: proess.env.PROD_CORS
+        origin: process.env.PROD_CORS
       },
     });
 
