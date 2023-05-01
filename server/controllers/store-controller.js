@@ -1,6 +1,7 @@
 const User = require("../models/user-model");
 const Subregion = require("../models/subregion-model");
 const MapProject = require("../models/mapproject-model");
+const Comment = require("../models/comment-model");
 
 createSubregion = (req, res) => {
   const body = req.body;
@@ -204,7 +205,6 @@ forkMap = async (req, res) => {
       collaborators: [],
       upvotes: [],
       downvotes: [],
-      comments: [],
       tags: [],
       isPublished: false,
       publishedDate: Date.now()
@@ -292,9 +292,9 @@ addCollaborators = async(req, res) => {
       })
     }
 
-    const collaborator = await User.findOne({ email : body.collaboratorEmail });   
+    const collaborator = await User.findOne({ email : body.collaboratorEmail }); 
     const map = await MapProject.findOne({ _id: req.params.mapId }); 
-
+    
     if (map.collaborators.includes(collaborator._id)) {
       return res.status(400).json({
         error: "Collaborator already added"
@@ -344,7 +344,7 @@ removeCollaborators = async(req, res) => {
       })
     }
 
-    let temp = map.collaborators.filter(userid => userid === collaborator._id);
+    let temp = map.collaborators.filter(userId => userId.toString() !== collaborator._id.toString());
     map.collaborators = temp
     await map.save();
 
@@ -354,7 +354,7 @@ removeCollaborators = async(req, res) => {
       })
     }
 
-    temp = collaborator.sharedMaps.filter(mapid => mapid === map._id);
+    temp = collaborator.sharedMaps.filter(mapId => mapId.toString() !== map._id.toString());
     collaborator.sharedMaps = temp;
     await collaborator.save();
 
@@ -384,6 +384,118 @@ getUserById = async(req,res) => {
   }
 }
 
+updateVote = async(req,res) =>{
+  try{
+    const body = req.body; //voteType: 0=downvote, 1=upvote; value: 0=remove, 1=add
+    if(body.value === 0){//removing
+      if(body.voteType === 0)
+        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"downvotes": body.userId}});
+      else
+        await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"upvotes": body.userId}});
+    } else{ //adding
+      await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"upvotes": body.userId}});
+      await MapProject.updateOne({_id: req.params.mapId}, {$pull: {"downvotes": body.userId}});
+      if(body.voteType === 0)
+        await MapProject.updateOne({_id: req.params.mapId}, {$push: {"downvotes": body.userId}})
+      else
+        await MapProject.updateOne({_id: req.params.mapId}, {$push: {"upvotes": body.userId}})
+    }
+    
+    return res.status(200).json({
+      message: "Map project voting updated"
+    })
+  } catch(err) {
+    return res.status(400).json({
+      error: 'Error occured when updating the voting'
+    })
+  }
+}
+
+getComments = async(req, res) => {
+  try{
+    const { mapId } = req.params;
+    if(!mapId){
+      return res.status(400).json({
+        error: 'No selected map'
+      })
+    }
+    const map = await MapProject.findById(mapId);
+    if(!map) {
+      return res.status(400).json({
+        error: 'Unable to find map'
+      })
+    }
+    const comments = await Comment.find({ mapId: map._id });
+    const newComments = [];
+    for(const comment of comments) {
+      const user = await User.findById(comment.userId);
+      const newComment = {
+        mapId: comment.mapId,
+        userId: comment.userId,
+        comment: comment.comment,
+        username: user.userName
+      }
+      newComments.push(newComment);
+    }
+    return res.status(200).json({
+      "comments": newComments
+    })
+  } catch(err) {
+    console.log(err);
+    return res.status(400).json({
+      error: 'Error occured getting comment'
+    })
+  }
+}
+
+addComment = async(req, res) =>{
+  try{
+    const { mapId } = req.params;
+    const { userId, comment } = req.body;
+    if(!comment){
+      return res.status(400).json({
+        error: 'You must provide a comment to input'
+      })
+    }
+    const map = await MapProject.findById(mapId);
+    console.log(map);
+    if(!map) {
+      return res.status(400).json({
+        error: 'Unable to find map'
+      })
+    }
+    const user = await User.findById(userId);
+    console.log(user);
+    if(!user) {
+      return res.status(400).json({
+        error: 'Unable to find user'
+      })
+    }
+    //create the comment 
+    const newComment = new Comment({
+      mapId: map._id,
+      userId: user._id,
+      comment: comment
+    });
+    await newComment.save();
+    const retComment = {
+      mapId: map._id,
+      userId: user._id,
+      comment: comment,
+      username: user.userName
+    }
+    return res.status(200).json({
+      "comment": retComment
+    })
+
+  } catch(err) {
+    console.log(err);
+    return res.status(400).json({
+      error: 'Error occured adding comment'
+    })
+  }
+}
+
 module.exports = {
   createSubregion,
   createMap,
@@ -399,5 +511,8 @@ module.exports = {
   getMapById,
   addCollaborators,
   removeCollaborators,
-  getUserById
+  getUserById,
+  updateVote, 
+  getComments,
+  addComment
 };

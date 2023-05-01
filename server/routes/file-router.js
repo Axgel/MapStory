@@ -5,5 +5,4 @@ const auth = require('../auth');
 
 router.get('/subregion/:mapId', FileController.getAllSubregions);
 
-
 module.exports = router;

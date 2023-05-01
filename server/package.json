@@ -21,12 +21,14 @@
     "mongoose": "^5.7.5",
     "nodemailer": "^6.9.1",
     "os": "^0.1.2",
+    "ot-json0": "^1.1.0",
     "ot-json1": "^1.0.2",
     "reconnecting-websocket": "^4.4.0",
     "sharedb": "^2.2.5",
     "sharedb-mongo": "^1.0.0",
     "socket.io": "^4.6.1",
-    "ws": "^8.5.0"
+    "ws": "^8.5.0",
+    "yjs": "^13.6.0"
   },
   "scripts": {
     "start": "node index.js",

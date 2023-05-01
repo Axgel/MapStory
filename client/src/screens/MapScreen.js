@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
-const json1 = require('ot-json1');
+
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
@@ -12,15 +12,17 @@ export default function MapScreen() {
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
 
+
   useEffect(() => {
-    file.loadAllSubregionsFromDb(mapId);
-    store.loadMapById(mapId);
+    // file.loadAllSubregionsFromDb(mapId);
+    // store.loadMapById(mapId);  
+    file.reloadYDoc();
   }, []);
 
   useEffect(() => {
     if (!auth.user) return;
     if (!auth.socket) return;
-    
+
     auth.socket.emit('openProject', {
         mapId: mapId,
     })
@@ -29,10 +31,11 @@ export default function MapScreen() {
       auth.socket.emit('closeProject');
     }
   }, [auth]);
-  
+
+
   return (
     <div>
-      <Header />
+      <Header /> 
       <EditToolbar />
       <Map />
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">

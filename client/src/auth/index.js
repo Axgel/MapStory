@@ -4,6 +4,7 @@ import api from "./auth-request-api";
 import { AuthActionType, CurrentModal } from "../enums";
 import socketIO from 'socket.io-client';
 
+
 const AuthContext = createContext();
 
 function AuthContextProvider(props) {
@@ -12,7 +13,7 @@ function AuthContextProvider(props) {
     user: null,
     loggedIn: false,
     error: "",
-    socket: null
+    socket: null,
   });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -92,7 +93,7 @@ function AuthContextProvider(props) {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
         const socket = await socketIO.connect(process.env.REACT_APP_SOCKETIO);
-        socket.on("connect", () => {
+        socket.on("connect", ()=>{
           authReducer({
             type: AuthActionType.GET_LOGGED_IN,
             payload: {
@@ -101,7 +102,7 @@ function AuthContextProvider(props) {
               socket: socket
             }
           })
-        });
+        })
       }
     } catch (err) {
       auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);

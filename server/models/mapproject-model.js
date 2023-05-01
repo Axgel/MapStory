@@ -10,7 +10,6 @@ const MapProjectSchema = new Schema(
     collaborators: [{type: ObjectId, ref: 'User'}],
     upvotes: [{type: ObjectId, ref: 'User'}],
     downvotes: [{type: ObjectId, ref: 'User'}],
-    comments: [{type: ObjectId, ref: 'Comment'}],
     tags: [{type: String, required: false}],
     isPublished: {type: Boolean, required: true},
     publishedDate: {type: Date, required: true}

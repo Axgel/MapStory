@@ -1,6 +1,8 @@
 import React, { useContext } from "react";
 import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
+import downvoteFilledIcon from "../assets/downvoteFilledIcon.png"
+import upvoteFilledIcon from "../assets/upvoteFilledIcon.png"
 import { CurrentModal } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
@@ -48,13 +50,25 @@ export default function MapCard(props) {
   function handleOpenMap(e){
     e.stopPropagation();
     store.loadMapById(mapDetails._id);
-    auth.socket.removeAllListeners();
     navigate(`/map/${mapDetails._id}`);
   }
 
   function setMapProjectAction(e, currentModal){
     e.stopPropagation();
-    store.setMapProjectAction(currentModal, mapDetails._id);
+    store.setMapProjectAction(currentModal, mapDetails);
+  }
+
+  let upvoteImg = mapDetails.upvotes.includes(auth.user._id)? upvoteFilledIcon : upvoteOutlineIcon;
+  let downvoteImg = mapDetails.downvotes.includes(auth.user._id)? downvoteFilledIcon : downvoteOutlineIcon;
+
+  function handleDownvote(e){
+    e.stopPropagation();
+    store.updateVotes(mapDetails, 0);
+  }
+  
+  function handleUpvote(e){
+    e.stopPropagation();
+    store.updateVotes(mapDetails, 1);
   }
 
   return (
@@ -63,11 +77,11 @@ export default function MapCard(props) {
         {/* Section for upvote/downvote */}
         <div className="flex flex-col justify-center px-2">
           <div className="flex items-center gap-2">
-            <img src={upvoteOutlineIcon} alt=""></img>
+            <img className="w-8 h-8" src={upvoteImg} onClick={handleUpvote} alt=""></img>
             <p>{mapDetails.upvotes.length}</p>
           </div>
           <div className="flex items-center gap-2">
-            <img src={downvoteOutlineIcon} alt=""></img>
+            <img className="w-8 h-8" src={downvoteImg} onClick={handleDownvote} alt=""></img>
             <p>{mapDetails.downvotes.length}</p>
           </div>
         </div>

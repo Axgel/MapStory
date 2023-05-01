@@ -5,6 +5,8 @@
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "^2.14.1",
     "@headlessui/react": "^1.7.13",
+    "@syncedstore/core": "^0.5.1",
+    "@syncedstore/react": "^0.5.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +18,7 @@
     "leaflet": "^1.9.3",
     "mapshaper-simplify": "^2.0.2",
     "node-polyfill-webpack-plugin": "^2.0.1",
+    "ot-json0": "^1.1.0",
     "ot-json1": "^1.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -24,7 +27,9 @@
     "shapefile": "^0.6.6",
     "socket.io-client": "^4.6.1",
     "tailwindcss": "^3.3.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "y-webrtc": "^10.2.5",
+    "yjs": "^13.6.0"
   },
   "scripts": {
     "start": "env-cmd -f .env.development react-scripts start",

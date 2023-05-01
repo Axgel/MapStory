@@ -1,5 +1,5 @@
 import jsTPS_Transaction from "../common/jsTPS.js"
-const json1 = require('ot-json1');
+
 /**
  * CreateSong_Transaction
  * 
@@ -10,26 +10,19 @@ const json1 = require('ot-json1');
  * @author ?
  */
 export class Test_Transaction extends jsTPS_Transaction {
-    constructor(initFile, initSubregionId, initOp) {
+
+    constructor(initFile, initSubregionId) {
         super();
         this.file = initFile;
         this.subregionId = initSubregionId;
-        this.op = initOp;
     }
 
     doTransaction() {
         // this.file.updateSubregions(this.subregionId, this.op);
-        this.file.sendOpMiddleware(this.subregionId, this.op);
+        console.log("do trans");
     }
     
     undoTransaction() {
-        const inverse = json1.type.invert(this.op);
-        // this.file.updateSubregions(this.subregionId, inverse);
-        this.file.sendOpMiddleware(this.subregionId, inverse);
-    }
-
-    toString() {
-        let text = JSON.stringify(this.op)
-        return text
+        console.log("undo trans");
     }
 }
