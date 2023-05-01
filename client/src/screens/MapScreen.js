@@ -4,35 +4,44 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
-const json1 = require('ot-json1');
+import { fileStore } from "../file/file";
+import { useSyncedStore } from '@syncedstore/react';
+import { getYjsValue } from "@syncedstore/core";
+
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { mapId } = useParams();
+  const fileState = useSyncedStore(fileStore);
+  const refresh = getYjsValue(fileState.refresh);
 
   useEffect(() => {
+    file.reset();
     file.loadAllSubregionsFromDb(mapId);
     store.loadMapById(mapId);
   }, []);
 
-  useEffect(() => {
-    if (!auth.user) return;
-    if (!auth.socket) return;
-    
-    auth.socket.emit('openProject', {
-        mapId: mapId,
-    })
+  function reset(e){
+    file.reset();
+  }
 
-    return () => {
-      auth.socket.emit('closeProject');
-    }
-  }, [auth]);
-  
+  function save(e){
+    file.save();
+  }
+
+
+  function printStackLen(e){
+    file.printStackLen();
+  }
+
   return (
     <div>
-      <Header />
+      <button onClick={save}>save map</button>
+      <button onClick={reset}>reset map</button>
+      <button onClick={printStackLen}>printStackLen</button>
+      <Header /> 
       <EditToolbar />
       <Map />
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">

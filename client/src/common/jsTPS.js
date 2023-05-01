@@ -22,6 +22,10 @@ export class jsTPS_Transaction {
     undoTransaction() {
         console.log("undoTransaction - MISSING IMPLEMENTATION");
     }
+
+    transformOp(op) {
+        console.log("transformOp - MISSING IMPLEMENTATION");
+    }
 }
 
 /**
@@ -195,6 +199,13 @@ export default class jsTPS {
         // TOP OF THE TPS STACK TOO
         this.mostRecentTransaction = -1;      
         this.numTransactions = 0; 
+    }
+
+    transformAllTransactions(op) {
+        for(let i = 0; i < this.numTransactions; i++) {
+            const transaction = this.transactions[i];
+            transaction.transformOp(op);
+        }
     }
 
     /**

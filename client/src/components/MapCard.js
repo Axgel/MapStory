@@ -50,7 +50,6 @@ export default function MapCard(props) {
   function handleOpenMap(e){
     e.stopPropagation();
     store.loadMapById(mapDetails._id);
-    auth.socket.removeAllListeners();
     navigate(`/map/${mapDetails._id}`);
   }
 
