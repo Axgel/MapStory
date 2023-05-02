@@ -118,7 +118,7 @@ export default function EditToolbar() {
         <img src={SplitSubregionIcon} alt=""></img>
         <img src={MergeSubregionIcon} alt=""></img>
         <img src={AddSubregionIcon} alt=""></img>
-        <img src={RemoveSubregionIcon} alt=""></img>
+        <img className="w-[25px] h-[25px]" src={RemoveSubregionIcon} alt=""></img>
       </div>
       <div className="w-[1px] bg-black h-full"></div>
     </>;
