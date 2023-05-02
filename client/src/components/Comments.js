@@ -25,6 +25,13 @@ export default function Comments(props) {
     store.addComment(comment);
   }
 
+  function handleKeyPress(e) {
+    e.stopPropagation();
+    if (e.code === "Enter") {
+      handleComment(e);
+    }
+  }
+
   return (
     <div id="commentView" className="flex flex-col pl-5 pt-4 gap-2">
       {commentCard}
@@ -38,7 +45,7 @@ export default function Comments(props) {
         <p className="text-sm text-publishmodalsubtext">I plan on making an extension of this app soon!</p>
       </div> */}
       <div className="absolute bottom-2 left-3">
-        <input id="input_comment" className="w-[230px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-2 text-base" type="text"></input>
+        <input id="input_comment" onKeyDown={handleKeyPress} className="w-[230px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-2 text-base" type="text"></input>
         <img id="submit_comment" className="h-[35px] absolute bottom-0" src={paperPlaneIcon} onClick={handleComment} alt=""></img>
       </div>
     </div>
