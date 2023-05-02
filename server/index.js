@@ -202,7 +202,20 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
+        const [transaction, mapId, subregionId, indexPath, newCoords] = data;
+        let ydoc = mapProjects[mapId].text
+        switch(transaction){
+          case "MOVE_VERTEX":
+            moveVertex(ydoc, subregionId, indexPath, newCoords)
+            break;
+          case "ADD_VERTEX":
+            break;
+          case "REMOVE_VERTEX":
+            break;
         
+        }
+
+        console.log(JSON.stringify(ydoc.getMap("regions")));
       });
     })
    
@@ -220,7 +233,6 @@ function createYjsData(ymap, jsonItems){
     const ymapData = new Y.Map();
 
     const coords = subregionData["coords"];
-    console.log(coords,"qwer");
     const properties = subregionData["properties"];
     
     const yArr0 = new Y.Array();
@@ -280,4 +292,22 @@ async function loadDocFromDb(socketid, mapId){
   let arr = Array.from(state);
   let str = JSON.stringify(arr);
   return str;
+}
+
+function moveVertex(ydoc, subregionId, indexPath, newCoords){
+  const [i,j] = indexPath
+  const ymap = ydoc.getMap("regions");
+  const oldCoords = ymap.get(subregionId).get("coords");
+  const newCoordsArr = new Y.Array();
+  oldCoords.get(i)[j] = newCoords;
+  console.log(JSON.stringify(oldCoords), "abc");
+  // ymap.set(subregionId, newCoordsArr);
+}
+
+function addVertex(ydoc, subregionId, indexPath, newCoords){
+  
+}
+
+function removeVertex(ydoc, subregionId, indexPath, newCoords){
+  
 }

@@ -8,6 +8,8 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
+import { CreateVertexTransaction } from "../transactions";
+import { TransactionType } from "../enums";
 import * as Y from 'yjs';
 
 const coords = {
@@ -37,6 +39,7 @@ export default function MapScreen() {
   const [loadedRegions, setLoadedRegions] = useState({});
   const [editRegions, setEditRegions] = useState({});
   const [staleBridge, setStaleBridge] = useState(null);
+  const [vertexTransaction, setVertexTransaction] = useState(null);
   // const [ydoc, setYdoc] = useState(null);
 
   const { mapId } = useParams();
@@ -67,7 +70,6 @@ export default function MapScreen() {
   useEffect(() => {
     if(!auth.user || !auth.socket) return;
 
-    console.log(1);
     auth.socket.on('sync', (data) => {
       const obj = JSON.parse(data);
       let uarr = Uint8Array.from(obj);
@@ -97,11 +99,12 @@ export default function MapScreen() {
     // init subregion load once
     if(!mapItem || initLoad >= 0) return;
     
-    const yjsRegions = ydoc.getMap('regions');
-
+    const yjsRegions = ydoc.getMap('regions').toJSON();
 
     const regions = {};
-    for(const [subregionId, coordinates] of Object.entries(coords)){
+    for(const [subregionId, subregionData] of Object.entries(yjsRegions)){
+      const coordinates = subregionData["coords"];
+      console.log(coordinates);
       const layer = L.polygon(coordinates).addTo(mapItem);
       regions[subregionId] = layer;
       initLayerHandlers(layer, subregionId);
@@ -135,9 +138,18 @@ export default function MapScreen() {
     setStaleBridge(null);
   }, [staleBridge])
 
+
   useEffect(() => {
-    console.log(editRegions)
-  }, [editRegions])
+    if(!vertexTransaction) return;
+
+    const [transaction, e, subregionId] = vertexTransaction;
+    const trans = CreateVertexTransaction(transaction, e, subregionId);
+    trans.splice(1, 0, mapId);
+    auth.socket.emit('op', trans);
+
+    setVertexTransaction(null);
+  }, [vertexTransaction])
+
 
   function reloadLayer(subregionId){
     // remove old layer
@@ -184,31 +196,17 @@ export default function MapScreen() {
   }
 
   function handleVertexAdded(e, subregionId){
-    // handle vertex added to layer
+    setVertexTransaction([TransactionType.ADD_VERTEX, e, subregionId]);
   }
 
   function handleMarkerDragEnd(e, subregionId){
-
-    // handle vertex move
+    setVertexTransaction([TransactionType.MOVE_VERTEX, e, subregionId]);
   }
 
   function handleVertexRemoved(e, subregionId){
-    // handle vertex removed from layer
+    setVertexTransaction([TransactionType.REMOVE_VERTEX, e, subregionId]);
   }
 
-
-  function initLoadData(e){
-    setInitLoad(-1);
-  }
-
-  function addItem(e){
-  }
-
-  function deleteItem(e){
-  }
-
-  function printAll(e){
-  }
 
   function handleInitMapLoad(e) {
     setMapRef(e);
@@ -218,10 +216,6 @@ export default function MapScreen() {
     <div>
       <button>undo</button>
       <button>redo</button>
-      <button onClick={addItem}>add item to ymap</button>
-      <button onClick={deleteItem}>delete item from ymap</button>
-      <button onClick={initLoadData}>initLoad</button>
-      <button onClick={printAll}>print</button>
       <br></br>
       <Header /> 
       <EditToolbar />

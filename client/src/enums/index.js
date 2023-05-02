@@ -8,6 +8,7 @@ import { DetailView } from "./DetailView"
 import { AuthActionType } from "./AuthActionType"
 import { EditMode } from "./EditMode"
 import { OTOperations } from "./OTOperations"
+import { TransactionType } from "./TransactionType"
 
 export {
   GlobalStoreActionType,
@@ -19,5 +20,6 @@ export {
   DetailView,
   AuthActionType,
   EditMode,
-  OTOperations
+  OTOperations,
+  TransactionType
 }
