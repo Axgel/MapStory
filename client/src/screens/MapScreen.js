@@ -8,12 +8,7 @@ import { useParams } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
-import useWebSocket from 'react-use-websocket';
 import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket'
-import { syncedStore, getYjsDoc } from "@syncedstore/core";
-import { WebrtcProvider } from 'y-webrtc'
-import { useSyncedStore } from "@syncedstore/react";
 
 const coords = {
   "1": [[
@@ -29,17 +24,8 @@ const coords = {
     [36.000674, -90.538593],
   ]]
 }
-const WS_URL = 'ws://localhost:4000';
-const request = {
-  id: "1",
-};
-const fileStateOut = syncedStore({ tmp: 'text' });
-const ydoc = getYjsDoc(fileStateOut);
-const provider = new WebrtcProvider('room-name', ydoc, { signaling: ['wss://test.emailgravely.com'] })
-provider.connect();
-// ydoc.on('update', () => {
-//   console.log("hgi");
-// })
+console.log(1);
+let ydoc = new Y.Doc({ autoLoad: true });
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
@@ -51,59 +37,52 @@ export default function MapScreen() {
   const [loadedRegions, setLoadedRegions] = useState({});
   const [editRegions, setEditRegions] = useState({});
   const [staleBridge, setStaleBridge] = useState(null);
+  // const [ydoc, setYdoc] = useState(null);
+
   const { mapId } = useParams();
   
-  const fileState = useSyncedStore(fileStateOut);
+  useEffect(() => {
+    ydoc = new Y.Doc();
 
-  const [ws, setWs] = useState(null);
-  const [wsP, setWsP] = useState(null);
-  const [text, setText] = useState("");
+  }, []);
 
-  // useEffect(() => {
-  //   const wsClient = new WebSocket(WS_URL);
-  //   wsClient.onopen = () => {
-  //     setWs(wsClient);
-  //     console.log("sending to ws");
-  //     wsClient.send("sync")
-  //   }
 
-  //   wsClient.onclose = () => console.log('ws closed');
+  useEffect(() => {
+    if (!auth.user) return;
+    if (!auth.socket) return;
 
-  //   return () => {
-  //     wsClient.close();
-  //   }
-  // }, [])
+    console.log("opening");
+    
+    auth.socket.emit('openProject', {
+        mapId: mapId,
+    })
 
-  
+    return () => {
+      auth.socket.emit('closeProject');
+    }
+  }, [auth]);
 
-  // useEffect(() => {
-  //   if(!ws) return;
 
-  //   ws.onmessage = (evt) => {
-  //     if(evt.data === "ydoc"){
-  //       const provider = new WebrtcProvider('room-name', ydoc, { signaling: ['ws://localhost:4000'] })
-  //       provider.connect();
-  //       // const provider = new WebsocketProvider(WS_URL, 'room-name', doc)
-  //       setWsP(provider);
-  //     }
-  //   }
-  // }, [ws])
 
-  // useEffect(() => {
-  //   if(!wsP) return;
+  useEffect(() => {
+    if(!auth.user || !auth.socket) return;
 
-  //   wsP.on('peers', event => {
-  //     // setText(ytext.toString());
-  //     console.log('peers');
-  //     console.log(event);
-  //   })
-
-  //   wsP.on('synced', event => {
-  //     console.log("syncing");
-  //     console.log(event);
-  //   })
-
-  // }, [wsP])
+    console.log(1);
+    auth.socket.on('sync', (data) => {
+      const obj = JSON.parse(data);
+      let uarr = Uint8Array.from(obj);
+      Y.applyUpdate(ydoc, uarr);
+      setInitLoad(-1);
+    })
+    
+    auth.socket.on('update', (data) => {
+      // apply transaction
+    })
+    
+    return () => {
+      auth.socket.removeAllListeners();
+    }
+  }, [auth])
 
 
   useEffect(() => {
@@ -118,6 +97,9 @@ export default function MapScreen() {
     // init subregion load once
     if(!mapItem || initLoad >= 0) return;
     
+    const yjsRegions = ydoc.getMap('regions');
+
+
     const regions = {};
     for(const [subregionId, coordinates] of Object.entries(coords)){
       const layer = L.polygon(coordinates).addTo(mapItem);
@@ -220,15 +202,12 @@ export default function MapScreen() {
   }
 
   function addItem(e){
-    fileState.tmp.insert(0, 'abc');
   }
 
   function deleteItem(e){
-    fileState.tmp.delete(0, 1);
   }
 
   function printAll(e){
-    console.log(JSON.stringify(fileState.tmp));
   }
 
   function handleInitMapLoad(e) {
@@ -246,7 +225,7 @@ export default function MapScreen() {
       <br></br>
       <Header /> 
       <EditToolbar />
-      {JSON.stringify(fileState.tmp)}
+      {/* <Map/> */}
       <div
         className="w-full h-[700px] z-10"
         id="map"

@@ -92,17 +92,21 @@ function AuthContextProvider(props) {
     try {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
-        authReducer({
-          type: AuthActionType.GET_LOGGED_IN,
-          payload: {
-            loggedIn: response.data.loggedIn,
-            user: response.data.user,
-            socket: null
-          }
+        const socket = await socketIO.connect(process.env.REACT_APP_SOCKETIO);
+        socket.on('connect', () => {
+          authReducer({
+            type: AuthActionType.GET_LOGGED_IN,
+            payload: {
+              loggedIn: response.data.loggedIn,
+              user: response.data.user,
+              socket: socket
+            }
+          })
         })
       }
     } catch (err) {
-      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
+      console.log(err);
+      // auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
   };
 
