@@ -10,7 +10,7 @@ export function exportGeoJSON(subregionsArr, compressionPercent){
     const simplified = simplify(toSimplify, compressionPercent) //TODO: check compression format
     //at the end download the object
     // console.log(geojson);
-    download(JSON.stringify(simplified), "testing.json", "text/plain");
+    download(JSON.stringify(simplified), "testing.json", "application/json");
 }
 
 export function createGeoJSON(subregions){

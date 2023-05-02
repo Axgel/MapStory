@@ -6,9 +6,9 @@ exportSHPDBF = async(req,res) =>{
     try{
         const {geojson} = req.body
         let path = `${os.tmpdir()}/file_shp.zip`;
-        console.log(path)
         const options = {
-            layer: 'file'
+            layer: 'file',
+            encoding: "UTF-8"
         }
         let stream = fs.createWriteStream(path)
         await convert(geojson, stream, options);
@@ -19,7 +19,6 @@ exportSHPDBF = async(req,res) =>{
                     error: err
                 })
             }
-            console.log(path)
             fs.unlink(path, (err) =>{
                 if(err){
                     return res.status(500).json({

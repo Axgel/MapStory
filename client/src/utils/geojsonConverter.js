@@ -108,7 +108,7 @@ async function parseSHPDBF(fileOne, fileTwo) {
 
 async function parseSHPDBFHelper(shp, dbf)  {
     const featureList = [];
-    return open(shp, dbf).then(source => source.read().then(function log(result) {
+    return open(shp, dbf, {encoding:"UTF-8"}).then(source => source.read().then(function log(result) {
         if (result.done) {
             const content = { type: "FeatureCollection", features: featureList}
             return content;

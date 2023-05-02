@@ -177,7 +177,10 @@ function GlobalStoreContextProvider(props) {
         type: GlobalStoreActionType.SET_SELECTED_MAP,
         payload: {
           selectedMap: response.data.map,
-          detailView: DetailView.NONE
+          detailView: DetailView.PROPERTIES,
+          collaborators: [],
+          selectedMapOwner: auth.user,
+          comments: []
         }
       })
       navigate(`/map/${response.data.map._id}`);
