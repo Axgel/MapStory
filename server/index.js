@@ -26,7 +26,7 @@ switch (process.env.ENVIRONMENT) {
     );
 
     
-    const wsServer = new WebSocket.Server({server: devHttpServer});
+    const wsServer = new WebSocket.Server({server: httpsServer});
     console.log(wsServer.Server);
     wsServer.on('connection', function connection(ws) {
       console.log('A new client Connected!');
