@@ -56,20 +56,9 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
-        const [transaction, mapId, subregionId, indexPath, newCoords] = data;
-        let ydoc = mapProjects[mapId].text
-        switch(transaction){
-          case "MOVE_VERTEX":
-            moveVertex(ydoc, subregionId, indexPath, newCoords)
-            break;
-          case "ADD_VERTEX":
-            break;
-          case "REMOVE_VERTEX":
-            break;
-        }
-
+        applyOp(data);
         for (const client of mapProjects[mapId].clients) {
-          // if (client == socket.id) continue;
+          if (client == socket.id) continue;
           socketIO.to(client).emit("update", data);
         }
       });
@@ -116,20 +105,9 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
-        const [transaction, mapId, subregionId, indexPath, newCoords] = data;
-        let ydoc = mapProjects[mapId].text
-        switch(transaction){
-          case "MOVE_VERTEX":
-            moveVertex(ydoc, subregionId, indexPath, newCoords)
-            break;
-          case "ADD_VERTEX":
-            break;
-          case "REMOVE_VERTEX":
-            break;
-        }
-
+        applyOp(data);
         for (const client of mapProjects[mapId].clients) {
-          // if (client == socket.id) continue;
+          if (client == socket.id) continue;
           socketIO.to(client).emit("update", data);
         }
       });
@@ -208,20 +186,39 @@ async function loadDocFromDb(socketid, mapId){
   return str;
 }
 
+function applyOp(data){
+  const [transaction, mapId, subregionId, indexPath, newCoords] = data;
+  let ydoc = mapProjects[mapId].text
+  switch(transaction){
+    case "MOVE_VERTEX":
+      moveVertex(ydoc, subregionId, indexPath, newCoords);
+      break;
+    case "ADD_VERTEX":
+      addVertex(ydoc, subregionId, indexPath, newCoords);
+      break;
+    case "REMOVE_VERTEX":
+      removeVertex(ydoc, subregionId, indexPath, newCoords);
+      break;
+  }
+}
+
 function moveVertex(ydoc, subregionId, indexPath, newCoords){
   const [i,j] = indexPath
   const ymap = ydoc.getMap("regions");
   const oldCoords = ymap.get(subregionId).get("coords");
-  const newCoordsArr = new Y.Array();
   oldCoords.get(i)[j] = newCoords;
-  console.log(JSON.stringify(oldCoords), "abc");
-  // ymap.set(subregionId, newCoordsArr);
 }
 
 function addVertex(ydoc, subregionId, indexPath, newCoords){
-  
+  const [i,j] = indexPath;
+  const ymap = ydoc.getMap("regions");
+  const coords = ymap.get(subregionId).get("coords");
+  coords.get(i).splice(j, 0, newCoords);
 }
 
 function removeVertex(ydoc, subregionId, indexPath, newCoords){
-  
+  const [i,j] = indexPath;
+  const ymap = ydoc.getMap("regions");
+  const coords = ymap.get(subregionId).get("coords");
+  coords.get(i).splice(j, 1);
 }
