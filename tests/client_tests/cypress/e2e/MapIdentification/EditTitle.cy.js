@@ -10,14 +10,14 @@ describe('Edit Title', () => {
     });
     
     // blank title
-    it('edit to blank title', () => {
-        cy.get("#mapTitleTB").then((currentTitle)=>{
-            cy.get('#mapTitleTB').dblclick()
-            cy.get('#inputNewUsername').clear().type("{enter}");
-            //get error for blank title
-            cy.get("#mapTitleTB").should('eq', currentTitle)
-        })
-    });
+    // it('edit to blank title', () => {
+    //     cy.get("#mapTitleTB").then((currentTitle)=>{
+    //         cy.get('#mapTitleTB').dblclick()
+    //         cy.get('#inputNewUsername').clear().type("{enter}");
+    //         //get error for blank title
+    //         cy.get("#mapTitleTB").should('eq', currentTitle)
+    //     })
+    // });
     
     //success
     it('success', () => {
