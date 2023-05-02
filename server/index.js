@@ -56,6 +56,7 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
+        const mapId = data[1];
         applyOp(data);
         for (const client of mapProjects[mapId].clients) {
           if (client == socket.id) continue;
@@ -105,6 +106,7 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
+        const mapId = data[1];
         applyOp(data);
         for (const client of mapProjects[mapId].clients) {
           if (client == socket.id) continue;
