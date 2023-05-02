@@ -24,8 +24,7 @@ describe('Comments', () => {
 
     //success pressing enter
     it('success', () => {
-        cy.get('#input_comment').type("good map")
-        cy.get("#submit_comment").click()
+        cy.get('#input_comment').type("good map{enter}")
         cy.get('#commentView').contains("good map")
     });
 })
