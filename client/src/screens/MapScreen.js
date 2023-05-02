@@ -35,7 +35,7 @@ const request = {
 };
 const fileStateOut = syncedStore({ tmp: 'text' });
 const ydoc = getYjsDoc(fileStateOut);
-const provider = new WebrtcProvider('room-name', ydoc, { signaling: ['ws://localhost:4000'] })
+const provider = new WebrtcProvider('room-name', ydoc, { signaling: ['wss://test.emailgravely.com'] })
 provider.connect();
 // ydoc.on('update', () => {
 //   console.log("hgi");
