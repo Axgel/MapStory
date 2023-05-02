@@ -215,6 +215,12 @@ switch (process.env.ENVIRONMENT) {
         
         }
 
+        for (const client of mapProjects[mapId].clients) {
+          // if (client == socket.id) continue;
+          socketIO.to(client).emit("update", data);
+        }
+
+
         console.log(JSON.stringify(ydoc.getMap("regions")));
       });
     })
