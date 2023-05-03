@@ -33,49 +33,27 @@ export default function MapScreen() {
   const { mapId } = useParams();
   
   useEffect(() => {
-    ydoc = new Y.Doc();
-  }, []);
-
-
-  useEffect(() => {
     if (!auth.user || !auth.socket) return;
     // init map project open
     auth.socket.emit('openProject', {
         mapId: mapId,
     })
 
+    ydoc.on('update', (update, origin) => {
+      if(origin[0]) {
+        const arr = Array.from(update);
+        const op = JSON.stringify(arr);
+        auth.socket.emit('op', {mapId: mapId, subregionId: origin[1], op: op});
+      }
+    })
+
     return () => {
-      auth.socket.emit('closeProject');
+      ydoc.destroy();
+      auth.socket.emit('closeProject', {
+        mapId: mapId,
+      });
     }
   }, [auth]);
-
-  useEffect(() => {
-    if(!incTransaction) return;
-    // sync received data to current doc
-    applyTransaction(incTransaction);
-    setIncTransaction(null);
-  }, [incTransaction])
-
-  useEffect(() => {
-    if(!auth.user || !auth.socket) return;
-
-    auth.socket.on('sync', (data) => {
-      const obj = JSON.parse(data);
-      let uarr = Uint8Array.from(obj);
-      Y.applyUpdate(ydoc, uarr);
-      setInitLoad(-1);
-    })
-
-    auth.socket.on('update', (data) => {
-      // apply transaction
-      setIncTransaction(data);
-    })
-    
-    return () => {
-      auth.socket.removeAllListeners();
-    }
-  }, [auth])
-
 
   useEffect(() => {
     // load map container
@@ -127,18 +105,144 @@ export default function MapScreen() {
     setStaleBridge(null);
   }, [staleBridge])
 
-  
+  // useEffect(() => {
+  //   ydoc = new Y.Doc();
+
+  //   ydoc.on('update', (update, origin) => {
+  //     if(origin[0]) {
+  //       const arr = Array.from(update);
+  //       const op = JSON.stringify(arr);
+  //       auth.socket.emit('op', {mapId: mapId, subregionId: origin[1], op: op});
+  //     }
+  //   })
+
+  //   return () => {
+  //     ydoc.destroy();
+  //   }
+  // }, [auth]);
+
+  useEffect(() => {
+    if(!auth.user || !auth.socket) return;
+
+    auth.socket.on('sync', (data) => {
+      const parsed = JSON.parse(data);
+      const uintArray = Uint8Array.from(parsed);
+      Y.applyUpdate(ydoc, uintArray, [false]);
+      setInitLoad(-1);
+    })
+
+    auth.socket.on('owner-update', (data) => {
+    })
+
+    auth.socket.on('others-update', (data) => {
+      const {subregionId, op} = data;
+      const parsed = JSON.parse(op);
+      const uintArray = Uint8Array.from(parsed);
+      Y.applyUpdate(ydoc, uintArray, [false]);
+      setIncTransaction(subregionId);
+    })
+    
+    return () => {
+      auth.socket.removeAllListeners();
+    }
+  }, [auth])
+
   useEffect(() => {
     if(!vertexTransaction) return;
     // create a vertex transaction
     const [transaction, e, subregionId] = vertexTransaction;
     const trans = CreateVertexTransaction(transaction, e, subregionId);
     trans.splice(1, 0, mapId);
-    auth.socket.emit('op', trans);
+    applyTransaction(trans);
 
     setVertexTransaction(null);
   }, [vertexTransaction])
 
+
+  useEffect(() => {
+    if(!incTransaction) return;
+    reloadLayer(incTransaction);
+    setIncTransaction(null);
+  }, [incTransaction]);
+
+
+  function initLayerHandlers(layer, subregionId){
+    layer.on('click', (e) => setStaleBridge(subregionId));
+    layer.on('pm:vertexadded', (e) => setVertexTransaction([TransactionType.ADD_VERTEX, e, subregionId]));
+    layer.on('pm:markerdragend', (e) => setVertexTransaction([TransactionType.MOVE_VERTEX, e, subregionId]));
+    layer.on('pm:vertexremoved', (e) => setVertexTransaction([TransactionType.REMOVE_VERTEX, e, subregionId]));
+  }
+
+  function enableEditing(layer){
+    layer.pm.enable({
+      removeLayerBelowMinVertexCount: false,
+      limitMarkersToCount: 5,
+      draggable: false,
+      addVertexOn: 'click',
+      removeVertexOn: 'click',
+      // addVertexValidation: file.addVertexValidate,
+      // moveVertexValidation: file.editVertexValidate,
+      // removeVertexValidation: file.editVertexValidate,
+      hideMiddleMarkers: false
+    })
+  }
+
+  function applyTransaction(data){
+    const [transaction, mapId, subregionId, indexPath, newCoords] = data;
+    switch(transaction){
+      case TransactionType.ADD_VERTEX:
+        applyVertexAdd(subregionId, indexPath, newCoords);
+        break;
+      case TransactionType.MOVE_VERTEX:
+        applyVertexMove(subregionId, indexPath, newCoords);
+        break;
+      case TransactionType.REMOVE_VERTEX:
+        applyVertexRemove(subregionId, indexPath, newCoords);
+        break;
+    }
+  }
+
+  function applyVertexAdd(subregionId, indexPath, newCoords){
+    const [i,j] = indexPath;
+    const ymap = ydoc.getMap("regions");
+    const coords = ymap.get(subregionId).get("coords");
+    const newData = JSON.parse(JSON.stringify(coords.get(i)));
+    newData.splice(j, 0, newCoords);
+    ydoc.transact(() => {
+      coords.delete(i, 1);
+      coords.insert(i, [newData]);
+    }, [true, subregionId]);
+    reloadLayer(subregionId);
+    //coords.get(i).splice(j, 0, newCoords);
+  }
+
+  function applyVertexMove(subregionId, indexPath, newCoords){
+    const [i,j] = indexPath
+    const ymap = ydoc.getMap("regions");
+    const coords = ymap.get(subregionId).get("coords");
+    const newData = JSON.parse(JSON.stringify(coords.get(i)));
+    newData[j] = newCoords;
+    ydoc.transact(() => {
+      coords.delete(i, 1);
+      coords.insert(i, [newData]);
+    }, [true, subregionId]);
+    reloadLayer(subregionId);
+    //coords.get(i)[j] = newCoords;
+  }
+
+  function applyVertexRemove(subregionId, indexPath, newCoords){
+    const [i,j] = indexPath;
+    const ymap = ydoc.getMap("regions");
+    const coords = ymap.get(subregionId).get("coords");
+    const newData = JSON.parse(JSON.stringify(coords.get(i)));
+    newData.splice(j, 1);
+    ydoc.transact(() => {
+      coords.delete(i, 1);
+      coords.insert(i, [newData]);
+    }, [true, subregionId]);
+    reloadLayer(subregionId);
+    //coords.get(i).splice(j, 1);
+  }
 
   function reloadLayer(subregionId){
     // remove old layer
@@ -163,89 +267,12 @@ export default function MapScreen() {
     }
   }
 
-  function initLayerHandlers(layer, subregionId){
-    layer.on('click', (e) => handleClickLayer(subregionId));
-    layer.on('pm:vertexadded', (e) => handleVertexAdded(e, subregionId));
-    layer.on('pm:markerdragend', (e) => handleMarkerDragEnd(e, subregionId));
-    layer.on('pm:vertexremoved', (e) => handleVertexRemoved(e, subregionId));
-  }
-
-  function enableEditing(layer){
-    layer.pm.enable({
-      removeLayerBelowMinVertexCount: false,
-      limitMarkersToCount: 5,
-      draggable: false,
-      addVertexOn: 'click',
-      removeVertexOn: 'click',
-      // addVertexValidation: file.addVertexValidate,
-      // moveVertexValidation: file.editVertexValidate,
-      // removeVertexValidation: file.editVertexValidate,
-      hideMiddleMarkers: false
-    })
-  }
-
-  function handleClickLayer(subregionId){
-    setStaleBridge(subregionId);
-  }
-
-  function handleVertexAdded(e, subregionId){
-    setVertexTransaction([TransactionType.ADD_VERTEX, e, subregionId]);
-  }
-
-  function handleMarkerDragEnd(e, subregionId){
-    setVertexTransaction([TransactionType.MOVE_VERTEX, e, subregionId]);
-  }
-
-  function handleVertexRemoved(e, subregionId){
-    setVertexTransaction([TransactionType.REMOVE_VERTEX, e, subregionId]);
-  }
-
-  function applyTransaction(data){
-    const [transaction, mapId, subregionId, indexPath, newCoords] = data;
-    switch(transaction){
-      case TransactionType.ADD_VERTEX:
-        applyVertexAdd(subregionId, indexPath, newCoords);
-        break;
-      case TransactionType.MOVE_VERTEX:
-        applyVertexMove(subregionId, indexPath, newCoords);
-        break;
-      case TransactionType.REMOVE_VERTEX:
-        applyVertexRemove(subregionId, indexPath, newCoords);
-        break;
-    }
-  }
-
-  function applyVertexAdd(subregionId, indexPath, newCoords){
-    const [i,j] = indexPath;
-    const ymap = ydoc.getMap("regions");
-    const coords = ymap.get(subregionId).get("coords");
-    coords.get(i).splice(j, 0, newCoords);
-    reloadLayer(subregionId);
-  }
-
-  function applyVertexMove(subregionId, indexPath, newCoords){
-    const [i,j] = indexPath
-    const ymap = ydoc.getMap("regions");
-    const coords = ymap.get(subregionId).get("coords");
-    coords.get(i)[j] = newCoords;
-    reloadLayer(subregionId);
-  }
-
-  function applyVertexRemove(subregionId, indexPath, newCoords){
-    const [i,j] = indexPath;
-    const ymap = ydoc.getMap("regions");
-    const coords = ymap.get(subregionId).get("coords");
-    coords.get(i).splice(j, 1);
-    reloadLayer(subregionId);
-  }
-
   function handleInitMapLoad(e) {
     setMapRef(e);
   }
 
   return (
     <div>
-      <br></br>
       <Header /> 
       <EditToolbar />
       {/* <Map/> */}
