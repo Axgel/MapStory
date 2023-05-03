@@ -4,16 +4,14 @@ import download from "downloadjs";
 
 export function exportGeoJSON(subregionsArr, compressionPercent){
     //create geojson obj
-    let geojson = createGeoJSON(subregionsArr);
-    //compress the object with map-shaper-simplified 
-    const toSimplify = preBuild(geojson);
-    const simplified = simplify(toSimplify, compressionPercent) //TODO: check compression format
+    let simplifiedGeojson = createGeoJSON(subregionsArr, compressionPercent);
+    
     //at the end download the object
     // console.log(geojson);
-    download(JSON.stringify(simplified), "testing.json", "application/json");
+    download(JSON.stringify(simplifiedGeojson), "testing.json", "application/json");
 }
 
-export function createGeoJSON(subregions){
+export function createGeoJSON(subregions, compressionPercent){
     let geojsonObj = {
         "type":"FeatureCollection",
         "features":[]
@@ -28,13 +26,12 @@ export function createGeoJSON(subregions){
         let subregionFeature = addSubregion(subregions[key]);
         geojsonObj.features.push(subregionFeature);
     }
-    console.log(geojsonObj)
-    
-    //for loop through subregions of map
-        //pass subregion id to addSubregion(let newFeature = addSubregion(subregionID))
-        //geojsonObj.features.push({newFeature})
 
-    return geojsonObj;
+    //compress the object with map-shaper-simplified 
+    const toSimplify = preBuild(geojsonObj);
+    const simplified = simplify(toSimplify, compressionPercent) //TODO: check compression format
+
+    return simplified;
 }
 
 function addSubregion(subregion){ //convert from subregion schema into GEOJSON format
