@@ -9,13 +9,22 @@ describe('Comments', () => {
         cy.get(".mt-8 > .px-10 > :nth-child(2)").click()
         cy.get('#commentDetailView').click()
     });
+
+    //blank comment
     
     
-    //success
+
+    //success pressing icon
     it('success', () => {
-        cy.get('#input_comment').type("good map")
+        cy.get('#input_comment').type("just what I needed")
         cy.get("#submit_comment").click()
         cy.get('#commentView').contains('fet')
+        cy.get('#commentView').contains("just what I needed")
+    });
+
+    //success pressing enter
+    it('success', () => {
+        cy.get('#input_comment').type("good map{enter}")
         cy.get('#commentView').contains("good map")
     });
 })
