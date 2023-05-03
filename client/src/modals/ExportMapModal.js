@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CurrentModal } from "../enums";
 import GlobalFileContext from "../file";
 import { exportSHPDBF } from "../utils/exportSHP";
@@ -11,14 +11,14 @@ export default function ExportMapModal() {
   const { auth } = useContext(AuthContext);
   const { file } = useContext(GlobalFileContext);
 
+  const [fileType, setFileType] = useState("GeoJSON");
+
   function handleExport(e){
     let compression = document.getElementById("compression").value
-    if (document.getElementById("fileType").value.toLowerCase() === "geojson"){
+    if (fileType === "GeoJSON")
       exportGeoJSON(file.subregions, compression);
-    }
-    if (document.getElementById("fileType").value.toLowerCase() === "shp"){
+    else
       exportSHPDBF(file.subregions, compression);
-    }
     store.setCurrentModal(CurrentModal.NONE);
   }
 
@@ -26,6 +26,19 @@ export default function ExportMapModal() {
     e.stopPropagation();
     store.setCurrentModal(CurrentModal.NONE);
   }
+
+  function toggleFileTypeDD(e){
+    e.stopPropagation();
+    document.getElementById("file-type-dd").classList.toggle("hidden");
+  }
+
+  function selectFileType(e, name){
+    e.stopPropagation();
+    setFileType(name)
+    document.getElementById("file-type-dd").classList.toggle("hidden");
+  }
+
+
 
   if(store.currentModal === CurrentModal.EXPORT_MAP){
     return (
@@ -35,7 +48,15 @@ export default function ExportMapModal() {
 
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
             <p>File Type</p>
-            <input id="fileType" className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="geojson/shp"></input>
+            <div className="flex flex-col">
+              <div className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex justify-center items-center" onClick={toggleFileTypeDD}>
+                {fileType}
+              </div>
+              <div id="file-type-dd" className="absolute mt-[53px] w-[100px] rounded-lg bg-white hidden z-10">
+                <p onClick={(e) => selectFileType(e, "SHP/DBF")} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">SHP/DBF</p>
+                <p onClick={(e) => selectFileType(e, "GeoJSON")} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">GeoJSON</p>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
