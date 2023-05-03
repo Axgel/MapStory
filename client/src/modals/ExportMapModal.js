@@ -33,9 +33,8 @@ export default function ExportMapModal() {
   }
 
   function selectFileType(e, name){
-    e.stopPropagation();
-    setFileType(name)
-    document.getElementById("file-type-dd").classList.toggle("hidden");
+    setFileType(name);
+    toggleFileTypeDD(e);
   }
 
 
