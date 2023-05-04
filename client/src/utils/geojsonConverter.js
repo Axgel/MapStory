@@ -1,7 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
 import { open } from 'shapefile';
-import { preBuild, simplify } from 'mapshaper-simplify';
 import {truncate} from '@turf/turf';
+import * as client from "topojson-client";
+import * as server from "topojson-server";
+import * as simplify from "topojson-simplify";
+
 
 export async function convertToGeojson(files) {
     let fileOne = files[0]
@@ -37,22 +39,20 @@ export async function convertToGeojson(files) {
     //reduce all the coordinates to only 5 decimal places
     let reducedPrecision = truncate(geoJSONFile, {precision: 5, coordinates: 2})
 
-    let idealNumPoints = 50000;
+    let idealNumPoints = 100000;
     let simplifyPercentage = idealNumPoints/JSON.stringify(reducedPrecision).length;
-    console.log(JSON.stringify(reducedPrecision).length);
-    console.log(simplifyPercentage);
     if(simplifyPercentage >= 1 || JSON.stringify(reducedPrecision).length < 2000000)
         return reducedPrecision;
     const simplifiedFile = await simplifyGeoJSON(reducedPrecision, simplifyPercentage);
-    console.log("simplified: " + JSON.stringify(geoJSONFile).length)
     return simplifiedFile;
 }
 
 async function simplifyGeoJSON(file, simplifyPercentage) {
     return new Promise((resolve, reject) => {
-        const dataset = preBuild(file);
-        const simplified = simplify(dataset, simplifyPercentage)
-        resolve(simplified);
+        let topology = server.topology({foo: file});
+        topology = simplify.presimplify(topology);
+        let topologySimplified = simplify.simplify(topology, simplifyPercentage)
+        resolve(client.feature(topologySimplified, "foo"));
     });
 }
 
@@ -108,7 +108,7 @@ async function parseSHPDBF(fileOne, fileTwo) {
 
 async function parseSHPDBFHelper(shp, dbf)  {
     const featureList = [];
-    return open(shp, dbf).then(source => source.read().then(function log(result) {
+    return open(shp, dbf, {encoding:"UTF-8"}).then(source => source.read().then(function log(result) {
         if (result.done) {
             const content = { type: "FeatureCollection", features: featureList}
             return content;

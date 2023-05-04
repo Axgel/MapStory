@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { CurrentModal } from "../enums";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
-import { ViewMode } from "../enums";
+import { ViewMode, DetailView } from "../enums";
 
 export default function HomeScreen() {
   const { store } = useContext(GlobalStoreContext);
@@ -74,7 +74,7 @@ export default function HomeScreen() {
           {mapCardsView}
         </div>
         
-        {store.selectedMap ?
+        {store.selectedMap && (store.detailView !== DetailView.NONE) ?
         <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
           <MapDetailCard mapDetails={store.selectedMap} />
         </div> : 

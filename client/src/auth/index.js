@@ -93,7 +93,7 @@ function AuthContextProvider(props) {
       const response = await api.getLoggedIn();
       if (response.status === 200) {
         const socket = await socketIO.connect(process.env.REACT_APP_SOCKETIO);
-        socket.on("connect", ()=>{
+        socket.on('connect', () => {
           authReducer({
             type: AuthActionType.GET_LOGGED_IN,
             payload: {
@@ -105,7 +105,8 @@ function AuthContextProvider(props) {
         })
       }
     } catch (err) {
-      auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
+      console.log(err);
+      // auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, err.response.data.errorMessage);
     }
   };
 

@@ -1,0 +1,5 @@
+export const TransactionType = {
+  ADD_VERTEX: "ADD_VERTEX",
+  REMOVE_VERTEX: "REMOVE_VERTEX",
+  MOVE_VERTEX: "MOVE_VERTEX"
+}
