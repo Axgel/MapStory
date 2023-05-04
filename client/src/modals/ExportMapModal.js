@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { CurrentModal } from "../enums";
-import GlobalFileContext from "../file";
 import { exportSHPDBF } from "../utils/exportSHP";
 import{exportGeoJSON} from "../utils/exportGeoJSON";
 import { GlobalStoreContext } from "../store";
@@ -9,16 +8,15 @@ import AuthContext from "../auth";
 export default function ExportMapModal() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
-  const { file } = useContext(GlobalFileContext);
 
   const [fileType, setFileType] = useState("GeoJSON");
 
   function handleExport(e){
     let compression = document.getElementById("compression").value
     if (fileType === "GeoJSON")
-      exportGeoJSON(file.subregions, compression);
+      exportGeoJSON(store.selectedMap._id, compression);
     else
-      exportSHPDBF(file.subregions, compression);
+      exportSHPDBF(store.selectedMap._id, compression);
     store.setCurrentModal(CurrentModal.NONE);
   }
 
