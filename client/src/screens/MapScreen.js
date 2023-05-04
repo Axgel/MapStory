@@ -245,7 +245,6 @@ export default function MapScreen() {
 
   return (
     <div>
-      <br></br>
       <Header /> 
       <EditToolbar />
       {/* <Map/> */}

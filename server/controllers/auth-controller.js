@@ -208,6 +208,13 @@ recoveryEmail = async(req, res) => {
       message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent(user.userName) + "&token=" + encodeURIComponent(resetToken);
       // message_body = process.env.DEV_CORS + "/recover?userName=" + encodeURIComponent("Hello") + "&token=" + encodeURIComponent(resetToken);
       //Testing purposes: we don't need to send out the email for when we are using JEST
+      // const message = await transporter.sendMail({
+      //   from: process.env.SMTP_SENDEMAIL,
+      //   to: email,
+      //   subject: "Password Reset Notice", 
+      //   text: message_body,
+      // })
+      
       return res.status(200).json({
         success: true,
         userName: user.userName,
@@ -279,17 +286,18 @@ recoverPassword = async(req, res) => {
     const salt = await bcrypt.genSalt(saltRounds);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    const deleted = await User.deleteOne({userName: userName})
+    // const deleted = await User.deleteOne({userName: userName})
 
-    const newUser = new User({
-      userName: search_by_username.userName,
-      email: search_by_username.email,
-      passwordHash: passwordHash,
-      personalMaps: search_by_username.personalMaps,
-      sharedMaps: search_by_username.sharedMaps
-    });
-    const savedUser = await newUser.save();
+    // const newUser = new User({
+    //   userName: search_by_username.userName,
+    //   email: search_by_username.email,
+    //   passwordHash: passwordHash,
+    //   personalMaps: search_by_username.personalMaps,
+    //   sharedMaps: search_by_username.sharedMaps
+    // });
+    // const savedUser = await newUser.save();
     
+    const savedUser = await User.updateOne({ userName: userName }, { passwordHash: passwordHash }, {new : true});
     if(savedUser){
       return res.status(200).json({
         success: true

@@ -47,9 +47,9 @@ export default function HomeScreen() {
         <div className="px-10 flex flex-col gap-5 min-w-max flex-grow pb-5">
           <div className="flex justify-between">
             <p id="mapsid" className="text-3xl font-bold">Maps</p>
-            <p id="createMapBtn" className="w-[100px] px-5 py-2 border-solid bg-periwinkle inline rounded-lg border ml-auto" onClick={(e) => setCurrentModal(e, CurrentModal.CREATE_MAP)}>
+            {auth.loggedIn ? <p id="createMapBtn" className="cursor-default w-[100px] px-5 py-2 border-solid bg-periwinkle hover:bg-opacity-50 inline rounded-lg border ml-auto" onClick={(e) => setCurrentModal(e, CurrentModal.CREATE_MAP)}>
               + Create Map
-            </p>
+            </p> : <></>}
           </div>
 
           {mapCards}

@@ -12,6 +12,7 @@ function AuthContextProvider(props) {
     currentModal: CurrentModal.NONE,
     user: null,
     loggedIn: false,
+    isGuest: false,
     error: "",
     socket: null,
   });
@@ -68,9 +69,17 @@ function AuthContextProvider(props) {
           user: payload.user,
         });
       }
-      case AuthActionType.CHANGE_PASSWORD: {
+      // case AuthActionType.CHANGE_PASSWORD: {
+      //   return setAuth({
+      //     ...auth,
+      //   });
+      // }
+      case AuthActionType.GUEST_USER: {
         return setAuth({
           ...auth,
+          user: null,
+          loggedIn: false,
+          isGuest: payload.access,
         });
       }
       default:
@@ -180,10 +189,10 @@ function AuthContextProvider(props) {
     try {
       const response = await api.changePassword(auth.user.email, oldPwd, newPwd, cfmPwd);
       if(response.status === 200){
-        authReducer({
-          type: AuthActionType.CHANGE_PASSWORD,
-          payload: null
-        })
+        // authReducer({
+        //   type: AuthActionType.CHANGE_PASSWORD,
+        //   payload: null
+        // })
         auth.setCurrentModal(CurrentModal.ACCOUNT_FEEDBACK, "Password has been updated!");
       }
     } catch (err) {
@@ -225,6 +234,15 @@ function AuthContextProvider(props) {
       navigate('/')
     } 
   };
+
+  auth.setGuestAccess = function(access) {
+    authReducer({
+      type: AuthActionType.GUEST_USER,
+      payload: {
+        access : access
+      }
+    })
+  }
 
   return (
     <AuthContext.Provider value={{auth}}>

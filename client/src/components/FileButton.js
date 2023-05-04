@@ -44,7 +44,7 @@ export default function FileButton() {
   }
 
   return (
-    <div className="cursor-pointer m-3 z-50">
+    <div className="cursor-default m-3 z-50">
       <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded flex items-start p-1" onClick={toggleFileByDD}>
         File
       </div>
