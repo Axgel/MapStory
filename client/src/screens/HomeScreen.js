@@ -28,10 +28,9 @@ export default function HomeScreen() {
   }
 
   if (store.searchValue !== "") {
-    console.log(store.searchBy)
     if(store.searchBy === "" || store.searchBy === "Title") //title
       mapCards = mapCards.filter(map => map.title.includes(store.searchValue));
-    else if(store.searchBy === "Tags") //TODO: tag
+    else if(store.searchBy === "Tags") //tag
       mapCards = mapCards.filter(map => map.tags.includes(store.searchValue));
     else // user
       mapCards = mapCards.filter(map => map.ownerName.includes(store.searchValue));
@@ -39,15 +38,11 @@ export default function HomeScreen() {
 
   if (store.sortBy !== "") {
     if(store.sortBy === "Name")
-      mapCards = mapCards.sort() //TODO
+      mapCards = mapCards.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)); //TODO: alphabetical name
     else if (store.sortBy === "Upvote")
-      mapCards = mapCards.sort(function(a, b) {
-        return b.upvotes.length - a.upvotes.length;
-      })
+      mapCards = mapCards.sort((a, b) => b.upvotes.length - a.upvotes.length);
     else 
-      mapCards = mapCards.sort(function(a, b) {
-        return b.downvotes.length - a.downvotes.length;
-      })
+      mapCards = mapCards.sort((a, b) => b.downvotes.length - a.downvotes.length);
   }
   
   mapCardsView = mapCards.map((map, index) => {
