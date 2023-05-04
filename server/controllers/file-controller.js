@@ -45,7 +45,6 @@ getAllSubregionsServer = async(mapId) => {
     for(const subregion of subregions){
       subregionsDict[subregion._id] = {};
       subregionsDict[subregion._id]["coords"] = subregion.coordinates; 
-
       const propArr = [];
       if(subregion.properties){
         for(const [k,v] of subregion.properties){

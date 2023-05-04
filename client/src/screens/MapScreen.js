@@ -15,6 +15,8 @@ import * as Y from 'yjs';
 
 console.log(1);
 let ydoc = new Y.Doc({ autoLoad: true });
+let ymap = ydoc.getMap("regions");
+let undoManager = new Y.UndoManager(ymap, {trackedOrigins: new Set([42])})
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
@@ -28,27 +30,51 @@ export default function MapScreen() {
   const [staleBridge, setStaleBridge] = useState(null);
   const [vertexTransaction, setVertexTransaction] = useState(null);
   const [incTransaction, setIncTransaction] = useState(null);
-  // const [ydoc, setYdoc] = useState(null);
-
   const { mapId } = useParams();
 
   useEffect(() => {
     ydoc = new Y.Doc();
+    ymap = ydoc.getMap("regions")
+    undoManager = new Y.UndoManager(ymap,  {trackedOrigins: new Set([42])})
   }, [])
 
   useEffect(() => {
     if (!auth.user || !auth.socket) return;
-    // init map project open
     auth.socket.emit('openProject', {
         mapId: mapId,
     })
+  }, [auth])
+
+  useEffect(() => {
+    if (!auth.user || !auth.socket) return;
+    // init map project open
+    
+    auth.socket.on('sync', (data) => {
+      const parsed = JSON.parse(data);
+      const uintArray = Uint8Array.from(parsed);
+      Y.applyUpdate(ydoc, uintArray, -1);
+      setInitLoad(-1);
+    })
+
+    auth.socket.on('others-update', (data) => {
+      const {op} = data;
+      const parsed = JSON.parse(op);
+      const uintArray = Uint8Array.from(parsed);
+      Y.applyUpdate(ydoc, uintArray, -1);
+      setIncTransaction([true]);
+    })
 
     ydoc.on('update', (update, origin) => {
-      if(origin[0]) {
+      if(origin !== -1){
         const arr = Array.from(update);
         const op = JSON.stringify(arr);
-        auth.socket.emit('op', {mapId: mapId, subregionId: origin[1], op: op});
-      }
+        auth.socket.emit('op', {mapId: mapId, op: op});
+      } 
+    })
+
+    undoManager.on('stack-item-popped', event => {
+      // restore the current cursor location on the stack-item
+      setIncTransaction([true]);
     })
 
     return () => {
@@ -63,7 +89,9 @@ export default function MapScreen() {
     if (!mapRef) return;
     const map = file.initMapContainer(mapRef);
     setMapItem(map);
-    return () => map.remove();
+    return () => {
+      map.remove();
+    }
   }, [mapRef]);
 
   useEffect(() => {
@@ -71,7 +99,6 @@ export default function MapScreen() {
     if(!mapItem || initLoad >= 0) return;
     
     const yjsRegions = ydoc.getMap('regions').toJSON();
-
     const regions = {};
     for(const [subregionId, subregionData] of Object.entries(yjsRegions)){
       const coordinates = subregionData["coords"];
@@ -88,6 +115,8 @@ export default function MapScreen() {
     if(!staleBridge) return;
     // layer clicked, change color, enable/disable editing
     const subregionId = staleBridge;
+
+    console.log(editRegions);
     if(editRegions[subregionId]){
       editRegions[subregionId].setStyle({ fillColor: '#A4BFEA'}); 
       editRegions[subregionId].pm.disable();
@@ -108,48 +137,6 @@ export default function MapScreen() {
     setStaleBridge(null);
   }, [staleBridge])
 
-  // useEffect(() => {
-  //   ydoc = new Y.Doc();
-
-  //   ydoc.on('update', (update, origin) => {
-  //     if(origin[0]) {
-  //       const arr = Array.from(update);
-  //       const op = JSON.stringify(arr);
-  //       auth.socket.emit('op', {mapId: mapId, subregionId: origin[1], op: op});
-  //     }
-  //   })
-
-  //   return () => {
-  //     ydoc.destroy();
-  //   }
-  // }, [auth]);
-
-  useEffect(() => {
-    if(!auth.user || !auth.socket) return;
-
-    auth.socket.on('sync', (data) => {
-      const parsed = JSON.parse(data);
-      const uintArray = Uint8Array.from(parsed);
-      Y.applyUpdate(ydoc, uintArray, [false]);
-      setInitLoad(-1);
-    })
-
-    auth.socket.on('owner-update', (data) => {
-    })
-
-    auth.socket.on('others-update', (data) => {
-      const {subregionId, op} = data;
-      const parsed = JSON.parse(op);
-      const uintArray = Uint8Array.from(parsed);
-      Y.applyUpdate(ydoc, uintArray, [false]);
-      setIncTransaction(subregionId);
-    })
-    
-    return () => {
-      auth.socket.removeAllListeners();
-    }
-  }, [auth])
-
   useEffect(() => {
     if(!vertexTransaction) return;
     // create a vertex transaction
@@ -164,7 +151,9 @@ export default function MapScreen() {
 
   useEffect(() => {
     if(!incTransaction) return;
-    reloadLayer(incTransaction);
+
+    reloadLayers()
+   
     setIncTransaction(null);
   }, [incTransaction]);
 
@@ -206,76 +195,93 @@ export default function MapScreen() {
   }
 
   function applyVertexAdd(subregionId, indexPath, newCoords){
-    const [i,j] = indexPath;
+    const [i,j,k] = indexPath;
     const ymap = ydoc.getMap("regions");
-    const coords = ymap.get(subregionId).get("coords");
-    const newData = JSON.parse(JSON.stringify(coords.get(i)));
-    newData.splice(j, 0, newCoords);
+    const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
+    const coords2 = coords.get(i).get(j);
+  
     ydoc.transact(() => {
-      coords.delete(i, 1);
-      coords.insert(i, [newData]);
-    }, [true, subregionId]);
-    reloadLayer(subregionId);
-    //coords.get(i).splice(j, 0, newCoords);
+      coords2.insert(k, [newCoords]);
+      undoManager.stopCapturing()
+    }, 42);
   }
 
   function applyVertexMove(subregionId, indexPath, newCoords){
-    const [i,j] = indexPath
+    const [i,j,k] = indexPath
     const ymap = ydoc.getMap("regions");
-    const coords = ymap.get(subregionId).get("coords");
-    const newData = JSON.parse(JSON.stringify(coords.get(i)));
-    newData[j] = newCoords;
+    const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
+    const coords2 = coords.get(i).get(j);
+  
     ydoc.transact(() => {
-      coords.delete(i, 1);
-      coords.insert(i, [newData]);
-    }, [true, subregionId]);
-    reloadLayer(subregionId);
-    //coords.get(i)[j] = newCoords;
+      coords2.delete(k, 1);
+      coords2.insert(k, [newCoords]);
+      undoManager.stopCapturing()
+    }, 42);
   }
 
   function applyVertexRemove(subregionId, indexPath, newCoords){
-    const [i,j] = indexPath;
+    const [i,j,k] = indexPath;
     const ymap = ydoc.getMap("regions");
     const coords = ymap.get(subregionId).get("coords");
-    const newData = JSON.parse(JSON.stringify(coords.get(i)));
-    newData.splice(j, 1);
+    const coords2 = coords.get(i).get(j);
+
     ydoc.transact(() => {
-      coords.delete(i, 1);
-      coords.insert(i, [newData]);
-    }, [true, subregionId]);
-    reloadLayer(subregionId);
-    //coords.get(i).splice(j, 1);
+      coords2.delete(k, 1);
+      undoManager.stopCapturing();
+    }, 42);
+    // reloadLayer(subregionId);
   }
 
-  function reloadLayer(subregionId){
+  function reloadLayers(){
     // remove old layer
-    const oldLayer = loadedRegions[subregionId];
-    mapItem.removeLayer(oldLayer);    
-    // add new layer
-    const ymap = ydoc.getMap("regions");
-    const coords = ymap.get(subregionId).get("coords").toJSON();
-    const newLayer = L.polygon(coords).addTo(mapItem);
-    initLayerHandlers(newLayer, subregionId);
-    // refresh states to hold new layer
-    const newLoadedRegions = {...loadedRegions};
-    newLoadedRegions[subregionId] = newLayer;
-    setLoadedRegions(newLoadedRegions);
-
-    if(editRegions[subregionId]){
-      newLayer.setStyle({fillColor: 'red'});
-      enableEditing(newLayer);
-      const newEditRegions = {...editRegions};
-      newEditRegions[subregionId] = newLayer; 
-      setEditRegions(newEditRegions);
+    const newLoadedRegions = {};
+    const newEditRegions = {};
+    for(const [subregionId,v] of Object.entries(loadedRegions)){
+      const oldLayer = loadedRegions[subregionId];
+      mapItem.removeLayer(oldLayer);    
+      const ymap = ydoc.getMap("regions");
+      const coords = ymap.get(subregionId).get("coords").toJSON();
+      const newLayer = L.polygon(coords).addTo(mapItem);
+      initLayerHandlers(newLayer, subregionId);
+      newLoadedRegions[subregionId] = newLayer;
+      
+      if(editRegions[subregionId]){
+        const oldLayer2 = editRegions[subregionId];
+        mapItem.removeLayer(oldLayer2);
+        newLayer.setStyle({fillColor: 'red'});
+        enableEditing(newLayer);
+        newEditRegions[subregionId] = newLayer; 
+      }
     }
+    // add new layer
+    // refresh states to hold new layer
+    setLoadedRegions(newLoadedRegions);
+    setEditRegions(newEditRegions);
   }
 
   function handleInitMapLoad(e) {
     setMapRef(e);
   }
 
+  function handleUndo(){
+    undoManager.undo();
+  }
+
+  function handleRedo(){
+    undoManager.redo();
+  }
+
+  function handlePrint(){
+    console.log(undoManager.undoStack.length, undoManager.redoStack.length);
+    console.log(JSON.stringify(ymap));
+  }
+
+
   return (
     <div>
+      <button onClick={handleUndo}>undo</button>
+      <button onClick={handleRedo}>redo</button>
+      <button onClick={handlePrint}>print</button>
       <Header /> 
       <EditToolbar />
       {/* <Map/> */}
