@@ -15,7 +15,7 @@ export default function SearchBy() {
   function selectSearchBy(e, value){
     setSearchByDD(value);
     toggleSearchByDD(e);
-    store.setSearchBy(searchByDD);
+    store.setSearchBy(value);
   }
 
   function handleOnChange(e){

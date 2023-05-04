@@ -119,6 +119,12 @@ function GlobalStoreContextProvider(props) {
           searchValue: payload.searchValue
         })
       }
+      case GlobalStoreActionType.SET_SEARCH_BY:{
+        return setStore({
+          ...store,
+          searchBy: payload.searchBy
+        })
+      }
       case GlobalStoreActionType.SET_SORT_BY:{
         return setStore({
           ...store,
