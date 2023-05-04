@@ -31,7 +31,11 @@ export default function MapScreen() {
   // const [ydoc, setYdoc] = useState(null);
 
   const { mapId } = useParams();
-  
+
+  useEffect(() => {
+    ydoc = new Y.Doc();
+  }, [])
+
   useEffect(() => {
     if (!auth.user || !auth.socket) return;
     // init map project open
@@ -48,7 +52,6 @@ export default function MapScreen() {
     })
 
     return () => {
-      ydoc.destroy();
       auth.socket.emit('closeProject', {
         mapId: mapId,
       });
