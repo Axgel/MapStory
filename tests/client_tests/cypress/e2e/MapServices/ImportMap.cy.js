@@ -29,7 +29,7 @@ describe('Import Map', () => {
     //success shp only
     it('shp success', () => {
         cy.get('#fileUpload').selectFile('./cypress/fixtures/squares.shp')
-        cy.get('#upload-map-title').clear().type("Testing shp/dbf")
+        cy.get('#upload-map-title').clear().type("Testing shp")
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')

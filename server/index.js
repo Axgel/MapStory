@@ -47,21 +47,31 @@ switch (process.env.ENVIRONMENT) {
         console.log(`user opened map ${socket.id}`);
       });
 
-      socket.on("closeProject", async () => {
-        
+      socket.on("closeProject", async (data) => {
+        const { mapId } = data;
+        filterClient(mapId, socket.id);
       });
 
       socket.on("disconnect", async () => {
-        
+        filterClientFromAll(socket.id);
       });
 
       socket.on("op", (data) => {
-        const mapId = data[1];
-        applyOp(data);
+        const {mapId, subregionId, op} = data;
+        const parsed = JSON.parse(op);
+        const uintArray = Uint8Array.from(parsed);
+        const ydoc = mapProjects[mapId].text
+        Y.applyUpdate(ydoc, uintArray);
         for (const client of mapProjects[mapId].clients) {
-          if (client == socket.id) continue;
-          socketIO.to(client).emit("update", data);
+          if (client === socket.id) continue;
+          socketIO.to(client).emit('others-update', {subregionId: subregionId, op: op});
         }
+        // const mapId = data[1];
+        // applyOp(data);
+        // for (const client of mapProjects[mapId].clients) {
+        //   if (client == socket.id) continue;
+        //   socketIO.to(client).emit("update", data);
+        // }
       });
     })
     
@@ -97,21 +107,31 @@ switch (process.env.ENVIRONMENT) {
         console.log(`user opened map ${socket.id}`);
       });
 
-      socket.on("closeProject", async () => {
-        
+      socket.on("closeProject", async (data) => {
+        const { mapId } = data;
+        filterClient(mapId, socket.id);
       });
 
       socket.on("disconnect", async () => {
-        
+        filterClientFromAll(socket.id);
       });
 
       socket.on("op", (data) => {
-        const mapId = data[1];
-        applyOp(data);
+        const {mapId, subregionId, op} = data;
+        const parsed = JSON.parse(op);
+        const uintArray = Uint8Array.from(parsed);
+        const ydoc = mapProjects[mapId].text
+        Y.applyUpdate(ydoc, uintArray);
         for (const client of mapProjects[mapId].clients) {
-          if (client == socket.id) continue;
-          socketIO.to(client).emit("update", data);
+          if (client === socket.id) continue;
+          socketIO.to(client).emit('others-update', {subregionId: subregionId, op: op});
         }
+        // const mapId = data[1];
+        // applyOp(data);
+        // for (const client of mapProjects[mapId].clients) {
+        //   if (client == socket.id) continue;
+        //   socketIO.to(client).emit("update", data);
+        // }
       });
     })
    
@@ -119,6 +139,16 @@ switch (process.env.ENVIRONMENT) {
       console.log(`Server listening on port ${PORT}`)
     );
     break;
+}
+
+function filterClient(mapId, socketId) {
+  mapProjects[mapId].clients = mapProjects[mapId].clients.filter(client => client !== socketId);
+}
+
+function filterClientFromAll(socketId) {
+  for(const mapId in mapProjects) {
+    filterClient(mapId, socketId);
+  }
 }
 
 function createYjsData(ymap, jsonItems){

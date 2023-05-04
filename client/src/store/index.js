@@ -29,6 +29,9 @@ function GlobalStoreContextProvider(props) {
     collaborators: [],
     selectedMapOwner: null,
     mapMarkedForAction: null,
+    searchBy: "",
+    searchValue: "",
+    sortBy: ""
   });
 
   const navigate = useNavigate();
@@ -108,6 +111,24 @@ function GlobalStoreContextProvider(props) {
         return setStore({
           ...store,
           comments: payload.comments
+        })
+      }
+      case GlobalStoreActionType.SET_SEARCH_VALUE:{
+        return setStore({
+          ...store,
+          searchValue: payload.searchValue
+        })
+      }
+      case GlobalStoreActionType.SET_SEARCH_BY:{
+        return setStore({
+          ...store,
+          searchBy: payload.searchBy
+        })
+      }
+      case GlobalStoreActionType.SET_SORT_BY:{
+        return setStore({
+          ...store,
+          sortBy: payload.sortBy
         })
       }
       default:
@@ -409,7 +430,7 @@ function GlobalStoreContextProvider(props) {
     }
   }
 
-  store.addComment = async function (newComment){
+  store.addComment = async function (newComment) {
     const response = await api.addComment(store.selectedMap._id, auth.user._id, newComment);
     if(response.status === 200) {
       const newComments = [...store.comments, response.data.comment];
@@ -420,7 +441,26 @@ function GlobalStoreContextProvider(props) {
     }
   }
   
+  store.setSearchValue = async function (searchValue) {
+    storeReducer({
+      type: GlobalStoreActionType.SET_SEARCH_VALUE,
+      payload: { searchValue: searchValue }
+    })
+  }
 
+  store.setSortBy = async function (sortByValue) {
+    storeReducer({
+      type: GlobalStoreActionType.SET_SORT_BY,
+      payload: { sortBy: sortByValue }
+    })
+  }
+
+  store.setSearchBy = async function (searchBy) {
+    storeReducer({
+      type: GlobalStoreActionType.SET_SEARCH_BY,
+      payload: { searchBy: searchBy }
+    })
+  }
 
   return (
     <GlobalStoreContext.Provider value={{ store }}>

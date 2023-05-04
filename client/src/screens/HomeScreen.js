@@ -15,20 +15,39 @@ export default function HomeScreen() {
     store.loadAllMaps();
   }, [])
 
-  let mapCards = <></>
+  let mapCardsView = <></>
+  let mapCards;
+
+
   if(store.viewMode === ViewMode.PERSONAL && store.personalMaps) {
-      mapCards = store.personalMaps.map((map, index) => {
-        return <MapCard key={index} mapDetails={map} />;
-      })
+    mapCards = store.personalMaps;
   } else if(store.viewMode === ViewMode.SHARED && store.sharedMaps) {
-      mapCards = store.sharedMaps.map((map, index) => {
-        return <MapCard key={index} mapDetails={map} />;
-      })
+    mapCards = store.sharedMaps;
   } else if(store.viewMode === ViewMode.PUBLISHED && store.publishedMaps) {
-    mapCards = store.publishedMaps.map((map, index) => {
-      return <MapCard key={index} mapDetails={map} />;
-      })
+    mapCards = store.publishedMaps;
   }
+
+  if (store.searchValue !== "") {
+    if(store.searchBy === "" || store.searchBy === "Title") //title
+      mapCards = mapCards.filter(map => map.title.includes(store.searchValue));
+    else if(store.searchBy === "Tags") //tag
+      mapCards = mapCards.filter(map => map.tags.includes(store.searchValue));
+    else // user
+      mapCards = mapCards.filter(map => map.ownerName.includes(store.searchValue));
+  }
+
+  if (store.sortBy !== "") {
+    if(store.sortBy === "Name")
+      mapCards = mapCards.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)); //TODO: alphabetical name
+    else if (store.sortBy === "Upvote")
+      mapCards = mapCards.sort((a, b) => b.upvotes.length - a.upvotes.length);
+    else 
+      mapCards = mapCards.sort((a, b) => b.downvotes.length - a.downvotes.length);
+  }
+  
+  mapCardsView = mapCards.map((map, index) => {
+    return <MapCard key={index} mapDetails={map} />;
+  })
 
   function setCurrentModal(e, currentModal){
     e.stopPropagation();
@@ -52,7 +71,7 @@ export default function HomeScreen() {
             </p> : <></>}
           </div>
 
-          {mapCards}
+          {mapCardsView}
         </div>
         
         {store.selectedMap && (store.detailView !== DetailView.NONE) ?

@@ -1,22 +1,27 @@
 import React, {useEffect, useRef, useState} from 'react';
 import { preBuild, simplify } from 'mapshaper-simplify';
 import download from "downloadjs";
+import api from "../file/file-request-api/index.js"
 
-export function exportGeoJSON(subregionsArr, compressionPercent){
+export async function exportGeoJSON(mapId, compressionPercent){
     //create geojson obj
-    let simplifiedGeojson = createGeoJSON(subregionsArr, compressionPercent);
+    let simplifiedGeojson = await createGeoJSON(mapId, compressionPercent);
     
     //at the end download the object
     // console.log(geojson);
     download(JSON.stringify(simplifiedGeojson), "testing.json", "application/json");
 }
 
-export function createGeoJSON(subregions, compressionPercent){
+export async function createGeoJSON(mapId, compressionPercent){
+    console.log(mapId)
+    let response = await api.getAllSubregions(mapId);
+    let subregions = response.data.subregions;
+
     let geojsonObj = {
         "type":"FeatureCollection",
         "features":[]
     };
-
+    console.log(subregions)
     // subregions.forEach(element => {
     //     let subregionFeature = addSubregion(element);
     //     geojsonObj.features.push(subregionFeature);
