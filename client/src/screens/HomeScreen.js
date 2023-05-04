@@ -15,20 +15,40 @@ export default function HomeScreen() {
     store.loadAllMaps();
   }, [])
 
-  let mapCards = <></>
+  let mapCardsView = <></>
+  let mapCards;
+
+
   if(store.viewMode === ViewMode.PERSONAL && store.personalMaps) {
-      mapCards = store.personalMaps.map((map, index) => {
-        return <MapCard key={index} mapDetails={map} />;
-      })
+    mapCards = store.personalMaps;
   } else if(store.viewMode === ViewMode.SHARED && store.sharedMaps) {
-      mapCards = store.sharedMaps.map((map, index) => {
-        return <MapCard key={index} mapDetails={map} />;
-      })
+    mapCards = store.sharedMaps;
   } else if(store.viewMode === ViewMode.PUBLISHED && store.publishedMaps) {
-    mapCards = store.publishedMaps.map((map, index) => {
-      return <MapCard key={index} mapDetails={map} />;
-      })
+    mapCards = store.publishedMaps;
   }
+
+  if (store.searchValue !== "") {
+    if(store.searchBy === "" || store.searchBy === "Title") //title
+      mapCards = mapCards.filter(map => map.title.includes(store.searchValue));
+    else if(store.searchBy === "Tags") //tag
+      mapCards = mapCards.filter(map => map.tags.includes(store.searchValue));
+    else // TODO: user
+      mapCards = mapCards.filter(map => map.ownerName.includes(store.searchValue));
+  }
+
+  // if (store.sortBy !== "") {
+  //   if(store.sortBy === "Name")
+  //     mapCards = mapCards.sort()
+  //   else if (store.sortBy === "Upvote")
+  //     mapCards = mapCards.sort(function(a, b) {
+  //       return a.upvotes - b.upvotes;
+  //     })
+  //   // else 
+  // }
+  
+  mapCardsView = mapCards.map((map, index) => {
+    return <MapCard key={index} mapDetails={map} />;
+  })
 
   function setCurrentModal(e, currentModal){
     e.stopPropagation();
@@ -52,7 +72,7 @@ export default function HomeScreen() {
             </p>
           </div>
 
-          {mapCards}
+          {mapCardsView}
         </div>
         
         {store.selectedMap ?

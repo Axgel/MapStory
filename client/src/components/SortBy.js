@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import GlobalStoreContext from "../store";
 
 export default function SortBy() {
+  const { store } = useContext(GlobalStoreContext);
+
   const [sortByDD, setSortByDD] = useState('Sort By:');
 
   function toggleSortByDD(e){
@@ -9,8 +12,9 @@ export default function SortBy() {
   }
 
   function selectSortBy(e, value){
-    setSortByDD(value)
+    setSortByDD(value);
     toggleSortByDD(e);
+    store.setSortBy(value);
   }
 
   return (

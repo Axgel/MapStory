@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import GlobalStoreContext from "../store";
 
 export default function SearchBy() {
-  const [searchByDD, setSearchByDD] = useState('Search By:');
+  const { store } = useContext(GlobalStoreContext);
 
+  const [searchByDD, setSearchByDD] = useState('Search By:');
+  const [searchValue, setSearchValue] = useState("");
 
   function toggleSearchByDD(e){
     e.stopPropagation();
@@ -12,6 +15,20 @@ export default function SearchBy() {
   function selectSearchBy(e, value){
     setSearchByDD(value);
     toggleSearchByDD(e);
+    store.setSearchBy(searchByDD);
+  }
+
+  function handleOnChange(e){
+    if (e.target.value == "") {
+      store.setSearchValue("");
+    }
+    setSearchValue(e.target.value);
+  }
+
+  function handleOnKeyDown(e){
+    if (e.key == "Enter") {
+      store.setSearchValue(searchValue);
+    }
   }
 
   return (
@@ -27,7 +44,7 @@ export default function SearchBy() {
         </div>
       </div>
 
-      <input className="w-[400px] h-[50px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text"></input>
+      <input className="w-[400px] h-[50px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" onChange={handleOnChange} onKeyDown={handleOnKeyDown}></input>
 
     </div>
   );
