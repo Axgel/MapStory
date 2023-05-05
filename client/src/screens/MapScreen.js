@@ -10,10 +10,9 @@ import AuthContext from "../auth";
 import GlobalFileContext from "../file";
 import { CreateVertexTransaction } from "../transactions";
 import { TransactionType } from "../enums";
+import { DetailView } from "../enums";
 import * as Y from 'yjs';
 
-
-console.log(1);
 let ydoc = new Y.Doc({ autoLoad: true });
 
 export default function MapScreen() {
@@ -287,11 +286,16 @@ export default function MapScreen() {
 
       {/* <Map /> */}
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
-        <MapDetailCard mapDetails={store.personalMaps[0]}/>
+        <MapDetailCard mapDetails={store.selectedMap}/>
       </div> */}
       {/* <div id="map-detail-view" className="absolute bottom-0 m-3">
         <MapProperties />
       </div> */}
+      {/* {store.selectedMap && (store.detailView !== DetailView.NONE) ?
+        <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
+          <MapDetailCard mapDetails={store.selectedMap} />
+        </div> : 
+        <></>} */}
       <br></br><b></b>
     </div>
   );

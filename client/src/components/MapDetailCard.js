@@ -63,7 +63,7 @@ export default function MapDetailCard(props) {
 
   let titleElement = editActive ? <input 
       id="inputNewUsername" 
-      className="text-2xl font-bold w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-2 pl-2" 
+      className="text-2xl font-bold w-[350px] h-[35px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey mx-2 pl-2" 
       type="text" 
       defaultValue={mapDetails ? mapDetails.title : ""} 
       autoFocus

@@ -29,7 +29,7 @@ export default function HomeScreen() {
 
   if (store.searchValue !== "") {
     if(store.searchBy === "" || store.searchBy === "Title") //title
-      mapCards = mapCards.filter(map => map.title.includes(store.searchValue));
+      mapCards = mapCards.filter(map => map.title.toLowerCase().includes(store.searchValue.toLowerCase()));
     else if(store.searchBy === "Tags") //tag
       mapCards = mapCards.filter(map => map.tags.includes(store.searchValue));
     else // user
@@ -53,7 +53,7 @@ export default function HomeScreen() {
     e.stopPropagation();
     store.setCurrentModal(currentModal);
   }
-
+  
   return (
     <div>
       <Header />

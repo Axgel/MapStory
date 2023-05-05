@@ -25,8 +25,8 @@ export default function EditToolbar() {
   const { store } = useContext(GlobalStoreContext);
   const { file } = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
-  const [editActive, setEditActive] = useState(false);
-
+  const [editActive, setEditActive] = useState(false); //for editing title
+  const [editTool, setEditTool] = useState(0);
   
   const navigate = useNavigate();
   function handleExitMap(){
@@ -38,12 +38,42 @@ export default function EditToolbar() {
     store.setCurrentModal(currentModal);
   }
   
-  function setCurrentEditMode(e, currentEditMode){
+  function setCurrentEditMode(e, currentEditMode, iconNum){
     e.stopPropagation();
     if(currentEditMode === file.currentEditMode){
       currentEditMode = EditMode.NONE;
     }
+    else {
+      toggleEditIcon(editTool)
+      setEditTool(iconNum)
+    }
+    toggleEditIcon(iconNum)
     file.setCurrentEditMode(currentEditMode);
+  }
+
+  function toggleEditIcon(iconNum){
+    switch(iconNum) {
+      case 1: //add vertex
+        document.getElementById("add-vertex").classList.toggle("bg-mapselectedfill");
+        break;
+      case 2: //edit vertex
+        document.getElementById("edit-vertex").classList.toggle("bg-mapselectedfill");
+        break;
+      case 3: //split subregion
+        document.getElementById("split-subregion").classList.toggle("bg-mapselectedfill");
+        break;
+      case 4: //merge subregion
+        document.getElementById("merge-subregion").classList.toggle("bg-mapselectedfill");
+        break;
+      case 5: //add subregion
+        document.getElementById("add-subregion").classList.toggle("bg-mapselectedfill");
+        break;
+      case 6: //remove subregion
+        document.getElementById("remove-subregion").classList.toggle("bg-mapselectedfill");
+        break;
+      default:
+        // code block
+    }
   }
   
   function handleUndo() {
@@ -71,18 +101,6 @@ export default function EditToolbar() {
     e.stopPropagation();
     setEditActive(true);
   }
-
-  //------------------------------VOTING ONCLICK FUNCTIONS-------------------------------------
-  function handleDownvote(e){
-    e.stopPropagation();
-    store.updateVotes(store.selectedMap, 0);
-  }
-  
-  function handleUpvote(e){
-    e.stopPropagation();
-    store.updateVotes(store.selectedMap, 1);
-  }
-  //--------------------------------------------------------------------------------------
   
   let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
   if(editActive){
@@ -100,29 +118,40 @@ export default function EditToolbar() {
   <>
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-4 px-3">
-        <img src={UndoIcon} onClick={handleUndo} alt=""></img>
-        <img src={RedoIcon} onClick={handleRedo} alt=""></img>
+      <div className="flex gap-2 px-3">
+        <img className="w-[25px] h-[25px] px-2 py-2 hover:bg-mapselectedfill" src={UndoIcon} onClick={handleUndo} alt=""></img>
+        <img className="w-[25px] h-[25px] px-2 py-2 hover:bg-mapselectedfill" src={RedoIcon} onClick={handleRedo} alt=""></img>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-4 px-3">
-        <img src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX)} alt=""></img>
-        <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
+      <div className="flex gap-2 px-3">
+        <img id="add-vertex" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX, 1)} alt=""></img>
+        <img id="edit-vertex" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX, 2)} alt=""></img>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-4 px-3">
-        <img src={SplitSubregionIcon} alt=""></img>
-        <img src={MergeSubregionIcon} alt=""></img>
-        <img src={AddSubregionIcon} alt=""></img>
-        <img className="w-[25px] h-[25px]" src={RemoveSubregionIcon} alt=""></img>
+      <div className="flex gap-2 px-3">
+        <img id="split-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={SplitSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION, 3)} alt=""></img>
+        <img id="merge-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={MergeSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION, 4)} alt=""></img>
+        <img id="add-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_SUBREGION, 5)} alt=""></img>
+        <img id="remove-subregion" className="w-[25px] h-[25px] px-[6px] py-[6px] hover:bg-mapselectedfill" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_SUBREGION, 6)} alt=""></img>
       </div>
       <div className="w-[1px] bg-black h-full"></div>
     </>;
 
+  //------------------------------VOTING -------------------------------------
+  function handleDownvote(e){
+    e.stopPropagation();
+    store.updateVotes(store.selectedMap, 0);
+  }
+
+  function handleUpvote(e){
+    e.stopPropagation();
+    store.updateVotes(store.selectedMap, 1);
+  }
+  
   let upvoteImg = upvoteOutlineIcon;
   if(store.selectedMap && auth.user && store.selectedMap.upvotes.includes(auth.user._id)) 
     upvoteImg = upvoteFilledIcon;
@@ -149,6 +178,12 @@ export default function EditToolbar() {
       </div>
     </>
     :<></>;
+  //--------------------------------------------------------------------------------------
+  let exportClassName = "bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center hover:bg-opacity-50";
+  let shareClassName = exportClassName;
+  if(!auth.loggedIn){
+    shareClassName += "cursor-not-allowed opacity-30";
+  }
 
   return (
     <div className="flex border-solid border bg-modalbgfill justify-between">
@@ -167,13 +202,10 @@ export default function EditToolbar() {
       <div className="flex">
         {voting}
         <div className="w-[1px] bg-black h-full"></div>
-        <div id="tagsBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.TAG)}>
-          Tags
-        </div>
-        <div id="shareMapBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
+        <div id="shareMapBtn" className={shareClassName} onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
           Share
         </div>
-        <div id="exportMapBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center" onClick={(e) => setCurrentModal(e, CurrentModal.EXPORT_MAP)}>
+        <div id="exportMapBtn" className={exportClassName} onClick={(e) => setCurrentModal(e, CurrentModal.EXPORT_MAP)}>
           Export
         </div>
       </div>
