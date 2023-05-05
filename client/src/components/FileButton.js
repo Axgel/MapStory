@@ -51,7 +51,7 @@ export default function FileButton() {
 
   return (
     <div className="cursor-default m-3 z-50">
-      <div className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded flex items-start p-1" onClick={toggleFileByDD}>
+      <div id="mapFileBtn" className="bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded flex items-start p-1" onClick={toggleFileByDD}>
         File
       </div>
       <div id="file-by-dd" className="absolute w-[150px] bg-modalbgfill hidden shadow-md">
@@ -64,7 +64,7 @@ export default function FileButton() {
             </div>
 
           </div>
-          <p onClick={(e) => setCurrentModal(e, CurrentModal.TAG)} className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80">Tags</p>
+          <p id="tagsBtn" className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setCurrentModal(e, CurrentModal.TAG)}>Tags</p>
           <div className="h-px bg-lightgrey bg-opacity-30"></div>
           <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
           <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
