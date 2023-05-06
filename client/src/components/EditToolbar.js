@@ -85,9 +85,9 @@ export default function EditToolbar() {
   }
   
   function handleUpdateTitle(e){
-    e.stopPropagation();
-    store.updateMapTitle(e.target.value);
-    setEditActive(false);
+      e.stopPropagation();
+      store.updateMapTitle(e.target.value);
+      setEditActive(false);
   }
   
   function handleKeyPress(e) {
@@ -98,8 +98,10 @@ export default function EditToolbar() {
   }
   
   function handleToggleEdit(e){
-    e.stopPropagation();
-    setEditActive(true);
+    if(auth.loggedIn){
+      e.stopPropagation();
+      setEditActive(true);
+    }
   }
   
   let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
@@ -144,11 +146,13 @@ export default function EditToolbar() {
   //------------------------------VOTING -------------------------------------
   function handleDownvote(e){
     e.stopPropagation();
+    if(!auth.loggedIn || !store.selectedMap.isPublished) return;
     store.updateVotes(store.selectedMap, 0);
   }
 
   function handleUpvote(e){
     e.stopPropagation();
+    if(!auth.loggedIn || !store.selectedMap.isPublished) return;
     store.updateVotes(store.selectedMap, 1);
   }
   
@@ -159,9 +163,13 @@ export default function EditToolbar() {
   if(store.selectedMap && auth.user && store.selectedMap.downvotes.includes(auth.user._id)) 
     downvoteImg = downvoteFilledIcon ;
 
-  let numUpvotes = 0;
-  let numDownvotes = 0;
-  if(store.selectedMap !== null){
+  let numUpvotes;
+  let numDownvotes;
+  if(store.selectedMap !== null && !store.selectedMap.isPublished){
+    numUpvotes="-";
+    numDownvotes="-";
+  }
+  else if(store.selectedMap !== null && store.selectedMap.isPublished){
     numUpvotes = store.selectedMap.upvotes.length;
     numDownvotes = store.selectedMap.downvotes.length;
   }
@@ -186,7 +194,7 @@ export default function EditToolbar() {
   }
 
   return (
-    <div className="flex border-solid border bg-modalbgfill justify-between">
+    <div className="flex-none h-16 flex border-solid border bg-modalbgfill justify-between">
       <div className="flex">
         <img className="w-[30px] h-[30px] pt-3.5 px-1" src={closeIcon} alt="" onClick={handleExitMap}></img>
         <FileButton />

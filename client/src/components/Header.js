@@ -49,7 +49,7 @@ export default function Header() {
   }
 
   return (
-    <div className="h-16 w-full bg-brownshade-900 flex items-center justify-between min-w-[1120px]">
+    <div className="flex-none h-16 w-full bg-brownshade-900 flex items-center justify-between min-w-[1120px]">
       <div className="flex items-center pl-8 gap-x-7">
         <img onClick={handleSplashScreen} className="cursor-pointer w-12 h-12 p-1 hover:w-14 hover:h-14 hover:p-0" src={MushroomLogo} alt=""></img>
         <h1 className="text-white text-4xl">

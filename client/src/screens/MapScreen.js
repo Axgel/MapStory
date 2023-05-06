@@ -273,29 +273,36 @@ export default function MapScreen() {
     setMapRef(e);
   }
 
+  let tmp = <div></div>;
+  if(store.selectedMap && (store.detailView !== DetailView.NONE)){
+    console.log(store.detailView)
+    tmp = <div className="flex flex-col h-full sticky top-5 self-start z-10">
+    <MapDetailCard mapDetails={store.selectedMap} />
+  </div>
+  }
+
   return (
     <div>
       <Header /> 
       <EditToolbar />
       {/* <Map/> */}
-      <div
-        className="w-full h-[700px] z-10"
-        id="map"
-        ref={handleInitMapLoad}
-      ></div>
+      <div className="flex">
+        <div className="w-full h-[775px] z-0" id="map" ref={handleInitMapLoad}>
+        </div>
+        <div>
+          {tmp}
+
+        </div>
+      </div>
 
       {/* <Map /> */}
       {/* <div className="absolute right-0 top-[15%]  flex flex-row-reverse">
-        <MapDetailCard mapDetails={store.selectedMap}/>
+        <MapDetailCard mapDetails={store.personalMaps[0]}/>
       </div> */}
       {/* <div id="map-detail-view" className="absolute bottom-0 m-3">
         <MapProperties />
       </div> */}
-      {/* {store.selectedMap && (store.detailView !== DetailView.NONE) ?
-        <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
-          <MapDetailCard mapDetails={store.selectedMap} />
-        </div> : 
-        <></>} */}
+      
       <br></br><b></b>
     </div>
   );
