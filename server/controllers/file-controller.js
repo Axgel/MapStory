@@ -65,6 +65,28 @@ getAllSubregionsServer = async(mapId) => {
   }
 }
 
+addSubregion = async(mapId, coords) => {
+  try{
+    const coordinates = JSON.parse(coords);
+    
+    const subregion = new Subregion({
+      mapId: mapId,
+      type: 'MultiPolygon',
+      properties: {},
+      coordinates: coordinates,
+      isStale: false
+    })
+
+    console.log(subregion._id, "qwer");
+    await subregion.save(); 
+    return {subregionId: subregion._id}
+
+  } catch(err){
+    console.log(err);
+    return false;
+  }
+}
+
 
 
 module.exports = {

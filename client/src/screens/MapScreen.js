@@ -9,14 +9,29 @@ import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
 import { CreateVertexTransaction } from "../transactions";
-import { TransactionType } from "../enums";
+import { EditMode, TransactionType } from "../enums";
 import * as Y from 'yjs';
+import { parseMultiPolygon } from "../utils/geojsonParser";
 
 
 console.log(1);
 let ydoc = new Y.Doc({ autoLoad: true });
 let ymap = ydoc.getMap("regions");
 let undoManager = new Y.UndoManager(ymap, {trackedOrigins: new Set([42])})
+const actions = [
+  // uses the default 'cancel' action
+  'cancel',
+  // creates a new action that has text, no click event
+  { text: 'Custom text, no click' },
+  // creates a new action with text and a click event
+  {
+    text: 'click me',
+    onClick: () => {
+      alert('🙋‍♂️');
+    },
+  },
+];
+
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
@@ -29,6 +44,7 @@ export default function MapScreen() {
   const [editRegions, setEditRegions] = useState({});
   const [staleBridge, setStaleBridge] = useState(null);
   const [vertexTransaction, setVertexTransaction] = useState(null);
+  const [regionTransaction, setRegionTransaction] = useState(null);
   const [incTransaction, setIncTransaction] = useState(null);
   const { mapId } = useParams();
 
@@ -37,6 +53,23 @@ export default function MapScreen() {
     ymap = ydoc.getMap("regions")
     undoManager = new Y.UndoManager(ymap,  {trackedOrigins: new Set([42])})
   }, [])
+
+  useEffect(() => {
+    if(!mapItem) return;
+    switch(file.currentEditMode){
+      case EditMode.ADD_REGION: {
+        mapItem.pm.enableDraw('Polygon', {
+          snappable: true,
+          snapDistance: 20,
+        });
+        
+        break;
+      }
+      default:
+        mapItem.pm.disableDraw();
+    }
+    reloadLayers();
+  }, [file])
 
   useEffect(() => {
     if (!auth.user || !auth.socket) return;
@@ -53,6 +86,7 @@ export default function MapScreen() {
       const parsed = JSON.parse(data);
       const uintArray = Uint8Array.from(parsed);
       Y.applyUpdate(ydoc, uintArray, -1);
+      console.log(JSON.stringify(ymap));
       setInitLoad(-1);
     })
 
@@ -61,10 +95,41 @@ export default function MapScreen() {
       const parsed = JSON.parse(op);
       const uintArray = Uint8Array.from(parsed);
       Y.applyUpdate(ydoc, uintArray, -1);
-      setIncTransaction([true]);
+      // console.log(JSON.stringify(ymap));
+      // setIncTransaction([true]);
+      setInitLoad(-1);
+    })
+
+    auth.socket.on('add-region-ack', (data) => {
+      const {subregionId, coords } = data;
+      console.log(subregionId);
+      const ymapData = new Y.Map();
+      ymap.set(subregionId, ymapData);
+      ydoc.transact(() => {
+        const coordinates = JSON.parse(coords);
+        console.log(coordinates, coordinates.length, coordinates[0].length, coordinates[0][0].length);
+        const yArr0 = new Y.Array();
+        for(let i=0; i<coordinates.length; i++){
+          const yArr1 = new Y.Array();
+          for(let j=0; j<coordinates[i].length; j++){
+            const yArr2 = new Y.Array();
+            for(let k=0; k<coordinates[i][j].length; k++){
+              yArr2.push([coordinates[i][j][k]]);
+            }
+            yArr1.push([yArr2]);
+          }
+          yArr0.push([yArr1]);
+        }
+        
+        ymapData.set("coords", yArr0);
+        console.log(JSON.stringify(ymap));
+      }, 42);
+
+      setInitLoad(-1);
     })
 
     ydoc.on('update', (update, origin) => {
+      console.log("updated", origin);
       if(origin !== -1){
         const arr = Array.from(update);
         const op = JSON.stringify(arr);
@@ -82,12 +147,13 @@ export default function MapScreen() {
         mapId: mapId,
       });
     }
-  }, [auth]);
+  }, [auth, ydoc]);
 
   useEffect(() => {
     // load map container
     if (!mapRef) return;
     const map = file.initMapContainer(mapRef);
+    file.initMapControls(map);
     setMapItem(map);
     return () => {
       map.remove();
@@ -98,6 +164,11 @@ export default function MapScreen() {
     // init subregion load once
     if(!mapItem || initLoad >= 0) return;
     
+    mapItem.eachLayer(function (layer) {
+      if(!layer._latlngs) return;
+      mapItem.removeLayer(layer);
+    });
+
     const yjsRegions = ydoc.getMap('regions').toJSON();
     const regions = {};
     for(const [subregionId, subregionData] of Object.entries(yjsRegions)){
@@ -148,6 +219,20 @@ export default function MapScreen() {
     setVertexTransaction(null);
   }, [vertexTransaction])
 
+  useEffect(() => {
+    if(!regionTransaction) return;
+    const [transaction , e] = regionTransaction;
+
+    mapItem.removeLayer(e.layer);
+    const geoJsonItem = e.layer.toGeoJSON();
+    if(transaction == TransactionType.ADD_REGION){
+      const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
+      const coordsStr = JSON.stringify(coords);
+      auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
+    }
+  
+    setRegionTransaction(null);  
+  }, [regionTransaction])
 
   useEffect(() => {
     if(!incTransaction) return;
@@ -163,20 +248,23 @@ export default function MapScreen() {
     layer.on('pm:vertexadded', (e) => setVertexTransaction([TransactionType.ADD_VERTEX, e, subregionId]));
     layer.on('pm:markerdragend', (e) => setVertexTransaction([TransactionType.MOVE_VERTEX, e, subregionId]));
     layer.on('pm:vertexremoved', (e) => setVertexTransaction([TransactionType.REMOVE_VERTEX, e, subregionId]));
+    mapItem.on('pm:create', (e) => setRegionTransaction([TransactionType.ADD_REGION, e]));
   }
 
   function enableEditing(layer){
-    layer.pm.enable({
-      removeLayerBelowMinVertexCount: false,
-      limitMarkersToCount: 5,
-      draggable: false,
-      addVertexOn: 'click',
-      removeVertexOn: 'click',
-      // addVertexValidation: file.addVertexValidate,
-      // moveVertexValidation: file.editVertexValidate,
-      // removeVertexValidation: file.editVertexValidate,
-      hideMiddleMarkers: false
-    })
+    if(file.currentEditMode === EditMode.EDIT_VERTEX){
+      layer.pm.enable({
+        removeLayerBelowMinVertexCount: false,
+        limitMarkersToCount: 5,
+        draggable: false,
+        addVertexOn: 'click',
+        removeVertexOn: 'click',
+        addVertexValidation: addVertexValidate,
+        moveVertexValidation: moveVertexValidate,
+        removeVertexValidation: removeVertexValidate,
+        hideMiddleMarkers: !file.editModeOptions[0]
+      })
+    }
   }
 
   function applyTransaction(data){
@@ -240,6 +328,7 @@ export default function MapScreen() {
       const oldLayer = loadedRegions[subregionId];
       mapItem.removeLayer(oldLayer);    
       const ymap = ydoc.getMap("regions");
+      if(!ymap.get(subregionId) || !ymap.get(subregionId).get("coords")) continue;
       const coords = ymap.get(subregionId).get("coords").toJSON();
       const newLayer = L.polygon(coords).addTo(mapItem);
       initLayerHandlers(newLayer, subregionId);
@@ -259,6 +348,18 @@ export default function MapScreen() {
     setEditRegions(newEditRegions);
   }
 
+  function addVertexValidate(){
+    return file.editModeOptions[0];
+  }
+
+  function moveVertexValidate(){
+    return file.editModeOptions[1];
+  }
+
+  function removeVertexValidate(){
+    return file.editModeOptions[2];
+  }
+
   function handleInitMapLoad(e) {
     setMapRef(e);
   }
@@ -276,11 +377,15 @@ export default function MapScreen() {
     console.log(JSON.stringify(ymap));
   }
 
+  function handleRemoveLast(){
+    setIncTransaction([true]);
+  }
 
   return (
     <div>
       <button onClick={handleUndo}>undo</button>
       <button onClick={handleRedo}>redo</button>
+      <button onClick={handleRemoveLast}>remove last placed</button>
       <button onClick={handlePrint}>print</button>
       <Header /> 
       <EditToolbar />

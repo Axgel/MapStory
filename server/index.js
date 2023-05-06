@@ -121,6 +121,14 @@ switch (process.env.ENVIRONMENT) {
           socketIO.to(client).emit('others-update', {op: op});
         }
       });
+
+      socket.on("add-region", async (data) => {
+        const {mapId, coords} = data;
+        // const string = new TextDecoder().decode(uint8array);
+        const subregionId = await addSubregion(mapId, coords);
+        console.log(subregionId, "qwert");
+        socketIO.to(socket.id).emit("add-region-ack", {subregionId: subregionId.subregionId, coords: coords});
+      })
     })
    
     devHttpServer.listen(PORT, () =>

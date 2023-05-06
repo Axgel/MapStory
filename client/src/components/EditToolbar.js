@@ -45,6 +45,10 @@ export default function EditToolbar() {
     }
     file.setCurrentEditMode(currentEditMode);
   }
+
+  function setCurrentEditModeOption(option){
+    file.setCurrentEditModeOption(option);
+  }
   
   function handleUndo() {
     file.handleUndo();
@@ -108,8 +112,11 @@ export default function EditToolbar() {
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-3">
-        <img src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX)} alt=""></img>
         <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
+        <p onClick={(e) => setCurrentEditModeOption(0)}>add</p>
+        <p onClick={(e) => setCurrentEditModeOption(1)}>move</p>
+        <p onClick={(e) => setCurrentEditModeOption(2)}>remove</p>
+        {/* <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img> */}
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
@@ -117,8 +124,8 @@ export default function EditToolbar() {
       <div className="flex gap-4 px-3">
         <img src={SplitSubregionIcon} alt=""></img>
         <img src={MergeSubregionIcon} alt=""></img>
-        <img src={AddSubregionIcon} alt=""></img>
-        <img className="w-[25px] h-[25px]" src={RemoveSubregionIcon} alt=""></img>
+        <img src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_REGION)} alt=""></img>
+        <img className="w-[25px] h-[25px]" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_REGION)} alt=""></img>
       </div>
       <div className="w-[1px] bg-black h-full"></div>
     </>;
