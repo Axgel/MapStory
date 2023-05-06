@@ -147,8 +147,15 @@ function GlobalStoreContextProvider(props) {
 
   store.loadMapById = async function(mapId) {
     const response = await api.getMapById(mapId);
+    const map = response.data.map;
+    const collaborators = await store.getAllCollaboratorsByMap(map);
+    const selectedMapOwner = await store.getSelectedMapOwner(map);
+    const comments = await store.getComments(map);
     if(response.status === 200){
-      store.setSelectedMap(response.data.map);
+      storeReducer({
+        type: GlobalStoreActionType.SET_SELECTED_MAP,
+        payload: {selectedMap: map, detailView: DetailView.NONE, collaborators: collaborators, selectedMapOwner: selectedMapOwner, comments: comments},
+    });
     }
   }
 
@@ -165,6 +172,8 @@ function GlobalStoreContextProvider(props) {
 
   store.setSelectedMap = async function (map) {
     const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
+    console.log(map)
+    console.log(detailView);
     const collaborators = await store.getAllCollaboratorsByMap(map);
     const selectedMapOwner = await store.getSelectedMapOwner(map);
     const comments = await store.getComments(map);

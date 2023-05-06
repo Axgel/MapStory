@@ -43,6 +43,7 @@ export default function MapCard(props) {
 
   function setSelectedMap(e){
     e.stopPropagation();
+    console.log("doubleclicked")
     if(store.selectedMap && (store.selectedMap._id === mapDetails._id)){
       store.setSelectedMap(null);
     }

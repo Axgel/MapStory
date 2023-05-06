@@ -27,18 +27,16 @@ export default function FileButton() {
   }
 
   function toggleViewingMode(e){
-    e.stopPropagation();
-    document.getElementById("file-by-dd").classList.toggle("hidden");
+    toggleFileByDD(e);
     file.setCurrentEditMode(EditMode.VIEW);
   }
   function toggleEditingMode(e){
-    e.stopPropagation();
-    document.getElementById("file-by-dd").classList.toggle("hidden");
+    toggleFileByDD(e);
     file.setCurrentEditMode(EditMode.NONE);
   }
 
   function setMapProjectAction(e, currentModal){
-    e.stopPropagation();
+    // e.stopPropagation();
     toggleFileByDD(e)
     store.setMapProjectAction(currentModal, store.selectedMap);
   }
