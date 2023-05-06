@@ -116,19 +116,22 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_SEARCH_VALUE:{
         return setStore({
           ...store,
-          searchValue: payload.searchValue
+          searchValue: payload.searchValue, 
+          detailView: DetailView.NONE
         })
       }
       case GlobalStoreActionType.SET_SEARCH_BY:{
         return setStore({
           ...store,
-          searchBy: payload.searchBy
+          searchBy: payload.searchBy, 
+          detailView: DetailView.NONE
         })
       }
       case GlobalStoreActionType.SET_SORT_BY:{
         return setStore({
           ...store,
-          sortBy: payload.sortBy
+          sortBy: payload.sortBy, 
+          detailView: DetailView.NONE
         })
       }
       default:
