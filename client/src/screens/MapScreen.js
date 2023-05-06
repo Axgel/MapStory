@@ -105,23 +105,30 @@ export default function MapScreen() {
       console.log(subregionId);
       const ymapData = new Y.Map();
       ymap.set(subregionId, ymapData);
+      const yArr0 = new Y.Array();
+      const yArr1 = new Y.Array();
+      const yArr2 = new Y.Array();
+      yArr0.push([yArr1]);
+      yArr1.push([yArr2])
+      ymapData.set("coords", yArr0);
+
       ydoc.transact(() => {
         const coordinates = JSON.parse(coords);
         console.log(coordinates, coordinates.length, coordinates[0].length, coordinates[0][0].length);
-        const yArr0 = new Y.Array();
+        // const yArr0 = ymapData.get("coords")
         for(let i=0; i<coordinates.length; i++){
-          const yArr1 = new Y.Array();
+          // const yArr1 = ymapData.get("coords").get(i);
           for(let j=0; j<coordinates[i].length; j++){
-            const yArr2 = new Y.Array();
+            const yArr3 = ymapData.get("coords").get(i).get(j);
             for(let k=0; k<coordinates[i][j].length; k++){
-              yArr2.push([coordinates[i][j][k]]);
+              yArr3.push([coordinates[i][j][k]]);
             }
-            yArr1.push([yArr2]);
+            // yArr1.push([yArr2]);
           }
-          yArr0.push([yArr1]);
+          // yArr0.push([yArr1]);
         }
         
-        ymapData.set("coords", yArr0);
+        // ymapData.set("coords", yArr0);
         console.log(JSON.stringify(ymap));
       }, 42);
 
@@ -173,6 +180,7 @@ export default function MapScreen() {
     const regions = {};
     for(const [subregionId, subregionData] of Object.entries(yjsRegions)){
       const coordinates = subregionData["coords"];
+      if(!coordinates) continue;
       const layer = L.polygon(coordinates).addTo(mapItem);
       regions[subregionId] = layer;
       initLayerHandlers(layer, subregionId);
