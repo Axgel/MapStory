@@ -63,7 +63,7 @@ describe ("POST /register", () => {
         it("Should successfully register the user", async () => {
             const response = await request(app).post("/auth/register").send({
                 userName: "JohnS",
-                email: "JohnSmith6969@gmail.com", 
+                email: "JohnSmith6968@gmail.com", 
                 password: "123456789", 
                 passwordVerify: "123456789",
             })
@@ -89,7 +89,7 @@ describe ("POST /profile/username", () => {
         })
         it("should response with 400 status code", async () => {
             const response = await request(app).post("/auth/profile/username").send({
-                email: "JohnSmith6969@gmail.com",
+                email: "JohnSmith6968@gmail.com",
                 userName: "fet"
             })
             expect(response.status).toEqual(400)
@@ -97,7 +97,7 @@ describe ("POST /profile/username", () => {
         })
         it("should response with 200 status code", async () => {
             const response = await request(app).post("/auth/profile/username").send({
-                email: "JohnSmith6969@gmail.com",
+                email: "JohnSmith6968@gmail.com",
                 userName: "John"
             })
             expect(response.status).toEqual(200)
@@ -116,7 +116,7 @@ describe ("POST /profile/password", () => {
     describe("Testing changing password", () => {
         it("should response with 200 status code", async () => {
             const response = await request(app).post("/auth/profile/password").send({
-                email: "JohnSmith6969@gmail.com",
+                email: "JohnSmith6968@gmail.com",
                 oldPwd: "123456789",
                 newPwd: "1234567890",
                 cfmPwd: "1234567890"
@@ -140,7 +140,7 @@ describe ("POST /recoverPassword", () => {
         let userName;
         it("should send an email with token and userName", async () => {
             const response = await request(app).post("/auth/recoveryEmail").send({
-                email: "JohnSmith6969@gmail.com"
+                email: "JohnSmith6968@gmail.com"
             });
             expect(response.status).toEqual(200);
             expect(response.body.userName).toBeDefined();
@@ -165,7 +165,7 @@ describe ("Cleaning up database", ()=>{
     describe("Cleaning up data", () =>{
         it("Should clean up testing user", async () => {
             const response = await request(app).post("/auth/deleteUser").send({
-                email: "JohnSmith6969@gmail.com", 
+                email: "JohnSmith6968@gmail.com", 
             })
             expect(response.status).toEqual(200)
         });

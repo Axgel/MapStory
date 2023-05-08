@@ -16,7 +16,7 @@ createSubregion = (req, res) => {
   const subregion = new Subregion(body);
 
   subregion.save().then(() => {
-    return res.status(201).json({
+    return res.status(200).json({
       message: "New subregion created"
     })
   }).catch((err) => {
@@ -39,7 +39,7 @@ createMap = (req, res) => {
     user.personalMaps.push(mapproject._id);
     user.save().then(() => {
       mapproject.save().then((map) => {
-        return res.status(201).json({
+        return res.status(200).json({
           map: mapproject
         })
       }).catch((err) => {
@@ -195,6 +195,7 @@ deleteMap = async (req, res) => {
 forkMap = async (req, res) => {
   try {
     const user = await User.findById(req.body.userId);
+    console.log(user)
     const mapProject = await MapProject.findById(req.params.mapId); //mapproject to duplicate
 
     // create a copy of the map
@@ -230,8 +231,9 @@ forkMap = async (req, res) => {
       await newSubregion.save();
     }
     
-    return res.status(201).json({
-      message: "Forked map project"
+    return res.status(200).json({
+      message: "Forked map project",
+      map: newMapProject
     })
   } catch (err) {
     return res.status(400).json({
@@ -328,10 +330,10 @@ removeCollaborators = async(req, res) => {
   try{
     const body = req.body;
 
-    if(!body){
+    if(!body.collaboratorEmail || !body){
       return res.status(400).json({
         success: false,
-        error: 'You must provide a collaborator to add'
+        error: 'You must provide a collaborator to remove'
       })
     }
 
@@ -364,7 +366,7 @@ removeCollaborators = async(req, res) => {
 
   } catch(err){
     return res.status(400).json({
-      error: 'Unable to add collaborator'
+      error: 'Unable to remove collaborator'
     })
   }
 }
@@ -372,14 +374,15 @@ removeCollaborators = async(req, res) => {
 
 getUserById = async(req,res) => {
   try{
-    User.findOne({ _id: req.params.userId}, (err, user) => {
+    await User.findOne({ _id: req.params.userId}, (err, user) => {
+      console.log(user)
       return res.status(200).json({
         user: user 
       })
     })
   } catch(err){
     return res.status(400).json({
-      error: 'Unable to find map'
+      error: 'Unable to find user'
     })
   }
 }
