@@ -26,6 +26,8 @@ function GlobalFileContextProvider(props) {
 
   const [file, setFile] = useState({
     currentEditMode: EditMode.NONE,
+    // add, move, remove
+    editModeOptions: [true,true,true],
     editRegions: {},
   })
   
@@ -62,6 +64,12 @@ function GlobalFileContextProvider(props) {
           subregions: payload.subregions
         })
       }
+      case GlobalFileActionType.SET_EDIT_MODE_OPTION: {
+        return setFile({
+          ...file, 
+          editModeOptions: payload.editModeOption
+        })
+      }
       default:
         return file;
     }
@@ -78,10 +86,57 @@ function GlobalFileContextProvider(props) {
     return map;
   }
 
+  file.initMapControls = function(map){
+    const actions = [
+      // uses the default 'cancel' action
+      'cancel',
+      // creates a new action that has text, no click event
+      { text: 'Custom text, no click' },
+      // creates a new action with text and a click event
+      {
+        text: 'click me',
+        onClick: () => {
+          alert('🙋‍♂️');
+        },
+      },
+      {
+        text: 'click me',
+        onClick: () => {
+          alert('🙋‍♂️');
+        },
+      },
+    ];
+    
+    map.pm.Toolbar.createCustomControl({
+      name: "Edit Vertex",
+      block: "custom",
+      title: "Edit Vertex",
+      className: "editVertex",
+      actions: actions
+    });
+    map.pm.addControls({
+      drawControls: false,
+      editControls: false,
+      customControls: true
+    });
+
+
+  }
+
+
   file.setCurrentEditMode = function(currentEditMode) {
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE,
       payload: {currentEditMode: currentEditMode}
+    })
+  }
+
+  file.setCurrentEditModeOption = function(editModeOption){
+    const arr = [...file.editModeOptions];
+    arr[editModeOption] = !arr[editModeOption];
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_OPTION,
+      payload: {editModeOption: arr}
     })
   }
 

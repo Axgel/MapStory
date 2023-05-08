@@ -17,8 +17,8 @@ function createAddVertexTransaction(transaction, e, subregionId){
 }
 
 function createMoveVertexTransaction(transaction, e, subregionId){
-  const [i,j] = e.indexPath;
-  const temp = e.layer.getLatLngs()[i][j];
+  const [i,j,k] = e.indexPath;
+  const temp = e.layer.getLatLngs()[i][j][k];
   const newVal = [temp.lat, temp.lng];
   return [transaction, subregionId, e.indexPath, newVal]
 }

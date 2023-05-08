@@ -45,7 +45,6 @@ getAllSubregionsServer = async(mapId) => {
     for(const subregion of subregions){
       subregionsDict[subregion._id] = {};
       subregionsDict[subregion._id]["coords"] = subregion.coordinates; 
-
       const propArr = [];
       if(subregion.properties){
         for(const [k,v] of subregion.properties){
@@ -61,6 +60,28 @@ getAllSubregionsServer = async(mapId) => {
     }
     
   } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+addSubregion = async(mapId, coords) => {
+  try{
+    const coordinates = JSON.parse(coords);
+    
+    const subregion = new Subregion({
+      mapId: mapId,
+      type: 'MultiPolygon',
+      properties: {},
+      coordinates: coordinates,
+      isStale: false
+    })
+
+    console.log(subregion._id, "qwer");
+    await subregion.save(); 
+    return {subregionId: subregion._id}
+
+  } catch(err){
     console.log(err);
     return false;
   }

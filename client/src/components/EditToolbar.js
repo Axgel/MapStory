@@ -75,6 +75,10 @@ export default function EditToolbar() {
         // code block
     }
   }
+
+  function setCurrentEditModeOption(option){
+    file.setCurrentEditModeOption(option);
+  }
   
   function handleUndo() {
     file.handleUndo();
@@ -127,19 +131,35 @@ export default function EditToolbar() {
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-2 px-3">
+      {/* <div className="flex gap-2 px-3">
         <img id="add-vertex" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX, 1)} alt=""></img>
         <img id="edit-vertex" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX, 2)} alt=""></img>
+      </div> */}
+
+      <div className="flex gap-4 px-3">
+        <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
+        <p onClick={(e) => setCurrentEditModeOption(0)}>add</p>
+        <p onClick={(e) => setCurrentEditModeOption(1)}>move</p>
+        <p onClick={(e) => setCurrentEditModeOption(2)}>remove</p>
+        {/* <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img> */}
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-2 px-3">
+      {/* <div className="flex gap-2 px-3">
         <img id="split-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={SplitSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION, 3)} alt=""></img>
         <img id="merge-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={MergeSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION, 4)} alt=""></img>
         <img id="add-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_SUBREGION, 5)} alt=""></img>
         <img id="remove-subregion" className="w-[25px] h-[25px] px-[6px] py-[6px] hover:bg-mapselectedfill" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_SUBREGION, 6)} alt=""></img>
+      </div> */}
+
+      <div className="flex gap-4 px-3">
+        <img src={SplitSubregionIcon} alt=""></img>
+        <img src={MergeSubregionIcon} alt=""></img>
+        <img src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_REGION)} alt=""></img>
+        <img className="w-[25px] h-[25px]" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_REGION)} alt=""></img>
       </div>
+      
       <div className="w-[1px] bg-black h-full"></div>
     </>;
 

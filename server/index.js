@@ -64,14 +64,8 @@ switch (process.env.ENVIRONMENT) {
         Y.applyUpdate(ydoc, uintArray);
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
-          socketIO.to(client).emit('others-update', {subregionId: subregionId, op: op});
+          socketIO.to(client).emit('others-update', {op: op});
         }
-        // const mapId = data[1];
-        // applyOp(data);
-        // for (const client of mapProjects[mapId].clients) {
-        //   if (client == socket.id) continue;
-        //   socketIO.to(client).emit("update", data);
-        // }
       });
     })
     
@@ -117,22 +111,24 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
-        const {mapId, subregionId, op} = data;
+        const {mapId, op} = data;
         const parsed = JSON.parse(op);
         const uintArray = Uint8Array.from(parsed);
         const ydoc = mapProjects[mapId].text
         Y.applyUpdate(ydoc, uintArray);
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
-          socketIO.to(client).emit('others-update', {subregionId: subregionId, op: op});
+          socketIO.to(client).emit('others-update', {op: op});
         }
-        // const mapId = data[1];
-        // applyOp(data);
-        // for (const client of mapProjects[mapId].clients) {
-        //   if (client == socket.id) continue;
-        //   socketIO.to(client).emit("update", data);
-        // }
       });
+
+      socket.on("add-region", async (data) => {
+        const {mapId, coords} = data;
+        // const string = new TextDecoder().decode(uint8array);
+        const subregionId = await addSubregion(mapId, coords);
+        console.log(subregionId, "qwert");
+        socketIO.to(socket.id).emit("add-region-ack", {subregionId: subregionId.subregionId, coords: coords});
+      })
     })
    
     devHttpServer.listen(PORT, () =>
@@ -142,6 +138,7 @@ switch (process.env.ENVIRONMENT) {
 }
 
 function filterClient(mapId, socketId) {
+  if(!mapProjects[mapId]) return;
   mapProjects[mapId].clients = mapProjects[mapId].clients.filter(client => client !== socketId);
 }
 
@@ -153,7 +150,6 @@ function filterClientFromAll(socketId) {
 
 function createYjsData(ymap, jsonItems){
   for(const [subregionId, subregionData] of Object.entries(jsonItems)){
-
     const ymapData = new Y.Map();
 
     const coords = subregionData["coords"];
@@ -161,19 +157,19 @@ function createYjsData(ymap, jsonItems){
     
     const yArr0 = new Y.Array();
     for(let i=0; i<coords.length; i++){
-      const yArr1 = [];
+      const yArr1 = new Y.Array();
       for(let j=0; j<coords[i].length; j++){
-        const yArr2 = [];
+        const yArr2 = new Y.Array();
         for(let k=0; k<coords[i][j].length; k++){
-          yArr2.push(coords[i][j][k]);
+          yArr2.push([coords[i][j][k]]);
         }
-        yArr1.push(yArr2);
+        yArr1.push([yArr2]);
       }
-      yArr0.push(yArr1);
+      yArr0.push([yArr1]);
     }
     
     ymapData.set("coords", yArr0);
-    
+
     if(properties){
       const pArr = new Y.Array();
       for(const [k,v] of properties){

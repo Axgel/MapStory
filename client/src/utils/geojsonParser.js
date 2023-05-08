@@ -44,7 +44,7 @@ function parsePolygon(coordinates){
   return regionCoords;
 }
 
-function parseMultiPolygon(coordinates){
+export function parseMultiPolygon(coordinates){
   const regionCoords = [];
   for(let i=0; i<coordinates.length; i++){
     regionCoords.push(parsePolygon(coordinates[i]));    
