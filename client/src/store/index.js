@@ -175,8 +175,6 @@ function GlobalStoreContextProvider(props) {
 
   store.setSelectedMap = async function (map) {
     const detailView = (map) ? DetailView.PROPERTIES : DetailView.NONE;
-    console.log(map)
-    console.log(detailView);
     const collaborators = await store.getAllCollaboratorsByMap(map);
     const selectedMapOwner = await store.getSelectedMapOwner(map);
     const comments = await store.getComments(map);
@@ -291,7 +289,6 @@ function GlobalStoreContextProvider(props) {
       }
     }
     response = await api.getPublishedMaps();
-
     
     if(response.status === 200){
       if(store.selectedMapInList(personalMaps)){
@@ -299,7 +296,7 @@ function GlobalStoreContextProvider(props) {
       } else if(store.selectedMapInList(sharedMaps)){
         selectedMap = store.selectedMapInList(sharedMaps);
       } else if(store.selectedMapInList(response.data.publishedMaps)){
-        selectedMap = store.selectedMapInList(response.data.publishMaps);
+        selectedMap = store.selectedMapInList(response.data.publishedMaps);
       }
       
       collaborators = await store.getAllCollaboratorsByMap(selectedMap);

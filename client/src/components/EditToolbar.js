@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import UndoIcon from "../assets/UndoIcon.png"
 import RedoIcon from "../assets/RedoIcon.png"
 import AddVertexIcon from "../assets/AddVertexIcon.png"
@@ -27,6 +27,15 @@ export default function EditToolbar() {
   const { auth } = useContext(AuthContext);
   const [editActive, setEditActive] = useState(false); //for editing title
   const [editTool, setEditTool] = useState(0);
+
+  
+  useEffect(() => {
+    if(!store.selectedMap) return
+    if (store.selectedMap.isPublished)
+      file.setCurrentEditMode(EditMode.VIEW)
+    else
+      file.setCurrentEditMode(EditMode.NONE)
+  }, [store])
   
   const navigate = useNavigate();
   function handleExitMap(){
@@ -42,33 +51,36 @@ export default function EditToolbar() {
     e.stopPropagation();
     if(currentEditMode === file.currentEditMode){
       currentEditMode = EditMode.NONE;
+      setEditTool(0);
     }
     else {
-      toggleEditIcon(editTool)
-      setEditTool(iconNum)
+      toggleEditIcon(editTool); //toggle old number
+      setEditTool(iconNum); //set new num
     }
-    toggleEditIcon(iconNum)
+    toggleEditIcon(iconNum); //toggle new number
     file.setCurrentEditMode(currentEditMode);
   }
 
+
+
   function toggleEditIcon(iconNum){
     switch(iconNum) {
-      case 1: //add vertex
-        document.getElementById("add-vertex").classList.toggle("bg-mapselectedfill");
+      case 1: //edit vertex
+        document.getElementById("editVertex").classList.toggle("bg-mapselectedfill");
+        document.getElementById("add-vertex").classList.toggle("hover:bg-mapselectedfill");
+        document.getElementById("move-vertex").classList.toggle("hover:bg-mapselectedfill");
+        document.getElementById("remove-vertex").classList.toggle("hover:bg-mapselectedfill");
         break;
-      case 2: //edit vertex
-        document.getElementById("edit-vertex").classList.toggle("bg-mapselectedfill");
-        break;
-      case 3: //split subregion
+      case 2: //split subregion
         document.getElementById("split-subregion").classList.toggle("bg-mapselectedfill");
         break;
-      case 4: //merge subregion
+      case 3: //merge subregion
         document.getElementById("merge-subregion").classList.toggle("bg-mapselectedfill");
         break;
-      case 5: //add subregion
+      case 4: //add subregion
         document.getElementById("add-subregion").classList.toggle("bg-mapselectedfill");
         break;
-      case 6: //remove subregion
+      case 5: //remove subregion
         document.getElementById("remove-subregion").classList.toggle("bg-mapselectedfill");
         break;
       default:
@@ -77,7 +89,7 @@ export default function EditToolbar() {
   }
 
   function setCurrentEditModeOption(option){
-    file.setCurrentEditModeOption(option);
+    file.setCurrentEditModeOption(option); 
   }
   
   function handleUndo() {
@@ -107,6 +119,20 @@ export default function EditToolbar() {
       setEditActive(true);
     }
   }
+
+  let addVertexClass = "text-lg py-1 px-2 rounded-md";
+  let moveVertexClass = addVertexClass;
+  let removeVertexClass = addVertexClass;
+  if(file.currentEditMode === EditMode.EDIT_VERTEX){
+    if(file.editModeOptions[0])
+      addVertexClass += " bg-mapselectedfill";
+    if(file.editModeOptions[1])
+      moveVertexClass += " bg-mapselectedfill";
+    if(file.editModeOptions[2])
+      removeVertexClass +=" bg-mapselectedfill";
+  } 
+
+  //EDITING TITLE ----------------------------------------------------------------------
   
   let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
   if(editActive){
@@ -125,39 +151,26 @@ export default function EditToolbar() {
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-2 px-3">
-        <img className="w-[25px] h-[25px] px-2 py-2 hover:bg-mapselectedfill" src={UndoIcon} onClick={handleUndo} alt=""></img>
-        <img className="w-[25px] h-[25px] px-2 py-2 hover:bg-mapselectedfill" src={RedoIcon} onClick={handleRedo} alt=""></img>
+        <img className="w-[25px] h-[25px] px-2 py-2 rounded-md hover:bg-mapselectedfill" src={UndoIcon} onClick={handleUndo} alt=""></img>
+        <img className="w-[25px] h-[25px] px-2 py-2 rounded-md hover:bg-mapselectedfill" src={RedoIcon} onClick={handleRedo} alt=""></img>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      {/* <div className="flex gap-2 px-3">
-        <img id="add-vertex" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={AddVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_VERTEX, 1)} alt=""></img>
-        <img id="edit-vertex" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX, 2)} alt=""></img>
-      </div> */}
-
-      <div className="flex gap-4 px-3">
-        <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
-        <p onClick={(e) => setCurrentEditModeOption(0)}>add</p>
-        <p onClick={(e) => setCurrentEditModeOption(1)}>move</p>
-        <p onClick={(e) => setCurrentEditModeOption(2)}>remove</p>
-        {/* <img src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img> */}
+      <div className="flex gap-4 px-2">
+        <img id="editVertex" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill" src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX, 1)} alt=""></img>
+        <div id="add-vertex" className={addVertexClass} onClick={(e) => setCurrentEditModeOption(0)}>Add</div>
+        <div id="move-vertex" className={moveVertexClass} onClick={(e) => setCurrentEditModeOption(1)}>Move</div>
+        <div id="remove-vertex" className={removeVertexClass} onClick={(e) => setCurrentEditModeOption(2)}>Remove</div>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      {/* <div className="flex gap-2 px-3">
-        <img id="split-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={SplitSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION, 3)} alt=""></img>
-        <img id="merge-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={MergeSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION, 4)} alt=""></img>
-        <img id="add-subregion" className="w-[30px] h-[30px] px-1 py-1 hover:bg-mapselectedfill" src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_SUBREGION, 5)} alt=""></img>
-        <img id="remove-subregion" className="w-[25px] h-[25px] px-[6px] py-[6px] hover:bg-mapselectedfill" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_SUBREGION, 6)} alt=""></img>
-      </div> */}
-
       <div className="flex gap-4 px-3">
-        <img src={SplitSubregionIcon} alt=""></img>
-        <img src={MergeSubregionIcon} alt=""></img>
-        <img src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_REGION)} alt=""></img>
-        <img className="w-[25px] h-[25px]" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_REGION)} alt=""></img>
+        <img id="split-subregion" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill" onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION, 2)} src={SplitSubregionIcon} alt=""></img>
+        <img id="merge-subregion" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill" onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION, 3)} src={MergeSubregionIcon} alt=""></img>
+        <img id="add-subregion" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill"  src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_REGION, 4)} alt=""></img>
+        <img id="remove-subregion" className="w-[25px] h-[25px] px-[6px] py-[6px] rounded-md hover:bg-mapselectedfill" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_REGION, 5)} alt=""></img>
       </div>
       
       <div className="w-[1px] bg-black h-full"></div>

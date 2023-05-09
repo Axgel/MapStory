@@ -140,8 +140,6 @@ function GlobalFileContextProvider(props) {
     })
   }
 
-
-
   file.handleUndo = function() {
   }
 
