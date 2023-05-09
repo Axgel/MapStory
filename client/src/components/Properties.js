@@ -30,12 +30,12 @@ export default function Properties() {
 
       <div>
         <p className="font-semibold text-base">Upvotes</p>
-        <p className="text-sm text-publishmodalsubtext">{mapInfo.upvotes.length}</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.isPublished ? mapInfo.upvotes.length : "-"}</p>
       </div>
 
       <div>
         <p className="font-semibold text-base">Downvotes</p>
-        <p className="text-sm text-publishmodalsubtext">{mapInfo.downvotes.length}</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.isPublished ? mapInfo.downvotes.length : "-"}</p>
       </div>
 
       <div>

@@ -1,10 +1,11 @@
 import React, { useContext, useEffect } from "react";
 import paperPlaneIcon from "../assets/paperPlaneIcon.png"
-
+import AuthContext from "../auth";
 import { GlobalStoreContext } from "../store";
 
 export default function Comments(props) {
   //display comments
+  const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
 
   let commentCard = <></>;
@@ -35,10 +36,12 @@ export default function Comments(props) {
   return (
     <div id="commentView" className="flex flex-col pl-5 pr-2 py-3  gap-2">
       <div className="overflow-auto h-[400px] mb-2">{commentCard}</div>
-      <div className="absolute bottom-2 left-3">
-        <input id="input_comment" onKeyDown={handleKeyPress} className="w-[230px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-2 text-base" type="text"></input>
-        <img id="submit_comment" className="h-[35px] absolute bottom-0" src={paperPlaneIcon} onClick={handleComment} alt=""></img>
-      </div>
+      {auth.loggedIn ?
+        <div className="absolute bottom-2 left-3">
+          <input id="input_comment" onKeyDown={handleKeyPress} className="w-[230px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-2 text-base" type="text"></input>
+          <img id="submit_comment" className="h-[35px] absolute bottom-0" src={paperPlaneIcon} onClick={handleComment} alt=""></img>
+        </div> : <></>
+      }
     </div>
   );
 }
