@@ -27,7 +27,7 @@ function GlobalFileContextProvider(props) {
   const [file, setFile] = useState({
     currentEditMode: EditMode.NONE,
     // add, move, remove
-    editModeOptions: [true,true,true],
+    editModeOptions: [true, true, true],
     editRegions: {},
   })
   
@@ -68,6 +68,14 @@ function GlobalFileContextProvider(props) {
         return setFile({
           ...file, 
           editModeOptions: payload.editModeOption
+        })
+      }
+      case GlobalFileActionType.RESET_DEFAULT: {
+        return setFile({
+          ...file, 
+          currentEditMode: EditMode.NONE,
+          editModeOptions: [true, true, true],
+          editRegions: {},
         })
       }
       default:
@@ -146,6 +154,12 @@ function GlobalFileContextProvider(props) {
   file.handleRedo = function() {
   }
   
+  file.resetDefault = function() {
+    fileReducer({
+      type: GlobalFileActionType.RESET_DEFAULT,
+      payload: null
+    })
+  }
   return (
     <GlobalFileContext.Provider value={{ file }}>
       {props.children}

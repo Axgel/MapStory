@@ -3,7 +3,7 @@ import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
 import downvoteFilledIcon from "../assets/downvoteFilledIcon.png"
 import upvoteFilledIcon from "../assets/upvoteFilledIcon.png"
-import { CurrentModal } from "../enums";
+import { CurrentModal, DetailView } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
@@ -35,7 +35,7 @@ export default function MapCard(props) {
   }
 
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
-  if(store.selectedMap && store.selectedMap._id === mapDetails._id){
+  if(store.detailView !== DetailView.NONE && store.selectedMap && (store.selectedMap._id === mapDetails._id)){
     mapCardWrapper += "bg-mapselectedfill"
   } else {
     mapCardWrapper += "bg-brownshade-700 hover:bg-mapselectedfill hover:bg-opacity-40"
@@ -43,7 +43,7 @@ export default function MapCard(props) {
 
   function setSelectedMap(e){
     e.stopPropagation();
-    if(store.selectedMap && (store.selectedMap._id === mapDetails._id)){
+    if(store.detailView !== DetailView.NONE && store.selectedMap && (store.selectedMap._id === mapDetails._id)){
       store.setSelectedMap(null);
     }
     else{

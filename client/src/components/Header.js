@@ -5,17 +5,17 @@ import { useNavigate } from "react-router-dom";
 import { ViewMode } from "../enums";
 import AuthContext from "../auth";
 import { GlobalStoreContext } from '../store'
+import GlobalFileContext from "../file";
 
 export default function Header() {
   const { auth } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
+  const { file } = useContext(GlobalFileContext);
+
   const navigate = useNavigate();
 
-  function handleSplashScreen(){
-    navigate("/")
-  }
-
   function handleHomeScreen(){
+    file.resetDefault();
     navigate("/")
   }
 
@@ -25,16 +25,20 @@ export default function Header() {
   }
 
   function handleProfileScreen(){
+    file.resetDefault();
     navigate("/profile")
   }
 
   function handleLogOut(){
+    file.resetDefault();
     auth.logoutUser();
   }
 
   function handleExit(){
     store.setViewMode(ViewMode.PERSONAL);
     auth.setGuestAccess(false);
+    file.resetDefault();
+    navigate("/")
   }
 
   let profileOptions = <></>
@@ -51,7 +55,7 @@ export default function Header() {
   return (
     <div className="flex-none h-16 w-full bg-brownshade-900 flex items-center justify-between min-w-[1120px]">
       <div className="flex items-center pl-8 gap-x-7">
-        <img onClick={handleSplashScreen} className="cursor-pointer w-12 h-12 p-1 hover:w-14 hover:h-14 hover:p-0" src={MushroomLogo} alt=""></img>
+        <img onClick={handleHomeScreen} className="cursor-pointer w-12 h-12 p-1 hover:w-14 hover:h-14 hover:p-0" src={MushroomLogo} alt=""></img>
         <h1 className="text-white text-4xl">
           MapStory
         </h1>

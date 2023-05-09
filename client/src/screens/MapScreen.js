@@ -55,7 +55,7 @@ export default function MapScreen() {
   useEffect(() => {
     if(!mapItem) return;
     switch(file.currentEditMode){
-      case EditMode.ADD_REGION: {
+      case EditMode.ADD_SUBREGION: {
         mapItem.pm.enableDraw('Polygon', {
           snappable: true,
           snapDistance: 20,
@@ -223,7 +223,7 @@ export default function MapScreen() {
 
     mapItem.removeLayer(e.layer);
     const geoJsonItem = e.layer.toGeoJSON();
-    if(transaction == TransactionType.ADD_REGION){
+    if(transaction == TransactionType.ADD_SUBREGION){
       const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
       const coordsStr = JSON.stringify(coords);
       auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
@@ -246,7 +246,7 @@ export default function MapScreen() {
     layer.on('pm:vertexadded', (e) => setVertexTransaction([TransactionType.ADD_VERTEX, e, subregionId]));
     layer.on('pm:markerdragend', (e) => setVertexTransaction([TransactionType.MOVE_VERTEX, e, subregionId]));
     layer.on('pm:vertexremoved', (e) => setVertexTransaction([TransactionType.REMOVE_VERTEX, e, subregionId]));
-    mapItem.on('pm:create', (e) => setRegionTransaction([TransactionType.ADD_REGION, e]));
+    mapItem.on('pm:create', (e) => setRegionTransaction([TransactionType.ADD_SUBREGION, e]));
   }
 
   function enableEditing(layer){
@@ -281,6 +281,7 @@ export default function MapScreen() {
   }
 
   function applyVertexAdd(subregionId, indexPath, newCoords){
+    console.log(indexPath);
     const [i,j,k] = indexPath;
     const ymap = ydoc.getMap("regions");
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
@@ -293,6 +294,7 @@ export default function MapScreen() {
   }
 
   function applyVertexMove(subregionId, indexPath, newCoords){
+    console.log(indexPath);
     const [i,j,k] = indexPath
     const ymap = ydoc.getMap("regions");
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);

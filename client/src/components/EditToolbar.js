@@ -26,69 +26,35 @@ export default function EditToolbar() {
   const { file } = useContext(GlobalFileContext);
   const { auth } = useContext(AuthContext);
   const [editActive, setEditActive] = useState(false); //for editing title
-  const [editTool, setEditTool] = useState(0);
 
   
   useEffect(() => {
     if(!store.selectedMap) return
-    if (store.selectedMap.isPublished)
-      file.setCurrentEditMode(EditMode.VIEW)
-    else
-      file.setCurrentEditMode(EditMode.NONE)
+    if (store.selectedMap.isPublished) file.setCurrentEditMode(EditMode.VIEW);
   }, [store])
   
   const navigate = useNavigate();
   function handleExitMap(){
+    file.resetDefault();
     navigate("/");
   }
   
   function setCurrentModal(e, currentModal){
     e.stopPropagation();
+    if(currentModal === CurrentModal.SHARE_MAP && (!auth.loggedIn || !store.selectedMap || auth.user._id !== store.selectedMap.owner)) return;
     store.setCurrentModal(currentModal);
   }
   
-  function setCurrentEditMode(e, currentEditMode, iconNum){
+  function setCurrentEditMode(e, currentEditMode){
     e.stopPropagation();
     if(currentEditMode === file.currentEditMode){
       currentEditMode = EditMode.NONE;
-      setEditTool(0);
     }
-    else {
-      toggleEditIcon(editTool); //toggle old number
-      setEditTool(iconNum); //set new num
-    }
-    toggleEditIcon(iconNum); //toggle new number
     file.setCurrentEditMode(currentEditMode);
   }
 
-
-
-  function toggleEditIcon(iconNum){
-    switch(iconNum) {
-      case 1: //edit vertex
-        document.getElementById("editVertex").classList.toggle("bg-mapselectedfill");
-        document.getElementById("add-vertex").classList.toggle("hover:bg-mapselectedfill");
-        document.getElementById("move-vertex").classList.toggle("hover:bg-mapselectedfill");
-        document.getElementById("remove-vertex").classList.toggle("hover:bg-mapselectedfill");
-        break;
-      case 2: //split subregion
-        document.getElementById("split-subregion").classList.toggle("bg-mapselectedfill");
-        break;
-      case 3: //merge subregion
-        document.getElementById("merge-subregion").classList.toggle("bg-mapselectedfill");
-        break;
-      case 4: //add subregion
-        document.getElementById("add-subregion").classList.toggle("bg-mapselectedfill");
-        break;
-      case 5: //remove subregion
-        document.getElementById("remove-subregion").classList.toggle("bg-mapselectedfill");
-        break;
-      default:
-        // code block
-    }
-  }
-
   function setCurrentEditModeOption(option){
+    if (file.currentEditMode !== EditMode.EDIT_VERTEX) return
     file.setCurrentEditModeOption(option); 
   }
   
@@ -120,17 +86,41 @@ export default function EditToolbar() {
     }
   }
 
-  let addVertexClass = "text-lg py-1 px-2 rounded-md";
-  let moveVertexClass = addVertexClass;
-  let removeVertexClass = addVertexClass;
-  if(file.currentEditMode === EditMode.EDIT_VERTEX){
-    if(file.editModeOptions[0])
-      addVertexClass += " bg-mapselectedfill";
-    if(file.editModeOptions[1])
-      moveVertexClass += " bg-mapselectedfill";
-    if(file.editModeOptions[2])
-      removeVertexClass +=" bg-mapselectedfill";
-  } 
+  const toggledOnClass = "bg-mapselectedfill"
+  const toggledOffClass = "hover:bg-mapselectedfill hover:bg-opacity-50"
+  const disabledClass = "cursor-not-allowed opacity-30"
+
+  let baseIconClass = "w-[30px] h-[30px] px-1 py-1 rounded-md " + toggledOffClass;
+  let baseTextClass = "text-lg py-1 px-2 rounded-md " + disabledClass;
+
+  let editVertexClass = baseIconClass;
+  let addVertexClass = baseTextClass;
+  let moveVertexClass = baseTextClass;
+  let removeVertexClass = baseTextClass;
+  let splitSubregionClass = baseIconClass;
+  let mergeSubregionClass = baseIconClass;
+  let addSubregionClass = baseIconClass;
+  let removeSubregionClass = "w-[25px] h-[25px] px-[6px] py-[6px] rounded-md " + toggledOffClass;
+  switch(file.currentEditMode) {
+    case(EditMode.EDIT_VERTEX):
+      editVertexClass = editVertexClass.replace(toggledOffClass, toggledOnClass);
+      addVertexClass = addVertexClass.replace(disabledClass, (file.editModeOptions[0] ? toggledOnClass : toggledOffClass));
+      moveVertexClass = moveVertexClass.replace(disabledClass, (file.editModeOptions[1] ? toggledOnClass : toggledOffClass));
+      removeVertexClass = removeVertexClass.replace(disabledClass, (file.editModeOptions[2] ? toggledOnClass : toggledOffClass));
+      break
+    case(EditMode.SPLIT_SUBREGION):
+      splitSubregionClass = splitSubregionClass.replace(toggledOffClass, toggledOnClass);
+      break
+    case(EditMode.MERGE_SUBREGION):
+      mergeSubregionClass = mergeSubregionClass.replace(toggledOffClass, toggledOnClass);
+      break
+    case(EditMode.ADD_SUBREGION):
+      addSubregionClass = addSubregionClass.replace(toggledOffClass, toggledOnClass);
+      break
+    case(EditMode.REMOVE_SUBREGION):
+      removeSubregionClass = removeSubregionClass.replace(toggledOffClass, toggledOnClass);
+      break
+  }
 
   //EDITING TITLE ----------------------------------------------------------------------
   
@@ -146,19 +136,20 @@ export default function EditToolbar() {
     onKeyDown={handleKeyPress}
     ></input>
   }
+
   let editingTools = (file.currentEditMode === EditMode.VIEW) ? <></> :
-  <>
+    <>
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-2 px-3">
-        <img className="w-[25px] h-[25px] px-2 py-2 rounded-md hover:bg-mapselectedfill" src={UndoIcon} onClick={handleUndo} alt=""></img>
-        <img className="w-[25px] h-[25px] px-2 py-2 rounded-md hover:bg-mapselectedfill" src={RedoIcon} onClick={handleRedo} alt=""></img>
+        <img className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill hover:bg-opacity-50" src={UndoIcon} onClick={handleUndo} alt=""></img>
+        <img className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill hover:bg-opacity-50" src={RedoIcon} onClick={handleRedo} alt=""></img>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-2">
-        <img id="editVertex" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill" src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX, 1)} alt=""></img>
+        <img id="editVertex" className={editVertexClass} src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
         <div id="add-vertex" className={addVertexClass} onClick={(e) => setCurrentEditModeOption(0)}>Add</div>
         <div id="move-vertex" className={moveVertexClass} onClick={(e) => setCurrentEditModeOption(1)}>Move</div>
         <div id="remove-vertex" className={removeVertexClass} onClick={(e) => setCurrentEditModeOption(2)}>Remove</div>
@@ -167,10 +158,10 @@ export default function EditToolbar() {
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-3">
-        <img id="split-subregion" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill" onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION, 2)} src={SplitSubregionIcon} alt=""></img>
-        <img id="merge-subregion" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill" onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION, 3)} src={MergeSubregionIcon} alt=""></img>
-        <img id="add-subregion" className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill"  src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_REGION, 4)} alt=""></img>
-        <img id="remove-subregion" className="w-[25px] h-[25px] px-[6px] py-[6px] rounded-md hover:bg-mapselectedfill" src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_REGION, 5)} alt=""></img>
+        <img id="split-subregion" className={splitSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION)} src={SplitSubregionIcon} alt=""></img>
+        <img id="merge-subregion" className={mergeSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION)} src={MergeSubregionIcon} alt=""></img>
+        <img id="add-subregion" className={addSubregionClass}  src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_SUBREGION)} alt=""></img>
+        <img id="remove-subregion" className={removeSubregionClass} src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_SUBREGION)} alt=""></img>
       </div>
       
       <div className="w-[1px] bg-black h-full"></div>
@@ -220,10 +211,13 @@ export default function EditToolbar() {
     </>
     :<></>;
   //--------------------------------------------------------------------------------------
-  let exportClassName = "bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center hover:bg-opacity-50";
-  let shareClassName = exportClassName;
-  if(!auth.loggedIn){
+  let fileButtonClass = "bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center ";
+  let exportClassName = fileButtonClass + "hover:bg-opacity-50";
+  let shareClassName = fileButtonClass
+  if(!auth.loggedIn || !store.selectedMap || auth.user._id !== store.selectedMap.owner) {
     shareClassName += "cursor-not-allowed opacity-30";
+  } else {
+    shareClassName += "hover:bg-opacity-50";
   }
 
   return (
@@ -239,7 +233,7 @@ export default function EditToolbar() {
           {editingTools}
         </div>
       </div>
-
+      
       <div className="flex">
         {voting}
         <div className="w-[1px] bg-black h-full"></div>
