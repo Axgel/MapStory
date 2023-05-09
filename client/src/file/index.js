@@ -84,7 +84,7 @@ function GlobalFileContextProvider(props) {
   };
   
   file.initMapContainer = function(mapRef) {
-    const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
+    const map = L.map(mapRef, {worldCopyJump: true})
     const southWest = L.latLng(-89.98155760646617, -180);
     const northEast = L.latLng(89.99346179538875, 180);
     const bounds = L.latLngBounds(southWest, northEast);

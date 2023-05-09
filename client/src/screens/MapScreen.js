@@ -169,13 +169,15 @@ export default function MapScreen() {
 
     const yjsRegions = ydoc.getMap('regions').toJSON();
     const regions = {};
+    const bounds = L.latLngBounds();
     for(const [subregionId, subregionData] of Object.entries(yjsRegions)){
       const coordinates = subregionData["coords"];
       const layer = L.polygon(coordinates).addTo(mapItem);
+      bounds.extend(layer.getBounds());
       regions[subregionId] = layer;
       initLayerHandlers(layer, subregionId);
     }
-
+    mapItem.fitBounds(bounds);
     setInitLoad(1);
     setLoadedRegions(regions);
   }, [mapItem, initLoad])
