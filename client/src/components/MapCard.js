@@ -66,7 +66,7 @@ export default function MapCard(props) {
   let downvoteImg = (auth.loggedIn && mapDetails.downvotes.includes(auth.user._id)) ? downvoteFilledIcon : downvoteOutlineIcon;
 
   let voteCSS = "w-8 h-8 p-0.5 "
-  voteCSS += (auth.loggedIn && mapDetails.isPublished) ? "hover:w-9 hover:h-9 hover:p-0" : ""
+  voteCSS += (auth.loggedIn && mapDetails.isPublished) ? "hover:w-9 hover:h-9 hover:p-0" : "opacity-30"
 
 
   function handleDownvote(e){

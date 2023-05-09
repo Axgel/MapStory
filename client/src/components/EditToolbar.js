@@ -170,42 +170,34 @@ export default function EditToolbar() {
   //------------------------------VOTING -------------------------------------
   function handleDownvote(e){
     e.stopPropagation();
-    if(!auth.loggedIn || !store.selectedMap.isPublished) return;
+    if(!auth.loggedIn || !store.selectedMap || !store.selectedMap.isPublished) return;
     store.updateVotes(store.selectedMap, 0);
   }
 
   function handleUpvote(e){
     e.stopPropagation();
-    if(!auth.loggedIn || !store.selectedMap.isPublished) return;
+    if(!auth.loggedIn || !store.selectedMap || !store.selectedMap.isPublished) return;
     store.updateVotes(store.selectedMap, 1);
   }
   
-  let upvoteImg = upvoteOutlineIcon;
-  if(store.selectedMap && auth.user && store.selectedMap.upvotes.includes(auth.user._id)) 
-    upvoteImg = upvoteFilledIcon;
-  let downvoteImg = downvoteOutlineIcon;
-  if(store.selectedMap && auth.user && store.selectedMap.downvotes.includes(auth.user._id)) 
-    downvoteImg = downvoteFilledIcon ;
 
-  let numUpvotes;
-  let numDownvotes;
-  if(store.selectedMap !== null && !store.selectedMap.isPublished){
-    numUpvotes="-";
-    numDownvotes="-";
-  }
-  else if(store.selectedMap !== null && store.selectedMap.isPublished){
-    numUpvotes = store.selectedMap.upvotes.length;
-    numDownvotes = store.selectedMap.downvotes.length;
-  }
+  let upvoteImg = (auth.user && store.selectedMap && store.selectedMap.upvotes.includes(auth.user._id)) ? upvoteFilledIcon : upvoteOutlineIcon;
+  let downvoteImg = (auth.user && store.selectedMap && store.selectedMap.downvotes.includes(auth.user._id)) ? downvoteFilledIcon : downvoteOutlineIcon;
+
+  let numUpvotes = (store.selectedMap && store.selectedMap.isPublished) ? store.selectedMap.upvotes.length : "-";
+  let numDownvotes = (store.selectedMap && store.selectedMap.isPublished) ? store.selectedMap.downvotes.length : "-";
+  
+  let voteCSS = "w-8 h-8 p-0.5 "
+  voteCSS += (auth.loggedIn && store.selectedMap && store.selectedMap.isPublished) ? "hover:w-9 hover:h-9 hover:p-0" : "cursor-not-allowed opacity-30"
 
   let voting = (file.currentEditMode === EditMode.VIEW) ?
     <>
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-4 px-3 py-2 items-center">
-        <img className="w-8 h-8" src={upvoteImg} onClick={handleUpvote} alt=""></img>
+        <img className={voteCSS} src={upvoteImg} onClick={handleUpvote} alt=""></img>
         <p className="font-bold">{numUpvotes}</p>
-        <img className="w-8 h-8" src={downvoteImg} onClick={handleDownvote} alt=""></img>
+        <img className={voteCSS} src={downvoteImg} onClick={handleDownvote} alt=""></img>
         <p className="font-bold pr-3">{numDownvotes}</p>
       </div>
     </>
@@ -214,12 +206,7 @@ export default function EditToolbar() {
   let fileButtonClass = "bg-filebuttonfill text-white px-8 text-lg	font-semibold rounded p-1 m-3 flex items-center ";
   let exportClassName = fileButtonClass + "hover:bg-opacity-50";
   let shareClassName = fileButtonClass
-  if(!auth.loggedIn || !store.selectedMap || auth.user._id !== store.selectedMap.owner) {
-    shareClassName += "cursor-not-allowed opacity-30";
-  } else {
-    shareClassName += "hover:bg-opacity-50";
-  }
-
+  shareClassName += ((auth.loggedIn && store.selectedMap && auth.user._id === store.selectedMap.owner) ? "hover:bg-opacity-50" : "cursor-not-allowed opacity-30");
   return (
     <div className="flex-none h-16 flex border-solid border bg-modalbgfill justify-between">
       <div className="flex">
