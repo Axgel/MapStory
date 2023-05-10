@@ -386,7 +386,7 @@ export default function MapScreen() {
   let tmp = <></>;
   if(store.selectedMap && (store.detailView !== DetailView.NONE)){
     console.log(store.detailView)
-    tmp = <div className="flex flex-col h-full sticky top-5 self-start z-10">
+    tmp = <div >
             <MapDetailCard mapDetails={store.selectedMap} />
           </div>
   }
@@ -402,7 +402,7 @@ export default function MapScreen() {
       <div className="flex">
         <div className="w-full h-[775px] z-0" id="map" ref={handleInitMapLoad}>
         </div>
-        <div>
+        <div className="w-[300px] h-full flex flex-col gap-5 sticky top-5 self-start">
           {tmp}
         </div>
       </div>
