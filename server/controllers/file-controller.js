@@ -87,8 +87,64 @@ addSubregion = async(mapId, coords) => {
   }
 }
 
+getAllProperties = async(req,res) => {
+  // Pass in subregionId to know which subregion property to grab
+  try{
+    const subregion = await Subregion.find({ _id: req.params.subregionId});
+    
+    return res.status(200).json({
+      properties: subregion.properties
+    })
 
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Error occured grabbing properties'
+    })
+  }
+
+}
+
+createProperty = async(req,res) => {
+  try{
+    const {property, value} = req.body;
+    const subregion = await Subregion.find({ _id: req.params.subregionId });
+    
+    subregion.properties.push(property, value);
+    await subregion.save();
+
+    return res.status(201).json({
+      message: "Subregion Property created"
+    })
+
+  }catch (err) {
+    return res.status(400).json({
+      error: 'Error occured updating properties'
+    })
+  }
+}
+
+deleteProperty = async(req,res) => {
+  try{
+    const {property, value} = req.body;
+    const subregion = await Subregion.find({ _id: req.params.subregionId });
+    
+    subregion.properties.filter(item => item !== property || item !== value)
+    await subregion.save();
+
+    return res.status(201).json({
+      message: "Subregion Property deleted"
+    })
+
+  }catch (err) {
+    return res.status(400).json({
+      error: 'Error occured updating properties'
+    })
+  }
+}
 
 module.exports = {
-  getAllSubregions
+  getAllSubregions,
+  getAllProperties,
+  createProperty,
+  deleteProperty
 };
