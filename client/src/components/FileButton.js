@@ -93,8 +93,6 @@ export default function FileButton() {
           <p id="forkBtn" className={guestNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>Fork</p>
           <p id="publishBtn" className={publishedCollabNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>Publish</p>
           <p id="deleteBtn" className={collabNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>Delete</p>
-          <div className="h-px bg-lightgrey bg-opacity-30"></div>
-          <p onClick={toggleFileByDD} className={guestNonAccessClass}>Save</p>
       </div>
     </div>
   );
