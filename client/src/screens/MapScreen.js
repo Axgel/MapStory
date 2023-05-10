@@ -75,7 +75,7 @@ export default function MapScreen() {
     // connect to server backend
     if (!auth.user || !auth.socket) return;
     auth.socket.emit('openProject', {mapId: mapId,})
-  }, [auth])
+  }, [auth, ydoc])
 
   useEffect(() => {
     // load map container
