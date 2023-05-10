@@ -5,6 +5,7 @@ import ProfileScreen from './ProfileScreen'
 import HomeScreen from './HomeScreen'
 import MapScreen from './MapScreen'
 import AllScreen from './AllScreen'
+import About from './About'
 
 export {
   SplashScreen,
@@ -13,5 +14,6 @@ export {
   ProfileScreen,
   HomeScreen,
   MapScreen,
-  AllScreen
+  AllScreen, 
+  About
 }

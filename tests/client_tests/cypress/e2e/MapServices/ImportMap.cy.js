@@ -19,12 +19,12 @@ describe('Import Map', () => {
     });
 
     //file not formatted properly (SHP + JSON)
-    // it('bad file format', () => {
-    //     cy.get('#upload-map-title').clear().type("Testing geojson")
-    //     cy.get('#fileUpload').selectFile(['./cypress/fixtures/squares.shp', './cypress/fixtures/squares.json'])
-    //     cy.get('#uploadFileBtn').click()
-    //     cy.contains('Map title cannot be empty')
-    // });
+    it('bad file format', () => {
+        cy.get('#upload-map-title').clear().type("Testing geojson")
+        cy.get('#fileUpload').selectFile(['./cypress/fixtures/squares.shp', './cypress/fixtures/squares.json'])
+        cy.get('#uploadFileBtn').click()
+        cy.contains('Please upload a shp/dbf combo or geojson file')
+    });
 
     //success shp only
     it('shp success', () => {
@@ -33,6 +33,11 @@ describe('Import Map', () => {
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
+        //delete file
+        cy.get('#mapFileBtn').click() //click on file
+        cy.get('#deleteBtn').click()
+        cy.contains("OK").click()
+        cy.url().should('include', '/')
     });
 
     //success shp and dbf
@@ -42,6 +47,11 @@ describe('Import Map', () => {
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
+        //delete file
+        cy.get('#mapFileBtn').click() //click on file
+        cy.get('#deleteBtn').click()
+        cy.contains("OK").click()
+        cy.url().should('include', '/')
     });
     
     //success json

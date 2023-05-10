@@ -24,7 +24,7 @@ export async function convertToGeojson(files) {
     } else if((fileOne.name.split('.').pop() === "dbf") && (fileTwo.name.split('.').pop() === "shp")) {     //file 1 = dbf, file 2 = shp
         console.log("DBF_SHP")
         geoJSONFile = await parseSHPDBF(fileTwo, fileOne);
-    } else if(fileOne.name.split('.').pop() === "json") {                       //file 1 = geojson
+    } else if(files.length === 1 && fileOne.name.split('.').pop() === "json") {                       //file 1 = geojson
         console.log("GEO")
         geoJSONFile = await parseGEO(fileOne);
     } else {
@@ -51,7 +51,7 @@ async function simplifyGeoJSON(file, simplifyPercentage) {
     return new Promise((resolve, reject) => {
         let topology = server.topology({foo: file});
         topology = simplify.presimplify(topology);
-        let topologySimplified = simplify.simplify(topology, simplifyPercentage)
+        let topologySimplified = simplify.simplify(topology, simplifyPercentage);
         resolve(client.feature(topologySimplified, "foo"));
     });
 }

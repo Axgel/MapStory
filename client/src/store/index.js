@@ -379,6 +379,8 @@ function GlobalStoreContextProvider(props) {
     let response = await api.addTags(store.selectedMap._id, newTag);
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.TAG);
+    }else if (response.status === 202){
+      return "Tag already exists";
     }
   }
 
@@ -393,6 +395,8 @@ function GlobalStoreContextProvider(props) {
     let response = await api.addCollaborator(store.selectedMap._id, collaboratorEmail);
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.SHARE_MAP);
+    } else if(response.status === 202){
+      return response.data.error;
     }
   }
 
@@ -441,7 +445,7 @@ function GlobalStoreContextProvider(props) {
 
   store.addComment = async function (newComment) {
     const response = await api.addComment(store.selectedMap._id, auth.user._id, newComment);
-    if(response.status === 200) {
+    if(response.status === 201) {
       const newComments = [...store.comments, response.data.comment];
       storeReducer({
         type: GlobalStoreActionType.ADD_COMMENTS,
