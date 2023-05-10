@@ -55,15 +55,17 @@ export default function MapScreen() {
       }
     }
     else if(file.editChangeType === EditMode.EDIT_TOOLBAR){
-
+      mapItem.pm.disableDraw();
+      if(editRegionId) reloadLayers([editRegionId]);  
       
       switch(file.currentEditMode){
         case EditMode.EDIT_VERTEX: {
-          if(!editRegionId) break;
-          reloadLayers([editRegionId]);     
+          // if(!editRegionId) break;
+          // reloadLayers([editRegionId]);     
           break; 
         }
         case EditMode.ADD_SUBREGION: {
+          
           mapItem.pm.enableDraw('Polygon', {
             snappable: true,
             snapDistance: 20
@@ -74,7 +76,7 @@ export default function MapScreen() {
         break;
       }
       default:
-        mapItem.pm.disableDraw();
+        // mapItem.pm.disableDraw();
         if(editRegionId){
           subregionLayerMap[editRegionId].pm.disable();
         }
@@ -154,6 +156,7 @@ export default function MapScreen() {
         const arr = Array.from(update);
         const op = JSON.stringify(arr);
         auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, op: op});
+        console.log(JSON.stringify(ymap));
         setStaleSubregionIds(subregionIds);
       } 
     })
@@ -198,11 +201,15 @@ export default function MapScreen() {
         break;
       case EditMode.ADD_OR_SPLIT_SUBREGION:
         [transactionType, e] = transaction;
+        console.log(e);
         mapItem.removeLayer(e.layer);
         const geoJsonItem = e.layer.toGeoJSON();
+        geoJsonItem.geometry.coordinates[0].pop();
+        // console.log(geoJsonItem);
         if(file.currentEditMode === EditMode.ADD_SUBREGION){
           applyAddSubregion(geoJsonItem);
         }
+        break;
     }
 
     setTransaction(null);
@@ -211,8 +218,6 @@ export default function MapScreen() {
   useEffect(() => {
     if(!staleSubregionIds) return;
 
-    // console.log(subregionLayerMap, tmpItem);
-    console.log("Asd");
     reloadLayers([...staleSubregionIds]);
     setStaleSubregionIds(null);
   }, [staleSubregionIds])
@@ -230,7 +235,6 @@ export default function MapScreen() {
 
   function reloadLayers(subregionIds){
     const newSubregionLayerMap = {...subregionLayerMap};
-    console.log(subregionLayerMap, subregionIds);
     for(const subregionId of subregionIds){
       if(subregionLayerMap[subregionId]){
         const oldLayer = subregionLayerMap[subregionId];
@@ -313,7 +317,8 @@ export default function MapScreen() {
     const ymap = ydoc.getMap("regions");
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
     const coords2 = coords.get(i).get(j);
-  
+    console.log(subregionId, indexPath, newCoords, JSON.stringify(ymap));
+    
     ydoc.transact(() => {
       coords2.delete(k, 1);
       coords2.insert(k, [newCoords]);
@@ -337,29 +342,28 @@ export default function MapScreen() {
 
   async function applyAddSubregion(geoJsonItem){
     const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
+    console.log(coords);
     const response = await api.createSubregion(mapId, coords);
     if(response.status === 201){
-      console.log(response);
       const subregionId = response.data.subregion._id;
       const coords = response.data.subregion.coordinates;
 
-      initNewLayer(subregionId, coords);
+      // initNewLayer(subregionId, coords);
 
-      const ymapData = new Y.Map();
-      ymap.set(subregionId, ymapData);
-      const yArr0 = new Y.Array();
-      const yArr1 = new Y.Array()
-      const yArr2 = new Y.Array();
-      yArr0.push([yArr1]);
-      yArr1.push([yArr2])
-      ymapData.set("coords", yArr0);
-      console.log(JSON.stringify(ymapData));
       ydoc.transact(() => {
+        const ymapData = new Y.Map();
+        ymap.set(subregionId, ymapData);
+        const yArr0 = new Y.Array();
+        const yArr1 = new Y.Array()
+        const yArr2 = new Y.Array();
+        yArr0.push([yArr1]);
+        yArr1.push([yArr2])
+        ymapData.set("coords", yArr0);
         for(let i=0; i<coords.length; i++){
           for(let j=0; j<coords[i].length; j++){
-            const yArr3 = ymapData.get("coords").get(i).get(j);
+            // const yArr3 = ymapData.get("coords").get(i).get(j);
             for(let k=0; k<coords[i][j].length; k++){
-              yArr3.push([coords[i][j][k]]);
+              yArr2.push([coords[i][j][k]]);
             }
           }
         }
