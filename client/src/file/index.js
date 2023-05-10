@@ -27,7 +27,7 @@ function GlobalFileContextProvider(props) {
   const [file, setFile] = useState({
     currentEditMode: EditMode.NONE,
     // add, move, remove
-    editModeOptions: [true,true,true],
+    editModeOptions: [true, true, true],
     editRegions: {},
   })
   
@@ -70,13 +70,21 @@ function GlobalFileContextProvider(props) {
           editModeOptions: payload.editModeOption
         })
       }
+      case GlobalFileActionType.RESET_DEFAULT: {
+        return setFile({
+          ...file, 
+          currentEditMode: EditMode.NONE,
+          editModeOptions: [true, true, true],
+          editRegions: {},
+        })
+      }
       default:
         return file;
     }
   };
   
   file.initMapContainer = function(mapRef) {
-    const map = L.map(mapRef, {worldCopyJump: true}).setView([39.0119, -98.4842], 5);
+    const map = L.map(mapRef, {worldCopyJump: true})
     const southWest = L.latLng(-89.98155760646617, -180);
     const northEast = L.latLng(89.99346179538875, 180);
     const bounds = L.latLngBounds(southWest, northEast);
@@ -140,14 +148,18 @@ function GlobalFileContextProvider(props) {
     })
   }
 
-
-
   file.handleUndo = function() {
   }
 
   file.handleRedo = function() {
   }
   
+  file.resetDefault = function() {
+    fileReducer({
+      type: GlobalFileActionType.RESET_DEFAULT,
+      payload: null
+    })
+  }
   return (
     <GlobalFileContext.Provider value={{ file }}>
       {props.children}

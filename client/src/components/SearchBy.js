@@ -33,8 +33,8 @@ export default function SearchBy() {
 
   return (
     <div className="flex gap-x-4 px-8">
-      <div className="cursor-pointer ">
-        <div className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex flex-col justify-center items-center hover:bg-dropdownhover" onClick={toggleSearchByDD}>
+      <div className="cursor-default">
+        <div className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex justify-center items-center hover:bg-dropdownhover" onClick={toggleSearchByDD}>
           {searchByDD}
         </div>
         <div id="search-by-dd" className="absolute w-[100px] rounded-lg mt-1 bg-white hidden">

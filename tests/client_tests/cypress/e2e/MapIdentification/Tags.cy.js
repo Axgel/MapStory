@@ -6,6 +6,7 @@ describe('Tags', () => {
         cy.get(".mt-8 > .px-10 > :nth-child(2)").dblclick()
         cy.wait(1000)
         cy.url().should('include', '/map')
+        cy.get('#mapFileBtn').click() //click on file
         cy.get('#tagsBtn').click() //click on tag
         cy.contains("Add Tags") 
     });

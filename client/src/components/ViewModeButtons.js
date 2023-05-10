@@ -8,13 +8,11 @@ import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 
 export default function ViewModeButtons() {
-  const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
+  const { store } = useContext(GlobalStoreContext);
 
-  let baseIconClassName = "w-[50px] h-[50px] border-solid border-black rounded-lg flex justify-center ";
-  if(auth.loggedIn){
-    baseIconClassName += "cursor-pointer ";
-  }
+
+  let baseIconClassName = "w-[50px] h-[50px] border-solid border-black rounded-lg flex justify-center cursor-default ";
 
   let personalIconClassName = baseIconClassName;
   let sharedIconClassName = baseIconClassName;
@@ -30,11 +28,17 @@ export default function ViewModeButtons() {
     switch(store.viewMode){
       case ViewMode.PERSONAL:
         personalIconClassName += "bg-periwinkle";
+        sharedIconClassName += "hover:bg-periwinkle hover:bg-opacity-50"
+        publishedIconClassName += "hover:bg-periwinkle hover:bg-opacity-50"
         break;
       case ViewMode.SHARED:
+        personalIconClassName += "hover:bg-periwinkle hover:bg-opacity-50"
         sharedIconClassName += "bg-periwinkle";
+        publishedIconClassName += "hover:bg-periwinkle hover:bg-opacity-50"
         break;
       case ViewMode.PUBLISHED:
+        personalIconClassName += "hover:bg-periwinkle hover:bg-opacity-50"
+        sharedIconClassName += "hover:bg-periwinkle hover:bg-opacity-50"
         publishedIconClassName += "bg-periwinkle"; 
         break;
     }
@@ -43,7 +47,8 @@ export default function ViewModeButtons() {
 
   function setViewMode(e, viewMode){
     e.stopPropagation();
-    store.setViewMode(viewMode);
+    if(!auth.loggedIn) return;
+      store.setViewMode(viewMode);
   }
 
   return (

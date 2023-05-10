@@ -3,7 +3,7 @@ import downvoteOutlineIcon from '../assets/downvoteOutlineIcon.png'
 import upvoteOutlineIcon from '../assets/upvoteOutlineIcon.png'
 import downvoteFilledIcon from "../assets/downvoteFilledIcon.png"
 import upvoteFilledIcon from "../assets/upvoteFilledIcon.png"
-import { CurrentModal } from "../enums";
+import { CurrentModal, DetailView } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
@@ -25,21 +25,25 @@ export default function MapCard(props) {
     publishButtonCSS += 'hidden '
     publishedWrapper = <p className="text-xs text-green-500">Published: {mapDetails.publishedDate}</p>;
   }
-  if(!auth || mapDetails.owner !== auth.user._id){
+  if(!auth.loggedIn) {
+    publishButtonCSS += 'hidden '
+    deleteButtonCSS += 'hidden '
+    forkButtonCSS += 'hidden '
+  } else if (mapDetails.owner !== auth.user._id) {
     deleteButtonCSS += 'hidden '
     publishButtonCSS += 'hidden '
   }
 
   let mapCardWrapper = "h-[85px] border-solid rounded-lg border flex justify-between "  
-  if(store.selectedMap && store.selectedMap._id === mapDetails._id){
+  if(store.detailView !== DetailView.NONE && store.selectedMap && (store.selectedMap._id === mapDetails._id)){
     mapCardWrapper += "bg-mapselectedfill"
   } else {
-    mapCardWrapper += "bg-brownshade-700"
+    mapCardWrapper += "bg-brownshade-700 hover:bg-mapselectedfill hover:bg-opacity-40"
   }
 
   function setSelectedMap(e){
     e.stopPropagation();
-    if(store.selectedMap && (store.selectedMap._id === mapDetails._id)){
+    if(store.detailView !== DetailView.NONE && store.selectedMap && (store.selectedMap._id === mapDetails._id)){
       store.setSelectedMap(null);
     }
     else{
@@ -58,16 +62,22 @@ export default function MapCard(props) {
     store.setMapProjectAction(currentModal, mapDetails);
   }
 
-  let upvoteImg = mapDetails.upvotes.includes(auth.user._id)? upvoteFilledIcon : upvoteOutlineIcon;
-  let downvoteImg = mapDetails.downvotes.includes(auth.user._id)? downvoteFilledIcon : downvoteOutlineIcon;
+  let upvoteImg = (auth.loggedIn && mapDetails.upvotes.includes(auth.user._id)) ? upvoteFilledIcon : upvoteOutlineIcon;
+  let downvoteImg = (auth.loggedIn && mapDetails.downvotes.includes(auth.user._id)) ? downvoteFilledIcon : downvoteOutlineIcon;
+
+  let voteCSS = "w-8 h-8 p-0.5 "
+  voteCSS += (auth.loggedIn && mapDetails.isPublished) ? "hover:w-9 hover:h-9 hover:p-0" : "opacity-30"
+
 
   function handleDownvote(e){
     e.stopPropagation();
+    if(!auth.loggedIn || !mapDetails.isPublished) return;
     store.updateVotes(mapDetails, 0);
   }
   
   function handleUpvote(e){
     e.stopPropagation();
+    if(!auth.loggedIn || !mapDetails.isPublished) return;
     store.updateVotes(mapDetails, 1);
   }
 
@@ -77,12 +87,12 @@ export default function MapCard(props) {
         {/* Section for upvote/downvote */}
         <div id="votingInfo" className="flex flex-col justify-center px-2">
           <div className="flex items-center gap-2">
-            <img className="w-8 h-8" id="upvoteIcon" src={upvoteImg} onClick={handleUpvote} alt=""></img>
-            <p id="upvoteCount">{mapDetails.upvotes.length}</p>
+            <img className={voteCSS} id="upvoteIcon" src={upvoteImg} onClick={handleUpvote} alt=""></img>
+            <p id="upvoteCount">{mapDetails.isPublished ? mapDetails.upvotes.length : "-"}</p>
           </div>
           <div className="flex items-center gap-2">
-            <img className="w-8 h-8" id="downvoteIcon" src={downvoteImg} onClick={handleDownvote} alt=""></img>
-            <p id="downvoteCount">{mapDetails.downvotes.length}</p>
+            <img className={voteCSS} id="downvoteIcon" src={downvoteImg} onClick={handleDownvote} alt=""></img>
+            <p id="downvoteCount">{mapDetails.isPublished ? mapDetails.downvotes.length : "-"}</p>
           </div>
         </div>
 
@@ -95,7 +105,7 @@ export default function MapCard(props) {
       </div>
 
       {/* Section for publish, delete, fork buttons */}
-      <div className="flex px-8 gap-4 items-center cursor-pointer">
+      <div className="flex px-8 gap-4 items-center cursor-default">
         <div id="publishBtn" className={publishButtonCSS} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>
           Publish
         </div>

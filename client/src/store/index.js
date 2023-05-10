@@ -116,19 +116,22 @@ function GlobalStoreContextProvider(props) {
       case GlobalStoreActionType.SET_SEARCH_VALUE:{
         return setStore({
           ...store,
-          searchValue: payload.searchValue
+          searchValue: payload.searchValue, 
+          detailView: DetailView.NONE
         })
       }
       case GlobalStoreActionType.SET_SEARCH_BY:{
         return setStore({
           ...store,
-          searchBy: payload.searchBy
+          searchBy: payload.searchBy, 
+          detailView: DetailView.NONE
         })
       }
       case GlobalStoreActionType.SET_SORT_BY:{
         return setStore({
           ...store,
-          sortBy: payload.sortBy
+          sortBy: payload.sortBy, 
+          detailView: DetailView.NONE
         })
       }
       default:
@@ -147,8 +150,15 @@ function GlobalStoreContextProvider(props) {
 
   store.loadMapById = async function(mapId) {
     const response = await api.getMapById(mapId);
+    const map = response.data.map;
+    const collaborators = await store.getAllCollaboratorsByMap(map);
+    const selectedMapOwner = await store.getSelectedMapOwner(map);
+    const comments = await store.getComments(map);
     if(response.status === 200){
-      store.setSelectedMap(response.data.map);
+      storeReducer({
+        type: GlobalStoreActionType.SET_SELECTED_MAP,
+        payload: {selectedMap: map, detailView: DetailView.NONE, collaborators: collaborators, selectedMapOwner: selectedMapOwner, comments: comments},
+    });
     }
   }
 
@@ -279,7 +289,6 @@ function GlobalStoreContextProvider(props) {
       }
     }
     response = await api.getPublishedMaps();
-
     
     if(response.status === 200){
       if(store.selectedMapInList(personalMaps)){
@@ -287,7 +296,7 @@ function GlobalStoreContextProvider(props) {
       } else if(store.selectedMapInList(sharedMaps)){
         selectedMap = store.selectedMapInList(sharedMaps);
       } else if(store.selectedMapInList(response.data.publishedMaps)){
-        selectedMap = store.selectedMapInList(response.data.publishMaps);
+        selectedMap = store.selectedMapInList(response.data.publishedMaps);
       }
       
       collaborators = await store.getAllCollaboratorsByMap(selectedMap);

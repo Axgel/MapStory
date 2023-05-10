@@ -11,7 +11,7 @@ export default function AddTagModal() {
   
   function handleAddTags(e){
     e.stopPropagation();
-    let tag = document.getElementById("input_tag").value;
+    let tag = document.getElementById("input_tag").value.toLowerCase();
     document.getElementById("input_tag").value = "";
     store.addTags(tag);
   }

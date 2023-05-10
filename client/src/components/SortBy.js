@@ -18,8 +18,8 @@ export default function SortBy() {
   }
 
   return (
-    <div className="cursor-pointer">
-      <div className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex justify-center items-center" onClick={toggleSortByDD}>
+    <div className="cursor-default">
+      <div className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex justify-center items-center hover:bg-dropdownhover" onClick={toggleSortByDD}>
         {sortByDD}
       </div>
       <div id="sort-by-dd" className="absolute w-[100px] rounded-lg mt-1 bg-white hidden z-10">
