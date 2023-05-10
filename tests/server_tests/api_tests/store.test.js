@@ -67,7 +67,7 @@ describe("POST /createMap & /createSubregions", () => {
                 isPublished: false,
                 publishedDate: Date.now()
             });
-            expect(response.status).toBe(200);
+            expect(response.status).toBe(201);
             expect(response.body.map).toBeDefined();
             map = response.body.map;
         });
@@ -94,7 +94,7 @@ describe("POST /createMap & /createSubregions", () => {
                 coordinates: [[[[-87.984916,35.005881],[-88.984916,35.005881],[-88.984916,34.005881],[-87.984916,34.005881]]]],
                 isStale: false
             });
-            expect(response.status).toBe(200);
+            expect(response.status).toBe(201);
             expect(response.body.message).toEqual("New subregion created");
         });
         
@@ -136,7 +136,7 @@ describe("Testing Map functionalities", () => {
             const response = await agent.post(`/store/fork/${map._id}`).set("Cookie", cookies).send({
                 userId: user._id
             });
-            expect(response.status).toBe(200);
+            expect(response.status).toBe(201);
             expect(response.body.map).toBeDefined()
             forkedMap = response.body.map
         });
@@ -271,7 +271,7 @@ describe("Testing Map functionalities", () => {
                 userId: user._id,
                 comment: "Great Map"
             });
-            expect(response.status).toBe(200);
+            expect(response.status).toBe(201);
             expect(response.body.comment).toBeDefined();
         });
     });

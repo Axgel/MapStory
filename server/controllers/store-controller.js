@@ -16,7 +16,7 @@ createSubregion = (req, res) => {
   const subregion = new Subregion(body);
 
   subregion.save().then(() => {
-    return res.status(200).json({
+    return res.status(201).json({
       message: "New subregion created"
     })
   }).catch((err) => {
@@ -39,7 +39,7 @@ createMap = (req, res) => {
     user.personalMaps.push(mapproject._id);
     user.save().then(() => {
       mapproject.save().then((map) => {
-        return res.status(200).json({
+        return res.status(201).json({
           map: mapproject
         })
       }).catch((err) => {
@@ -231,7 +231,7 @@ forkMap = async (req, res) => {
       await newSubregion.save();
     }
     
-    return res.status(200).json({
+    return res.status(201).json({
       message: "Forked map project",
       map: newMapProject
     })
@@ -487,7 +487,7 @@ addComment = async(req, res) =>{
       comment: comment,
       username: user.userName
     }
-    return res.status(200).json({
+    return res.status(201).json({
       "comment": retComment
     })
 
