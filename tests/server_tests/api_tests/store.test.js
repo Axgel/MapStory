@@ -181,7 +181,7 @@ describe("Testing Map functionalities", () => {
                 collaboratorEmail: "Testing12345678@gmail.com"
             });
             expect(response.status).toBe(202);
-            expect(response.body.error).toEqual("Unable to add collaborator");
+            expect(response.body.error).toEqual("User does not exist");
         });
         it("is adding a existing email", async() => {
             const response = await agent.put(`/store/addCollaborators/${forkedMap._id}`).set("Cookie", cookies).send({
