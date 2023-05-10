@@ -71,13 +71,13 @@ export default function MapDetailCard(props) {
       onBlur={handleUpdateTitle}
       onKeyDown={handleKeyPress}
       ></input> :
-      <p className="text-2xl font-bold" onDoubleClick={handleToggleEdit}>{mapDetails.title}</p>;
+      <p className="text-2xl font-bold max-w-[225px] text-ellipsis overflow-hidden" onDoubleClick={handleToggleEdit}>{mapDetails.title}</p>;
 
 
   if(store.detailView !== DetailView.NONE){
     return (
       <div className="w-[300px] h-[600px] border-solid rounded-lg border flex flex-col bg-brownshade-700">
-        <div className="h-12 flex items-center px-2 gap-4">
+        <div className="h-12 flex items-center px-2 gap-4 ">
           <img src={closeIcon} alt="" onClick={closeDetailView}></img>
           {titleElement}
         </div>
