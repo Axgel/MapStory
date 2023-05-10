@@ -129,7 +129,7 @@ addTags = async(req,res) =>{
         })
       }
       if (map.tags.includes(body.tag)) {
-        return res.status(400).json({
+        return res.status(202).json({
           message: "Duplicate Tag"
         })
       }

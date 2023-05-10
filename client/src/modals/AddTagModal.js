@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { CurrentModal } from "../enums";
 import { TagCard } from "../components";
 
@@ -8,12 +8,20 @@ import AuthContext from "../auth";
 export default function AddTagModal() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
+
+  const [errMsg, setErrMsg] = useState('');
   
-  function handleAddTags(e){
+  async function handleAddTags(e){
     e.stopPropagation();
     let tag = document.getElementById("input_tag").value.toLowerCase();
     document.getElementById("input_tag").value = "";
-    store.addTags(tag);
+    console.log("there")
+    let response = await store.addTags(tag);
+    console.log("here")
+    if (response)
+      setErrMsg(response); 
+    else
+      setErrMsg(""); 
   }
 
   function handleCloseModal(e){
@@ -44,6 +52,7 @@ export default function AddTagModal() {
             <input id = "input_tag" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Tags" onKeyDown={handleKeyPress} required></input>
             <button id="addTagBtn" className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddTags}>ADD</button>
           </div>
+          <p className="mx-6 mb-4 text-red-600">{errMsg}</p>
 
           <p className="text-lightgrey text-left mx-12">Tags:</p>
 
