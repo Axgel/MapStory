@@ -13,6 +13,8 @@ import { DetailView , EditMode } from "../enums";
 import * as Y from 'yjs';
 import { parseMultiPolygon } from "../utils/geojsonParser";
 import jsTPS from "../common/jsTPS";
+import api from "../file/file-request-api";
+
 
 let ydoc = new Y.Doc({ autoLoad: true });
 let ymap = ydoc.getMap("regions");
@@ -37,30 +39,42 @@ export default function MapScreen() {
 
   useEffect(() => {
     if(!mapItem) return;
-    switch(file.currentEditMode){
-      case EditMode.EDIT_VERTEX: {
-        if(!editRegionId) break;
-        reloadLayers([editRegionId]);     
-        break; 
+
+    if(file.editChangeType === EditMode.UNDO_REDO){
+      switch(file.editModeAction){
+        case EditMode.UNDO: {
+          handleUndo();
+          file.clearUndoRedo();
+          return;
+        }
+        case EditMode.REDO: {
+          handleRedo();
+          file.clearUndoRedo();
+          return;
+        }
       }
-      case EditMode.ADD_SUBREGION: {
+    }
+    else if(file.editChangeType === EditMode.EDIT_TOOLBAR){
+
+      
+      switch(file.currentEditMode){
+        case EditMode.EDIT_VERTEX: {
+          if(!editRegionId) break;
+          reloadLayers([editRegionId]);     
+          break; 
+        }
+        case EditMode.ADD_SUBREGION: {
+          mapItem.pm.enableDraw('Polygon', {
+            snappable: true,
+            snapDistance: 20
+          })
         break;
       }
       default:
         mapItem.pm.disableDraw();
-        subregionLayerMap[editRegionId].pm.disable();
-    }
-
-    switch(file.editModeAction){
-      case EditMode.UNDO: {
-        handleUndo();
-        file.clearUndoRedo();
-        break;
-      }
-      case EditMode.REDO: {
-        handleRedo();
-        file.clearUndoRedo();
-        break;
+        if(editRegionId){
+          subregionLayerMap[editRegionId].pm.disable();
+        }
       }
     }
   }, [file])
@@ -137,6 +151,7 @@ export default function MapScreen() {
         const arr = Array.from(update);
         const op = JSON.stringify(arr);
         auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, op: op});
+        setStaleSubregionIds(subregionIds);
       } 
     })
 
@@ -167,16 +182,24 @@ export default function MapScreen() {
 
   useEffect(() => {
     if(!transaction) return;
+    let transactionType, e, subregionId;
     // create a vertex transaction
     switch(transaction[0]){
       case EditMode.ADD_VERTEX:
       case EditMode.MOVE_VERTEX:
       case EditMode.REMOVE_VERTEX:
-        const [transactionType, e, subregionId] = transaction;
+        [transactionType, e, subregionId] = transaction;
         const trans = CreateVertexTransaction(transactionType, e, subregionId);
         trans.splice(1, 0, mapId);
         applyTransaction(trans);
         break;
+      case EditMode.ADD_OR_SPLIT_SUBREGION:
+        [transactionType, e] = transaction;
+        mapItem.removeLayer(e.layer);
+        const geoJsonItem = e.layer.toGeoJSON();
+        if(file.currentEditMode === EditMode.ADD_SUBREGION){
+          applyAddSubregion(geoJsonItem);
+        }
     }
 
     setTransaction(null);
@@ -186,6 +209,7 @@ export default function MapScreen() {
     if(!staleSubregionIds) return;
 
     // console.log(subregionLayerMap, tmpItem);
+    console.log("Asd");
     reloadLayers([...staleSubregionIds]);
     setStaleSubregionIds(null);
   }, [staleSubregionIds])
@@ -203,12 +227,15 @@ export default function MapScreen() {
 
   function reloadLayers(subregionIds){
     const newSubregionLayerMap = {...subregionLayerMap};
+    console.log(subregionLayerMap, subregionIds);
     for(const subregionId of subregionIds){
-      const oldLayer = subregionLayerMap[subregionId];
-      mapItem.removeLayer(oldLayer);
-      const ymap = ydoc.getMap("regions");
-      if(!ymap.get(subregionId) || !ymap.get(subregionId).get("coords")) continue;
-      if(ymap.get(subregionId).get("stale")) continue;
+      if(subregionLayerMap[subregionId]){
+        const oldLayer = subregionLayerMap[subregionId];
+        mapItem.removeLayer(oldLayer);
+        const ymap = ydoc.getMap("regions");
+        if(!ymap.get(subregionId) || !ymap.get(subregionId).get("coords")) continue;
+        if(ymap.get(subregionId).get("stale")) continue;
+      }
 
       const coords = ymap.get(subregionId).get("coords").toJSON();
       const newLayer = L.polygon(coords).addTo(mapItem);
@@ -230,7 +257,7 @@ export default function MapScreen() {
     layer.on('pm:vertexadded', (e) => setTransaction([EditMode.ADD_VERTEX, e, subregionId]));
     layer.on('pm:markerdragend', (e) => setTransaction([EditMode.MOVE_VERTEX, e, subregionId]));
     layer.on('pm:vertexremoved', (e) => setTransaction([EditMode.REMOVE_VERTEX, e, subregionId]));
-    mapItem.on('pm:create', (e) => setTransaction([EditMode.ADD_SUBREGION, e]));
+    mapItem.on('pm:create', (e) => setTransaction([EditMode.ADD_OR_SPLIT_SUBREGION, e]));
   }
 
   function enableEditing(layer){
@@ -305,6 +332,46 @@ export default function MapScreen() {
     }, 42);
   }
 
+  async function applyAddSubregion(geoJsonItem){
+    const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
+    const response = await api.createSubregion(mapId, coords);
+    if(response.status === 201){
+      console.log(response);
+      const subregionId = response.data.subregion._id;
+      const coords = response.data.subregion.coordinates;
+
+      initNewLayer(subregionId, coords);
+
+      const ymapData = new Y.Map();
+      ymap.set(subregionId, ymapData);
+      const yArr0 = new Y.Array();
+      const yArr1 = new Y.Array()
+      const yArr2 = new Y.Array();
+      yArr0.push([yArr1]);
+      yArr1.push([yArr2])
+      ymapData.set("coords", yArr0);
+      console.log(JSON.stringify(ymapData));
+      ydoc.transact(() => {
+        for(let i=0; i<coords.length; i++){
+          for(let j=0; j<coords[i].length; j++){
+            const yArr3 = ymapData.get("coords").get(i).get(j);
+            for(let k=0; k<coords[i][j].length; k++){
+              yArr3.push([coords[i][j][k]]);
+            }
+          }
+        }
+        tps.addTransaction([subregionId])
+      }, 42);
+    }
+  }
+
+  function initNewLayer(subregionId, coords){
+    const regions = {...subregionLayerMap};
+    const layer = L.polygon(coords).addTo(mapItem);
+    regions[subregionId] = layer;
+    initLayerHandlers(layer, subregionId);
+    setSubregionLayerMap(regions);
+  }
 
   function addVertexValidate(){
     return file.editModeOptions[0];
