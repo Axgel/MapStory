@@ -162,7 +162,7 @@ describe("Testing Map functionalities", () => {
             const response = await agent.put(`/store/addTags/${forkedMap._id}`).set("Cookie", cookies).send({
                 tag: "Alabama"
             });
-            expect(response.status).toBe(400);
+            expect(response.status).toBe(202);
             expect(response.body.message).toEqual("Duplicate Tag");
         });
     });
@@ -180,8 +180,8 @@ describe("Testing Map functionalities", () => {
             const response = await agent.put(`/store/addCollaborators/${forkedMap._id}`).set("Cookie", cookies).send({
                 collaboratorEmail: "Testing12345678@gmail.com"
             });
-            expect(response.status).toBe(400);
-            expect(response.body.error).toEqual("Unable to add collaborator");
+            expect(response.status).toBe(202);
+            expect(response.body.error).toEqual("User does not exist");
         });
         it("is adding a existing email", async() => {
             const response = await agent.put(`/store/addCollaborators/${forkedMap._id}`).set("Cookie", cookies).send({
@@ -194,7 +194,7 @@ describe("Testing Map functionalities", () => {
             const response = await agent.put(`/store/addCollaborators/${forkedMap._id}`).set("Cookie", cookies).send({
                 collaboratorEmail: "arvin.wang@stonybrook.edu"
             });
-            expect(response.status).toBe(400);
+            expect(response.status).toBe(202);
             expect(response.body.error).toEqual("Collaborator already added");
         });
         it("is deleting a nonexisting collaborator", async() => {

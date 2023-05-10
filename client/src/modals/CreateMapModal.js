@@ -33,9 +33,22 @@ export default function CreateMapModal(props) {
       setErrMsg('Please upload a shp/dbf combo or geojson file');
       return;
     }
-    if(mapFile){
-      store.parseFileUpload(mapFile, document.getElementById("upload-map-title").value);
-    }
+    if(mapFile.length === 1){
+      if(mapFile[0].name.split('.').pop() === "dbf"){
+        setErrMsg('Please upload a shp/dbf combo or geojson file');
+        return;
+      }
+    }else if (mapFile.length === 2){
+      if(mapFile[0].name.split('.').pop() === "json" || mapFile[1].name.split('.').pop() === "json"){
+        setErrMsg('Please upload a shp/dbf combo or geojson file');
+        return;
+      }
+    } else if(mapFile.length > 2){
+      setErrMsg('Please upload a shp/dbf combo or geojson file');
+      return;
+    } 
+    store.parseFileUpload(mapFile, document.getElementById("upload-map-title").value);
+
     setErrMsg("");
     setMapFile(null);
   }

@@ -70,6 +70,9 @@ export default function MapScreen() {
           })
         break;
       }
+      case EditMode.VIEW: {
+        break;
+      }
       default:
         mapItem.pm.disableDraw();
         if(editRegionId){
