@@ -34,7 +34,7 @@ export default function Comments(props) {
   }
 
   return (
-    <div id="commentView" className="flex flex-col pl-5 pr-2 py-3  gap-2">
+    <div id="commentView" className="flex flex-col pl-5 pr-2 py-3 gap-2">
       <div className="overflow-auto h-[400px] mb-2">{commentCard}</div>
       {auth.loggedIn ?
         <div className="absolute bottom-2 left-3">

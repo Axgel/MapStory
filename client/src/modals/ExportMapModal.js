@@ -14,9 +14,9 @@ export default function ExportMapModal() {
   function handleExport(e){
     let compression = document.getElementById("compression").value
     if (fileType === "GeoJSON")
-      exportGeoJSON(store.selectedMap._id, compression);
+      exportGeoJSON(store.selectedMap._id, compression, store.selectedMap.title);
     else
-      exportSHPDBF(store.selectedMap._id, compression);
+      exportSHPDBF(store.selectedMap._id, compression, store.selectedMap.title);
     store.setCurrentModal(CurrentModal.NONE);
   }
 
@@ -46,12 +46,12 @@ export default function ExportMapModal() {
           <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
             <p>File Type</p>
             <div className="flex flex-col">
-              <div className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex justify-center items-center" onClick={toggleFileTypeDD}>
+              <div id="fileTypeSelect" className="w-[100px] h-[50px] rounded-lg shadow-lg bg-white flex justify-center items-center" onClick={toggleFileTypeDD}>
                 {fileType}
               </div>
               <div id="file-type-dd" className="absolute mt-[53px] w-[100px] rounded-lg bg-white hidden z-10">
-                <p onClick={(e) => selectFileType(e, "SHP/DBF")} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">SHP/DBF</p>
-                <p onClick={(e) => selectFileType(e, "GeoJSON")} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">GeoJSON</p>
+                <p id="shpFile" onClick={(e) => selectFileType(e, "SHP/DBF")} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">SHP/DBF</p>
+                <p id="geojsonFile" onClick={(e) => selectFileType(e, "GeoJSON")} className="text-center py-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg">GeoJSON</p>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function ExportMapModal() {
 
 
           <div className="flex flex-row-reverse mx-12 gap-3 mt-7">
-            <button className="bg-brownshade-800 text-white mb-3 px-3 py-1.5 rounded-md border-brownshade-850" onClick={handleExport}>OK</button>
+            <button id="okBtn" className="bg-brownshade-800 text-white mb-3 px-3 py-1.5 rounded-md border-brownshade-850" onClick={handleExport}>OK</button>
             <button className="bg-brownshade-800 text-white mb-3 px-3 py-1.5 rounded-md border-brownshade-850" onClick={handleCloseModal}>Cancel</button>
           </div>
         </div>

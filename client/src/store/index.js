@@ -379,6 +379,8 @@ function GlobalStoreContextProvider(props) {
     let response = await api.addTags(store.selectedMap._id, newTag);
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.TAG);
+    }else if (response.status === 202){
+      return "Tag already exists";
     }
   }
 
@@ -393,6 +395,8 @@ function GlobalStoreContextProvider(props) {
     let response = await api.addCollaborator(store.selectedMap._id, collaboratorEmail);
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.SHARE_MAP);
+    } else if(response.status === 202){
+      return response.data.error;
     }
   }
 

@@ -9,7 +9,8 @@ import {
   ProfileScreen,
   HomeScreen,
   MapScreen,
-  AllScreen
+  AllScreen, 
+  About
  } from "./screens";
 
  import {
@@ -45,6 +46,7 @@ function App() {
               <Route path="/recover" element={<RecoverPasswordScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
               <Route path="/map/:mapId" element={<MapScreen />} />
+              <Route path="/about" element={<About />} />
               <Route path="/all" element={<AllScreen />} />
             </Routes>
             <AccountFeedbackModal />

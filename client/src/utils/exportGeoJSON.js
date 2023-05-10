@@ -1,15 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { preBuild, simplify } from 'mapshaper-simplify';
+import * as client from "topojson-client";
+import * as server from "topojson-server";
+import * as simplify from "topojson-simplify";
 import download from "downloadjs";
 import api from "../file/file-request-api/index.js"
 
-export async function exportGeoJSON(mapId, compressionPercent){
+export async function exportGeoJSON(mapId, compressionPercent, mapTitle){
     //create geojson obj
     let simplifiedGeojson = await createGeoJSON(mapId, compressionPercent);
     
     //at the end download the object
     // console.log(geojson);
-    download(JSON.stringify(simplifiedGeojson), "testing.json", "application/json");
+    download(JSON.stringify(simplifiedGeojson), mapTitle+".json", "application/json");
 }
 
 export async function createGeoJSON(mapId, compressionPercent){
@@ -31,12 +33,15 @@ export async function createGeoJSON(mapId, compressionPercent){
         let subregionFeature = addSubregion(subregions[key]);
         geojsonObj.features.push(subregionFeature);
     }
-
+    console.log(geojsonObj);
+    console.log(compressionPercent)
     //compress the object with map-shaper-simplified 
-    const toSimplify = preBuild(geojsonObj);
-    const simplified = simplify(toSimplify, compressionPercent) //TODO: check compression format
-
-    return simplified;
+    if(compressionPercent == 0)
+        return geojsonObj;
+    let topology = server.topology({foo: geojsonObj});
+    topology = simplify.presimplify(topology);
+    let topologySimplified = simplify.simplify(topology, compressionPercent)
+    return client.feature(topologySimplified, "foo")
 }
 
 function addSubregion(subregion){ //convert from subregion schema into GEOJSON format

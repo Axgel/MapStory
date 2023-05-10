@@ -80,10 +80,9 @@ export default function EditToolbar() {
   }
   
   function handleToggleEdit(e){
-    if(auth.loggedIn){
-      e.stopPropagation();
-      setEditActive(true);
-    }
+    e.stopPropagation();
+    if(!auth.loggedIn || !store.selectedMap || auth.user._id !== store.selectedMap.owner) return;
+    setEditActive(true);
   }
 
   const toggledOnClass = "bg-mapselectedfill"
@@ -124,7 +123,7 @@ export default function EditToolbar() {
 
   //EDITING TITLE ----------------------------------------------------------------------
   
-  let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
+  let titleElement = store.selectedMap ?  <p id="mapTitleTB" className="font-bold px-3 text-ellipsis overflow-hidden max-w-[250px]" onDoubleClick={handleToggleEdit}>{store.selectedMap.title}</p> : <></>;
   if(editActive){
     titleElement = <input 
     id="inputNewUsername" 

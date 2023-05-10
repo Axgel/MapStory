@@ -12,6 +12,10 @@ export default function SplashScreenButtons() {
     navigate("/register");
   }
 
+  function handleAbout(){
+    navigate("/about");
+  }
+
   function handleGuestAccess(){
     store.setViewMode(ViewMode.PUBLISHED);
     auth.setGuestAccess(true);
@@ -22,7 +26,7 @@ export default function SplashScreenButtons() {
       <div className="flex items-center justify-center gap-6">
           <input onClick={handleRegister} type="submit" className="h-12 w-[150px] bg-brownshade-500 hover:bg-brownshade-600" value="Register"></input>
           <input onClick={handleGuestAccess} type="submit" className="h-12 w-[150px] bg-brownshade-500 hover:bg-brownshade-600" value="Continue as Guest"></input>
-          <input type="submit" className="h-12 w-[150px] bg-brownshade-500 hover:bg-brownshade-600" value="About"></input>
+          <input onClick={handleAbout} type="submit" className="h-12 w-[150px] bg-brownshade-500 hover:bg-brownshade-600" value="About"></input>
         </div>
     </div>
   );
