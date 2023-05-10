@@ -21,6 +21,27 @@ getAllSubregions = async (req, res) => {
   }
 }
 
+createSubregion = (req, res) => {
+  const body = req.body;
+
+  if(!body.mapId || !body) {
+    return res.status(400).json({
+      success: false,
+      error: 'You must provide a subregion',
+    })
+  };
+
+  const subregion = new Subregion(body);
+
+  subregion.save().then(() => {
+    return res.status(201).json({
+      subregion: subregion
+    })
+  }).catch((err) => {
+    return res.status(400).json({error: 'Error occured while trying to save'})
+  })
+}
+
 updateSubregions = async (subregionId) => {
   try{
     const subregion = await Subregion.findOne({ _id: subregionId});
@@ -90,5 +111,6 @@ addSubregion = async(mapId, coords) => {
 
 
 module.exports = {
-  getAllSubregions
+  getAllSubregions,
+  createSubregion
 };

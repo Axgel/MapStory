@@ -29,7 +29,7 @@ function GlobalFileContextProvider(props) {
     // add, move, remove
     editModeOptions: [true, true, true],
     editModeAction: EditMode.NONE,
-    editRegions: {},
+    editChangeType: EditMode.NONE,
   })
   
   const fileReducer = (action) => {
@@ -38,19 +38,22 @@ function GlobalFileContextProvider(props) {
       case GlobalFileActionType.SET_EDIT_MODE: {
         return setFile({
           ...file,
-          currentEditMode: payload.currentEditMode
+          currentEditMode: payload.currentEditMode,
+          editChangeType: payload.editChangeType
         })
       }
       case GlobalFileActionType.SET_EDIT_MODE_OPTION: {
         return setFile({
           ...file, 
-          editModeOptions: payload.editModeOption
+          editModeOptions: payload.editModeOption,
+          editChangeType: payload.editChangeType
         })
       }
       case GlobalFileActionType.SET_EDIT_MODE_ACTION: {
         return setFile({
           ...file, 
-          editModeAction: payload.editModeAction
+          editModeAction: payload.editModeAction,
+          editChangeType: payload.editChangeType
         })
       }
 
@@ -73,7 +76,7 @@ function GlobalFileContextProvider(props) {
   file.setCurrentEditMode = function(currentEditMode) {
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE,
-      payload: {currentEditMode: currentEditMode}
+      payload: {currentEditMode: currentEditMode, editChangeType: EditMode.EDIT_TOOLBAR}
     })
   }
 
@@ -82,28 +85,28 @@ function GlobalFileContextProvider(props) {
     arr[editModeOption] = !arr[editModeOption];
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE_OPTION,
-      payload: {editModeOption: arr}
+      payload: {editModeOption: arr, editChangeType: EditMode.EDIT_TOOLBAR}
     })
   }
 
   file.handleUndo = function() {
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
-      payload: {editModeAction: EditMode.UNDO}
+      payload: {editModeAction: EditMode.UNDO,  editChangeType: EditMode.UNDO_REDO}
     })
   }
 
   file.handleRedo = function() {
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
-      payload: {editModeAction: EditMode.REDO}
+      payload: {editModeAction: EditMode.REDO, editChangeType: EditMode.UNDO_REDO}
     })
   }
 
   file.clearUndoRedo = function(){
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
-      payload: {editModeAction: EditMode.NONE}
+      payload: {editModeAction: EditMode.NONE, editChangeType: EditMode.UNDO_REDO}
     })
   }
   

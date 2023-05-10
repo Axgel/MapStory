@@ -6,10 +6,20 @@ const api = axios.create({
 });
 
 export const getAllSubregions = (mapId) => api.get(`/subregion/${mapId}`);
+export const createSubregion = (mapId, coordinates) => {
+  return api.post(`/subregion`, {
+    mapId: mapId,
+    type: "MultiPolygon",
+    properties: {},
+    coordinates: coordinates,
+    isStale: false
+  })
+}
 
 
 const apis = {
   getAllSubregions,
+  createSubregion
 };
 
 export default apis;
