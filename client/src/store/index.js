@@ -441,7 +441,7 @@ function GlobalStoreContextProvider(props) {
 
   store.addComment = async function (newComment) {
     const response = await api.addComment(store.selectedMap._id, auth.user._id, newComment);
-    if(response.status === 200) {
+    if(response.status === 201) {
       const newComments = [...store.comments, response.data.comment];
       storeReducer({
         type: GlobalStoreActionType.ADD_COMMENTS,
