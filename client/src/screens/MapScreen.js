@@ -9,13 +9,15 @@ import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
 import { CreateVertexTransaction } from "../transactions";
-import { DetailView , EditMode, TransactionType } from "../enums";
+import { DetailView , EditMode } from "../enums";
 import * as Y from 'yjs';
 import { parseMultiPolygon } from "../utils/geojsonParser";
+import jsTPS from "../common/jsTPS";
 
 let ydoc = new Y.Doc({ autoLoad: true });
 let ymap = ydoc.getMap("regions");
 let undoManager = new Y.UndoManager(ymap, {trackedOrigins: new Set([42])})
+let tps = new jsTPS();
 
 export default function MapScreen() {
   const { auth } = useContext(AuthContext);
@@ -31,7 +33,36 @@ export default function MapScreen() {
   const [staleBridgeId, setStaleBridgeId] = useState(null);
   const [mergeRegionId, setMergeRegionId] = useState([]);
   const [editRegionId, setEditRegionId] = useState(null);
+  const [staleSubregionIds, setStaleSubregionIds] = useState(null);
 
+  useEffect(() => {
+    if(!mapItem) return;
+    switch(file.currentEditMode){
+      case EditMode.EDIT_VERTEX: {
+        reloadLayers([editRegionId]);     
+        break; 
+      }
+      case EditMode.ADD_SUBREGION: {
+        break;
+      }
+      default:
+        mapItem.pm.disableDraw();
+        subregionLayerMap[editRegionId].pm.disable();
+    }
+
+    switch(file.editModeAction){
+      case EditMode.UNDO: {
+        handleUndo();
+        file.clearUndoRedo();
+        break;
+      }
+      case EditMode.REDO: {
+        handleRedo();
+        file.clearUndoRedo();
+        break;
+      }
+    }
+  }, [file])
 
   useEffect(() => {
     // init yjs items
@@ -50,7 +81,6 @@ export default function MapScreen() {
     // load map container
     if (!mapRef) return;
     const map = file.initMapContainer(mapRef);
-    file.initMapControls(map);
     setMapItem(map);
     return () => {
       map.remove();
@@ -89,23 +119,32 @@ export default function MapScreen() {
     })
 
     auth.socket.on('others-update', (data) => {
-      const {op} = data;
+      const {subregionIds, op} = data;
       const parsed = JSON.parse(op);
       const uintArray = Uint8Array.from(parsed);
       Y.applyUpdate(ydoc, uintArray, -1);
+      setStaleSubregionIds(subregionIds);
     })
 
     ydoc.on('update', (update, origin) => {
       if(origin !== -1){
+        const subregionIds = getTPSSubregionId();
         const arr = Array.from(update);
         const op = JSON.stringify(arr);
-        auth.socket.emit('op', {mapId: mapId, op: op});
+        auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, op: op});
       } 
     })
 
-    // undoManager.on('stack-item-popped', event => {
-    //   setIncTransaction([true]);
-    // })
+    undoManager.on('stack-item-added', event => {
+      // if(event.origin == 42){
+      //   tps.addTransaction
+      // }
+      console.log(event.origin, 1);
+    })
+
+    undoManager.on('stack-item-popped', event => {
+      console.log(event, 2);
+    })
 
     return () => {
       auth.socket.emit('closeProject', {
@@ -132,6 +171,31 @@ export default function MapScreen() {
     setStaleBridgeId(null);
   }, [staleBridgeId])
 
+  useEffect(() => {
+    if(!transaction) return;
+    // create a vertex transaction
+    switch(transaction[0]){
+      case EditMode.ADD_VERTEX:
+      case EditMode.MOVE_VERTEX:
+      case EditMode.REMOVE_VERTEX:
+        const [transactionType, e, subregionId] = transaction;
+        const trans = CreateVertexTransaction(transactionType, e, subregionId);
+        trans.splice(1, 0, mapId);
+        applyTransaction(trans);
+        break;
+    }
+
+    setTransaction(null);
+  }, [transaction])
+
+  useEffect(() => {
+    if(!staleSubregionIds) return;
+
+    // console.log(subregionLayerMap, tmpItem);
+    reloadLayers([...staleSubregionIds]);
+    setStaleSubregionIds(null);
+  }, [staleSubregionIds])
+
 
   function disableLayer(subregionId){
     subregionLayerMap[subregionId].setStyle({ fillColor: '#3387FF'});
@@ -145,7 +209,9 @@ export default function MapScreen() {
 
   function reloadLayers(subregionIds){
     const newSubregionLayerMap = {...subregionLayerMap};
+    console.log(subregionLayerMap, subregionIds);
     for(const subregionId of subregionIds){
+      // console.log(subregionId)
       const oldLayer = subregionLayerMap[subregionId];
       mapItem.removeLayer(oldLayer);
       const ymap = ydoc.getMap("regions");
@@ -156,9 +222,10 @@ export default function MapScreen() {
       const newLayer = L.polygon(coords).addTo(mapItem);
       initLayerHandlers(newLayer, subregionId);
       newSubregionLayerMap[subregionId] = newLayer;
-
+      
       if(subregionId === editRegionId){
-        enableLayer(subregionId);
+        newLayer.setStyle({fillColor: 'red'});
+        enableEditing(newLayer);
       }
     }
 
@@ -168,10 +235,10 @@ export default function MapScreen() {
 
   function initLayerHandlers(layer, subregionId){
     layer.on('click', (e) => setStaleBridgeId(subregionId));
-    layer.on('pm:vertexadded', (e) => setTransaction([TransactionType.ADD_VERTEX, e, subregionId]));
-    layer.on('pm:markerdragend', (e) => setTransaction([TransactionType.MOVE_VERTEX, e, subregionId]));
-    layer.on('pm:vertexremoved', (e) => setTransaction([TransactionType.REMOVE_VERTEX, e, subregionId]));
-    mapItem.on('pm:create', (e) => setTransaction([TransactionType.ADD_SUBREGION, e]));
+    layer.on('pm:vertexadded', (e) => setTransaction([EditMode.ADD_VERTEX, e, subregionId]));
+    layer.on('pm:markerdragend', (e) => setTransaction([EditMode.MOVE_VERTEX, e, subregionId]));
+    layer.on('pm:vertexremoved', (e) => setTransaction([EditMode.REMOVE_VERTEX, e, subregionId]));
+    mapItem.on('pm:create', (e) => setTransaction([EditMode.ADD_SUBREGION, e]));
   }
 
   function enableEditing(layer){
@@ -191,6 +258,60 @@ export default function MapScreen() {
 
 
 
+  function applyTransaction(data){
+    const [transactionType, mapId, subregionId, indexPath, newCoords] = data;
+    switch(transactionType){
+      case EditMode.ADD_VERTEX:
+        applyVertexAdd(subregionId, indexPath, newCoords);
+        break;
+      case EditMode.MOVE_VERTEX:
+        applyVertexMove(subregionId, indexPath, newCoords);
+        break;
+      case EditMode.REMOVE_VERTEX:
+        applyVertexRemove(subregionId, indexPath, newCoords);
+        break;
+    }
+  }
+
+  function applyVertexAdd(subregionId, indexPath, newCoords){
+    const [i,j,k] = indexPath;
+    const ymap = ydoc.getMap("regions");
+    const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
+    const coords2 = coords.get(i).get(j);
+  
+    ydoc.transact(() => {
+      coords2.insert(k, [newCoords]);
+      undoManager.stopCapturing()
+      tps.addTransaction([subregionId]);
+    }, 42);
+  }
+
+  function applyVertexMove(subregionId, indexPath, newCoords){
+    const [i,j,k] = indexPath
+    const ymap = ydoc.getMap("regions");
+    const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
+    const coords2 = coords.get(i).get(j);
+  
+    ydoc.transact(() => {
+      coords2.delete(k, 1);
+      coords2.insert(k, [newCoords]);
+      undoManager.stopCapturing()
+      tps.addTransaction([subregionId]);
+    }, 42);
+  }
+
+  function applyVertexRemove(subregionId, indexPath, newCoords){
+    const [i,j,k] = indexPath;
+    const ymap = ydoc.getMap("regions");
+    const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
+    const coords2 = coords.get(i).get(j);
+
+    ydoc.transact(() => {
+      coords2.delete(k, 1);
+      undoManager.stopCapturing();
+      tps.addTransaction([subregionId])
+    }, 42);
+  }
 
 
   function addVertexValidate(){
@@ -203,6 +324,30 @@ export default function MapScreen() {
 
   function removeVertexValidate(){
     return file.editModeOptions[2];
+  }
+
+  function handleUndo(){
+    undoManager.undo();
+  }
+
+  function handleRedo(){
+    undoManager.redo();
+  }
+
+  function getTPSSubregionId(){
+    if(tps.undoStack.length == undoManager.undoStack.length){
+      // grab subregion from undoStacl
+      return tps.undoPeek();
+    }
+    else if(tps.undoStack.length > undoManager.undoStack.length){
+      // move item to redostack // is an undo op
+      const subregionIds = tps.undoTransaction();
+      return subregionIds;
+    } else {
+      // move item to undo stack, is an redo op
+      const subregionIds = tps.redoTransaction();
+      return subregionIds;
+    }
   }
 
   function handleInitMapLoad(e) {
