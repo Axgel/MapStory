@@ -33,6 +33,11 @@ describe('Import Map', () => {
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
+        //delete file
+        cy.get('#mapFileBtn').click() //click on file
+        cy.get('#delteBtn').click()
+        cy.contains("OK").click()
+        cy.url().should('include', '/')
     });
 
     //success shp and dbf
@@ -42,6 +47,11 @@ describe('Import Map', () => {
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
+        //delete file
+        cy.get('#mapFileBtn').click() //click on file
+        cy.get('#delteBtn').click()
+        cy.contains("OK").click()
+        cy.url().should('include', '/')
     });
     
     //success json
