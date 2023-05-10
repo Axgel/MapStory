@@ -46,6 +46,9 @@ export default function MapScreen() {
       case EditMode.ADD_SUBREGION: {
         break;
       }
+      case EditMode.VIEW: {
+        break;
+      }
       default:
         mapItem.pm.disableDraw();
         subregionLayerMap[editRegionId].pm.disable();

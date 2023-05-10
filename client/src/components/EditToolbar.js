@@ -80,10 +80,9 @@ export default function EditToolbar() {
   }
   
   function handleToggleEdit(e){
-    if(auth.loggedIn){
-      e.stopPropagation();
-      setEditActive(true);
-    }
+    e.stopPropagation();
+    if(!auth.loggedIn || !store.selectedMap || auth.user._id !== store.selectedMap.owner) return;
+    setEditActive(true);
   }
 
   const toggledOnClass = "bg-mapselectedfill"
