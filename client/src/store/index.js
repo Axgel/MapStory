@@ -377,11 +377,9 @@ function GlobalStoreContextProvider(props) {
 
   store.addTags = async function(newTag){
     let response = await api.addTags(store.selectedMap._id, newTag);
-    console.log(response)
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.TAG);
     }else if (response.status === 202){
-      console.log("very here")
       return "Tag already exists";
     }
   }
@@ -397,6 +395,8 @@ function GlobalStoreContextProvider(props) {
     let response = await api.addCollaborator(store.selectedMap._id, collaboratorEmail);
     if(response.status === 200){
       store.loadPersonalAndSharedMaps(CurrentModal.SHARE_MAP);
+    } else if(response.status === 202){
+      return response.data.error;
     }
   }
 

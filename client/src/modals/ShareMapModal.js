@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CurrentModal } from "../enums";
 import { CollaboratorCard } from "../components";
 
@@ -9,22 +9,37 @@ export default function ShareMapModal() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
 
+  const [errMsg, setErrMsg] = useState('');
+
   function handleCloseModal(e){
     e.stopPropagation();
     store.setCurrentModal(CurrentModal.NONE);
   }
 
-  function handleAddCollaborator(e){
+  async function handleAddCollaborator(e){
     e.stopPropagation();
-    const collaboratorEmail = document.getElementById("add-collaborator").value;
+    if(store.collaborators.length === 3){
+      setErrMsg("Cannot have more than 3 collaborators");
+      return;
+    }
+      
+    const collaboratorEmail = document.getElementById("add-collaborator").value.trim();
     document.getElementById("add-collaborator").value = "";
     if(!auth.user || !store.selectedMapOwner) return;
     if(auth.user.email !== store.selectedMapOwner.email || collaboratorEmail === store.selectedMapOwner.email) return;
     for(const collaborator of store.collaborators){
-      if(collaborator.email === collaboratorEmail) return;
+      if(collaborator.email === collaboratorEmail) {
+        setErrMsg("Collaborator already exists");
+        return;
+      }
     }
   
-    store.addCollaborator(collaboratorEmail);
+    let response = await store.addCollaborator(collaboratorEmail);
+    if (response){
+      setErrMsg(response);
+    } else{
+      setErrMsg('');
+    }
   }
 
   function handleKeyPress(e) {
@@ -54,7 +69,7 @@ export default function ShareMapModal() {
             <input id="add-collaborator" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Collaborators" onKeyDown={handleKeyPress}></input>
             <button id="addCollaboratorBtn" className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddCollaborator}>ADD</button>
           </div>
-
+          <p className="mx-6 mb-4 text-red-600">{errMsg}</p>
           <p className="text-lightgrey text-left mx-12">People with access:</p>
 
           <div className="flex flex-col items-start mx-12 mb-5">

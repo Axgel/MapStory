@@ -292,18 +292,21 @@ addCollaborators = async(req, res) => {
       })
     }
 
-    const collaborator = await User.findOne({ email : body.collaboratorEmail }); 
+    const collaborator = await User.findOne({ email : body.collaboratorEmail });
+    if(!collaborator){
+      return res.status(202).json({
+        error: "User does not exist"
+      })
+    }
     const map = await MapProject.findOne({ _id: req.params.mapId }); 
-    
     if (map.collaborators.includes(collaborator._id)) {
-      return res.status(400).json({
+      return res.status(202).json({
         error: "Collaborator already added"
       })
     }
 
     map.collaborators.push(collaborator._id);
     await map.save();
-
     if(collaborator.sharedMaps.includes(map._id)){
       return res.status(400).json({
         error: "Map already added to user"

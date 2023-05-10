@@ -13,7 +13,11 @@ export default function AddTagModal() {
   
   async function handleAddTags(e){
     e.stopPropagation();
-    let tag = document.getElementById("input_tag").value.toLowerCase();
+    let tag = document.getElementById("input_tag").value.toLowerCase().trim();
+    if(!tag){
+      setErrMsg("Cannot have empty tag"); 
+      return;
+    }
     document.getElementById("input_tag").value = "";
     console.log("there")
     let response = await store.addTags(tag);
