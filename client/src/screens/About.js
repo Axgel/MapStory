@@ -3,7 +3,11 @@ import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 import { ViewMode } from "../enums";
 import { useNavigate } from "react-router-dom";
-import MushroomLogo from '../assets/MushroomLogo.png'
+import MushroomLogo from '../assets/MushroomLogo.png';
+import Kenny from '../assets/kenny.jpg';
+import Tracy from '../assets/tracy.jpg';
+import Angel from '../assets/angel.jpg';
+import Arvin from '../assets/arvin.jpg';
 
 export default function About() {
   const { store } = useContext(GlobalStoreContext);
@@ -79,11 +83,11 @@ export default function About() {
       <h1 className={sectionClass}>
           Meet the Team
       </h1>
-      <div className="flex flex-wrap justify-center">
-        <div className="w-2/12 mb-6 px-6">
+      <div className="flex flex-wrap justify-center gap-4">
+        <div className="mb-6 px-6">
             <div className="flex flex-col">
-              <img className="rounded-2xl drop-shadow-md"
-                  src=""/> 
+              <img className="w-[250px] h-[229px] rounded-2xl drop-shadow-md"
+                  src={Angel}/> 
                   {/* image width height=400 */}
               <div className="text-center mt-6">
                   <h1 className="text-gray-900 text-xl font-bold mb-1">
@@ -93,10 +97,10 @@ export default function About() {
             </div>
         </div>
 
-        <div className="w-2/12 mb-6 px-6">
-            <div className="flex flex-col">
-              <img className="rounded-2xl drop-shadow-md"
-                  src=""/>
+        <div className="mb-6 px-6">
+            <div className="flex flex-col justify-center">
+              <img className="w-[250px] h-[229px] rounded-2xl drop-shadow-md"
+                  src={Arvin}/>
               <div className="text-center mt-6">
                   <h1 className="text-gray-900 text-xl font-bold mb-1">
                       Arvin Wang
@@ -105,10 +109,10 @@ export default function About() {
             </div>
         </div>
 
-        <div className="w-2/12 mb-6 px-6">
-            <div className="flex flex-col">
-              <img className="rounded-2xl drop-shadow-md"
-                  src=""/>
+        <div className="mb-6 px-6">
+            <div className="flex flex-col justify-center">
+              <img className="w-[250px] h-[229px] rounded-2xl drop-shadow-md"
+                  src={Kenny}/>
               <div className="text-center mt-6">
                   <h1 className="text-gray-900 text-xl font-bold mb-1">
                       Kenny Li
@@ -117,10 +121,10 @@ export default function About() {
             </div>
         </div>
 
-        <div className="w-2/12 mb-6 px-6">
+        <div className="mb-6 px-6">
             <div className="flex flex-col">
-              <img className="rounded-2xl drop-shadow-md"
-                  src=""/>
+              <img className="w-[250px] h-[229px] rounded-2xl drop-shadow-md"
+                  src={Tracy}/>
               <div className="text-center mt-6">
                   <h1 className="text-gray-900 text-xl font-bold mb-1">
                       Tracy Ho
