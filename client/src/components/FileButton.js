@@ -90,9 +90,9 @@ export default function FileButton() {
           <p className="py-1 px-3 hover:bg-dropdownhover rounded-tl-lg rounded-tr-lg hover:bg-opacity-80" onClick={(e) => setDetailView(e, DetailView.PROPERTIES)}>Properties</p>
           <p className={publishedNonAccessClass} onClick={(e) => setDetailView(e, DetailView.COMMENTS)}>Comments</p>
           <div className="h-px bg-lightgrey bg-opacity-30"></div>
-          <p className={guestNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>Fork</p>
-          <p className={publishedCollabNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>Publish</p>
-          <p className={collabNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>Delete</p>
+          <p id="forkBtn" className={guestNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.FORK_MAP)}>Fork</p>
+          <p id="publishBtn" className={publishedCollabNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.PUBLISH_MAP)}>Publish</p>
+          <p id="deleteBtn" className={collabNonAccessClass} onClick={(e) => setMapProjectAction(e, CurrentModal.DELETE_MAP)}>Delete</p>
           <div className="h-px bg-lightgrey bg-opacity-30"></div>
           <p onClick={toggleFileByDD} className={guestNonAccessClass}>Save</p>
       </div>

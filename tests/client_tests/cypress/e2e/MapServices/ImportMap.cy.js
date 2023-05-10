@@ -35,7 +35,7 @@ describe('Import Map', () => {
         cy.url().should('include', '/map')
         //delete file
         cy.get('#mapFileBtn').click() //click on file
-        cy.get('#delteBtn').click()
+        cy.get('#deleteBtn').click()
         cy.contains("OK").click()
         cy.url().should('include', '/')
     });
@@ -49,7 +49,7 @@ describe('Import Map', () => {
         cy.url().should('include', '/map')
         //delete file
         cy.get('#mapFileBtn').click() //click on file
-        cy.get('#delteBtn').click()
+        cy.get('#deleteBtn').click()
         cy.contains("OK").click()
         cy.url().should('include', '/')
     });
