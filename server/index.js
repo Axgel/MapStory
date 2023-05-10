@@ -57,14 +57,14 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
-        const {mapId, subregionId, op} = data;
+        const {mapId, subregionIds, op} = data;
         const parsed = JSON.parse(op);
         const uintArray = Uint8Array.from(parsed);
         const ydoc = mapProjects[mapId].text
         Y.applyUpdate(ydoc, uintArray);
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
-          socketIO.to(client).emit('others-update', {op: op});
+          socketIO.to(client).emit('others-update', {subregionIds: subregionIds, op: op});
         }
       });
     })
@@ -111,24 +111,17 @@ switch (process.env.ENVIRONMENT) {
       });
 
       socket.on("op", (data) => {
-        const {mapId, op} = data;
+        const {mapId, subregionIds, op} = data;
         const parsed = JSON.parse(op);
         const uintArray = Uint8Array.from(parsed);
         const ydoc = mapProjects[mapId].text
         Y.applyUpdate(ydoc, uintArray);
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
-          socketIO.to(client).emit('others-update', {op: op});
+          socketIO.to(client).emit('others-update', {subregionIds: subregionIds, op: op});
         }
       });
 
-      socket.on("add-region", async (data) => {
-        const {mapId, coords} = data;
-        // const string = new TextDecoder().decode(uint8array);
-        const subregionId = await addSubregion(mapId, coords);
-        console.log(subregionId, "qwert");
-        socketIO.to(socket.id).emit("add-region-ack", {subregionId: subregionId.subregionId, coords: coords});
-      })
     })
    
     devHttpServer.listen(PORT, () =>

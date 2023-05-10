@@ -28,40 +28,17 @@ function GlobalFileContextProvider(props) {
     currentEditMode: EditMode.NONE,
     // add, move, remove
     editModeOptions: [true, true, true],
+    editModeAction: EditMode.NONE,
     editRegions: {},
   })
   
   const fileReducer = (action) => {
     const { type, payload } = action;
     switch (type) {
-      case GlobalFileActionType.LOAD_SUBREGIONS: {
-        return setFile({
-          ...file,
-          currentEditMode: EditMode.NONE,
-          editRegions: [],
-        })
-      }
       case GlobalFileActionType.SET_EDIT_MODE: {
         return setFile({
           ...file,
           currentEditMode: payload.currentEditMode
-        })
-      }
-      case GlobalFileActionType.UPDATE_EDIT_REGIONS: {
-        return setFile({
-          ...file,
-          editRegions: payload.editRegions
-        })
-      }
-      case GlobalFileActionType.REFRESH: {
-        return setFile({
-          ...file
-        })
-      }
-      case GlobalFileActionType.UPDATE_SUBREGIONS: {
-        return setFile({
-          ...file,
-          subregions: payload.subregions
         })
       }
       case GlobalFileActionType.SET_EDIT_MODE_OPTION: {
@@ -70,14 +47,13 @@ function GlobalFileContextProvider(props) {
           editModeOptions: payload.editModeOption
         })
       }
-      case GlobalFileActionType.RESET_DEFAULT: {
+      case GlobalFileActionType.SET_EDIT_MODE_ACTION: {
         return setFile({
           ...file, 
-          currentEditMode: EditMode.NONE,
-          editModeOptions: [true, true, true],
-          editRegions: {},
+          editModeAction: payload.editModeAction
         })
       }
+
       default:
         return file;
     }
@@ -93,44 +69,6 @@ function GlobalFileContextProvider(props) {
 
     return map;
   }
-
-  file.initMapControls = function(map){
-    const actions = [
-      // uses the default 'cancel' action
-      'cancel',
-      // creates a new action that has text, no click event
-      { text: 'Custom text, no click' },
-      // creates a new action with text and a click event
-      {
-        text: 'click me',
-        onClick: () => {
-          alert('🙋‍♂️');
-        },
-      },
-      {
-        text: 'click me',
-        onClick: () => {
-          alert('🙋‍♂️');
-        },
-      },
-    ];
-    
-    map.pm.Toolbar.createCustomControl({
-      name: "Edit Vertex",
-      block: "custom",
-      title: "Edit Vertex",
-      className: "editVertex",
-      actions: actions
-    });
-    map.pm.addControls({
-      drawControls: false,
-      editControls: false,
-      customControls: true
-    });
-
-
-  }
-
 
   file.setCurrentEditMode = function(currentEditMode) {
     fileReducer({
@@ -149,9 +87,24 @@ function GlobalFileContextProvider(props) {
   }
 
   file.handleUndo = function() {
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
+      payload: {editModeAction: EditMode.UNDO}
+    })
   }
 
   file.handleRedo = function() {
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
+      payload: {editModeAction: EditMode.REDO}
+    })
+  }
+
+  file.clearUndoRedo = function(){
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
+      payload: {editModeAction: EditMode.NONE}
+    })
   }
   
   file.resetDefault = function() {
