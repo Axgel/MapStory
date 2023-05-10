@@ -251,7 +251,6 @@ describe("Testing Map functionalities", () => {
             const response = await agent.get(`/store/user/${userId}`).set("Cookie", cookies);
             expect(response.status).toBe(200);
             expect(response.body.user).toBeDefined();
-            console.log(response.body.user)
             // userId = response.body.user._id
         })
         it("should fail to add comments", async() => {

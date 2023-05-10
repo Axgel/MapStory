@@ -195,7 +195,6 @@ deleteMap = async (req, res) => {
 forkMap = async (req, res) => {
   try {
     const user = await User.findById(req.body.userId);
-    console.log(user)
     const mapProject = await MapProject.findById(req.params.mapId); //mapproject to duplicate
 
     // create a copy of the map
@@ -375,7 +374,6 @@ removeCollaborators = async(req, res) => {
 getUserById = async(req,res) => {
   try{
     await User.findOne({ _id: req.params.userId}, (err, user) => {
-      console.log(user)
       return res.status(200).json({
         user: user 
       })
@@ -461,14 +459,12 @@ addComment = async(req, res) =>{
       })
     }
     const map = await MapProject.findById(mapId);
-    console.log(map);
     if(!map) {
       return res.status(400).json({
         error: 'Unable to find map'
       })
     }
     const user = await User.findById(userId);
-    console.log(user);
     if(!user) {
       return res.status(400).json({
         error: 'Unable to find user'
