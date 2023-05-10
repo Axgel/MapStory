@@ -1,11 +1,11 @@
-import { TransactionType } from "../enums"
+import { EditMode } from "../enums"
 export function CreateVertexTransaction(transaction, e, subregionId){
   switch(transaction){
-    case TransactionType.ADD_VERTEX:
+    case EditMode.ADD_VERTEX:
       return createAddVertexTransaction(transaction, e, subregionId);
-    case TransactionType.MOVE_VERTEX:
+    case EditMode.MOVE_VERTEX:
       return createMoveVertexTransaction(transaction, e, subregionId);
-    case TransactionType.REMOVE_VERTEX:
+    case EditMode.REMOVE_VERTEX:
       return createRemoveVertexTransaction(transaction, e, subregionId);
    }
 }

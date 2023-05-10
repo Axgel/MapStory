@@ -31,7 +31,7 @@ export async function convertGeojsonToInternalFormat(geojson) {
   return regionObjs;
 }
 
-function parsePolygon(coordinates){
+export function parsePolygon(coordinates){
   const regionCoords = [];
   for(let i=0; i<coordinates.length; i++){
     const newCoords = [];
