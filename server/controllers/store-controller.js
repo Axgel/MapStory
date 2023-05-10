@@ -231,7 +231,8 @@ forkMap = async (req, res) => {
     }
     
     return res.status(201).json({
-      message: "Forked map project"
+      message: "Forked map project",
+      map: newMapProject
     })
   } catch (err) {
     return res.status(400).json({
@@ -328,10 +329,10 @@ removeCollaborators = async(req, res) => {
   try{
     const body = req.body;
 
-    if(!body){
+    if(!body.collaboratorEmail || !body){
       return res.status(400).json({
         success: false,
-        error: 'You must provide a collaborator to add'
+        error: 'You must provide a collaborator to remove'
       })
     }
 
@@ -364,7 +365,7 @@ removeCollaborators = async(req, res) => {
 
   } catch(err){
     return res.status(400).json({
-      error: 'Unable to add collaborator'
+      error: 'Unable to remove collaborator'
     })
   }
 }
@@ -372,14 +373,14 @@ removeCollaborators = async(req, res) => {
 
 getUserById = async(req,res) => {
   try{
-    User.findOne({ _id: req.params.userId}, (err, user) => {
+    await User.findOne({ _id: req.params.userId}, (err, user) => {
       return res.status(200).json({
         user: user 
       })
     })
   } catch(err){
     return res.status(400).json({
-      error: 'Unable to find map'
+      error: 'Unable to find user'
     })
   }
 }
@@ -458,14 +459,12 @@ addComment = async(req, res) =>{
       })
     }
     const map = await MapProject.findById(mapId);
-    console.log(map);
     if(!map) {
       return res.status(400).json({
         error: 'Unable to find map'
       })
     }
     const user = await User.findById(userId);
-    console.log(user);
     if(!user) {
       return res.status(400).json({
         error: 'Unable to find user'
@@ -484,7 +483,7 @@ addComment = async(req, res) =>{
       comment: comment,
       username: user.userName
     }
-    return res.status(200).json({
+    return res.status(201).json({
       "comment": retComment
     })
 
