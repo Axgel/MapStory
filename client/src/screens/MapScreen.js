@@ -39,6 +39,7 @@ export default function MapScreen() {
     if(!mapItem) return;
     switch(file.currentEditMode){
       case EditMode.EDIT_VERTEX: {
+        if(!editRegionId) break;
         reloadLayers([editRegionId]);     
         break; 
       }
@@ -90,6 +91,10 @@ export default function MapScreen() {
   useEffect(() => {
     // init subregion load once
     if(!mapItem || initLoad >= 0) return;
+
+    mapItem.eachLayer(function (layer) {
+      mapItem.removeLayer(layer);
+    });
     
     const yjsRegions = ydoc.getMap('regions').toJSON();
     const regions = {};
@@ -133,17 +138,6 @@ export default function MapScreen() {
         const op = JSON.stringify(arr);
         auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, op: op});
       } 
-    })
-
-    undoManager.on('stack-item-added', event => {
-      // if(event.origin == 42){
-      //   tps.addTransaction
-      // }
-      console.log(event.origin, 1);
-    })
-
-    undoManager.on('stack-item-popped', event => {
-      console.log(event, 2);
     })
 
     return () => {
@@ -209,9 +203,7 @@ export default function MapScreen() {
 
   function reloadLayers(subregionIds){
     const newSubregionLayerMap = {...subregionLayerMap};
-    console.log(subregionLayerMap, subregionIds);
     for(const subregionId of subregionIds){
-      // console.log(subregionId)
       const oldLayer = subregionLayerMap[subregionId];
       mapItem.removeLayer(oldLayer);
       const ymap = ydoc.getMap("regions");
