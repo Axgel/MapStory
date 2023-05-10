@@ -51,7 +51,7 @@ async function simplifyGeoJSON(file, simplifyPercentage) {
     return new Promise((resolve, reject) => {
         let topology = server.topology({foo: file});
         topology = simplify.presimplify(topology);
-        let topologySimplified = simplify.simplify(topology, simplifyPercentage)
+        let topologySimplified = simplify.simplify(topology, simplifyPercentage);
         resolve(client.feature(topologySimplified, "foo"));
     });
 }
