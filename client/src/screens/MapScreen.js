@@ -18,7 +18,9 @@ import newUnion from '@turf/union';
 import { union } from 'turf5'
 import jsTPS from "../common/jsTPS";
 import api from "../file/file-request-api";
-
+import arrowright from '../assets/arrowright.png'
+import arrowleft from '../assets/arrowleft.png'
+import closeIcon from "../assets/closeIcon.png"
 
 let ydoc = new Y.Doc({ autoLoad: true });
 let ymap = ydoc.getMap("regions");
@@ -32,6 +34,9 @@ export default function MapScreen() {
   const [mapRef, setMapRef] = useState(null);
   const [mapItem, setMapItem] = useState(null);
   const { mapId } = useParams();
+  const [mapPropOpen, setMapPropOpen] = useState(false);
+  const [propEdit, setPropEdit] = useState(["",""]);
+  const [propEditKeyRefresh, setPropEditKeyRefresh] = useState([""]);
 
   const [initLoad, setInitLoad] = useState(1);
   const [subregionLayerMap, setSubregionLayerMap] = useState({});
@@ -302,6 +307,11 @@ export default function MapScreen() {
         
     setStaleBridgeId(null);
   }, [staleBridgeId])
+
+  useEffect(() => {
+    setPropEdit(["",""]);
+    setPropEditKeyRefresh(["c"]);
+  }, [editRegionId])
 
   useEffect(() => {
     if(!transaction) return;
@@ -745,23 +755,139 @@ export default function MapScreen() {
 
   let tmp = <></>;
   if(store.selectedMap && (store.detailView !== DetailView.NONE)){
-    tmp = <div className="w-[300px] h-[600px] flex flex-col gap-5 sticky top-5 self-start">
+    tmp = <div className="w-[300px] min-h-[400px] h-screen sticky top-5 self-start">
             <MapDetailCard mapDetails={store.selectedMap} />
           </div>
   }
+
+  function handleMapProp(){
+    setMapPropOpen(!mapPropOpen);
+  }
+
+  function handleEditProp(k,v){
+    if(store.selectedMap.isPublished) return;
+    setPropEdit([k,v]);
+    setPropEditKeyRefresh(["a"]);
+
+    document.getElementById("inputPropTextKey").value = k
+    document.getElementById("inputPropTextValue").value = v
+  }
+
+  function handleNewEditProp(){
+    setPropEdit(["",""]);
+    setPropEditKeyRefresh(["b"]);
+
+    document.getElementById("inputPropTextKey").value = ""
+    document.getElementById("inputPropTextValue").value = ""
+  }
+
+  function handleSavePropEdit(){
+    const ymap = ydoc.getMap("regions");
+    const props = ymap.get(editRegionId, Y.Map).get("properties", Y.Map);
+    const newTextKey = document.getElementById("inputPropTextKey").value
+    const newTextValue = document.getElementById("inputPropTextValue").value
+
+    ydoc.transact(() => {
+      props.set(newTextKey, newTextValue)
+    }, 99)
+    handleEditProp(newTextKey, newTextValue);
+  }
+
+  function handleDeletePropEdit(){
+    const ymap = ydoc.getMap("regions");
+    const props = ymap.get(editRegionId, Y.Map).get("properties", Y.Map);
+    const newTextKey = document.getElementById("inputPropTextKey").value
+    // const newTextValue = document.getElementById("inputPropTextValue").value
+
+    ydoc.transact(() => {
+      props.delete(newTextKey);
+    }, 99)
+    handleNewEditProp();
+  }
+
+  let mapProps = <></>
+  if(mapPropOpen){
+    if(editRegionId){
+      const tmpProperties = ydoc.getMap('regions').get(editRegionId).get('properties').toJSON();
+
+
+      let editPropInput =
+        <div>
+          <h1 className="mx-6 my-1 text-start">Key:</h1>
+          <input id="inputPropTextKey" className="w-[250px] h-[25px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2 mb-[5px]" type="text" defaultValue={propEdit[0]} key={propEditKeyRefresh} disabled={propEdit[0] == "" ? false : true}></input>
+          <h1 className="mx-6 my-1 text-start">Value:</h1>
+          <input id="inputPropTextValue" className="w-[250px] h-[25px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2 mb-[5px]" type="text" defaultValue={propEdit[1]} key={propEdit}></input>
+
+          <div className="flex mx-6 justify-around mb-2">
+            <div className="border-solid border rounded-lg text-center px-3 py-1 bg-publishfill hover:bg-opacity-50" onClick={handleSavePropEdit}>
+              Save
+            </div>
+            <div className="border-solid border rounded-lg text-center px-3 py-1 bg-deletefill hover:bg-opacity-50" onClick={handleDeletePropEdit}>
+              Delete
+            </div>
+            <div className="border-solid border rounded-lg text-center px-3 py-1 bg-forkfill hover:bg-opacity-50" onClick={handleNewEditProp}>
+              Clear
+            </div>
+          </div>
+
+          <div className="h-[1px] bg-black"></div>
+        </div>
+      
+      if(store.selectedMap.isPublished){
+        editPropInput = <></>;
+      }
+
+      mapProps = 
+      <div className="w-[300px] min-h-[400px] h-screen sticky top-5 self-start">
+        <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700 overflow-scroll	">
+          <div className="h-12 flex items-center px-2 gap-4 ">
+            <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
+            Region Properties
+          </div>
+          <div className="h-[1px] bg-black"></div>
+
+          {editPropInput}
+
+        <div className="flex flex-col overflow-scroll">
+          {
+            Object.keys(tmpProperties).map((k, index) => ( 
+              <div className="bg-modalbgfill hover:bg-white">
+                <div onClick={(e) => handleEditProp(k, tmpProperties[k])} key={index} className="flex justify-between items-center px-3.5 py-2 ">
+                  <p className="text-sm font-extrabold">{k}</p>
+                  <p className="border-none bg-transparent outline-none text-sm">{tmpProperties[k]}</p>
+                </div>
+                <div className="h-[1px] bg-modalborder border-opacity-60"></div>
+              </div>
+            ))
+          }
+        </div>
+        </div>
+      </div>
+    }
+  } else {
+    mapProps = 
+    <div className="min-h-[400px] h-screen absolute z-40 flex flex-col pt-[100px] px-[10px]">
+      <img onClick={handleMapProp} className="w-[30px] h-[30px]" src={arrowright}></img>
+    </div>
+  }
+
+
   return (
     <div>
       <Header /> 
       <EditToolbar />
       {/* <Map/> */}
       <div className="flex">
-        <div className="w-full h-[775px] z-0" id="map" ref={handleInitMapLoad}>
+        <div>
+          {mapProps}
+        </div>
+        <div className="w-full min-h-[400px] h-screen z-0" id="map" ref={handleInitMapLoad}>
         </div>
         <div>
           {tmp}
         </div>
       </div>      
-      <br></br><b></b>
+      <br></br>
     </div>
   );
 }
