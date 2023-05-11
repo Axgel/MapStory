@@ -76,7 +76,7 @@ export default function MapDetailCard(props) {
 
   if(store.detailView !== DetailView.NONE){
     return (
-      <div className="w-[300px] h-screen border-solid rounded-lg border flex flex-col bg-brownshade-700">
+      <div className="w-[300px] h-full border-solid rounded-lg border flex flex-col bg-brownshade-700">
         <div className="h-12 flex items-center px-2 gap-4 ">
           <img src={closeIcon} alt="" onClick={closeDetailView}></img>
           {titleElement}

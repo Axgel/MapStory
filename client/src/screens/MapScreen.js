@@ -692,7 +692,7 @@ export default function MapScreen() {
 
   let tmp = <></>;
   if(store.selectedMap && (store.detailView !== DetailView.NONE)){
-    tmp = <div className="w-[300px] min-h-[400px] h-screen sticky top-5 self-start">
+    tmp = <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
             <MapDetailCard mapDetails={store.selectedMap} />
           </div>
   }
@@ -742,7 +742,16 @@ export default function MapScreen() {
     handleNewEditProp();
   }
 
-  let mapProps = <></>
+  let mapProps =
+    <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
+      <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
+        <div className="h-12 flex items-center px-2 gap-4 ">
+          <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
+          Region Properties
+        </div>
+        <div className="h-[1px] bg-black"></div>
+      </div>
+    </div>
   if(mapPropOpen){
     if(editRegionId){
       const tmpProperties = ydoc.getMap('regions').get(editRegionId).get('properties').toJSON();
@@ -751,9 +760,9 @@ export default function MapScreen() {
       let editPropInput =
         <div>
           <h1 className="mx-6 my-1 text-start">Key:</h1>
-          <input id="inputPropTextKey" className="w-[250px] h-[25px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2 mb-[5px]" type="text" defaultValue={propEdit[0]} key={propEditKeyRefresh} disabled={propEdit[0] == "" ? false : true}></input>
+          <input id="inputPropTextKey" className="ml-6 w-[240px] h-[25px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mb-[5px]" type="text" defaultValue={propEdit[0]} key={propEditKeyRefresh} disabled={propEdit[0] == "" ? false : true}></input>
           <h1 className="mx-6 my-1 text-start">Value:</h1>
-          <input id="inputPropTextValue" className="w-[250px] h-[25px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mx-6 pl-2 mb-[5px]" type="text" defaultValue={propEdit[1]} key={propEdit}></input>
+          <input id="inputPropTextValue" className="ml-6 w-[240px] h-[25px] rounded-lg shadow-lg bg-transparent outline-none border-solid border pborder-lightgrey text-base mb-[5px]" type="text" defaultValue={propEdit[1]} key={propEdit}></input>
 
           <div className="flex mx-6 justify-around mb-2">
             <div className="border-solid border rounded-lg text-center px-3 py-1 bg-publishfill hover:bg-opacity-50" onClick={handleSavePropEdit}>
@@ -775,8 +784,8 @@ export default function MapScreen() {
       }
 
       mapProps = 
-      <div className="w-[300px] min-h-[400px] h-screen sticky top-5 self-start">
-        <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700 overflow-scroll	">
+      <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
+        <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
           <div className="h-12 flex items-center px-2 gap-4 ">
             <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
             Region Properties
@@ -803,28 +812,31 @@ export default function MapScreen() {
     }
   } else {
     mapProps = 
-    <div className="min-h-[400px] h-screen absolute z-40 flex flex-col pt-[100px] px-[10px]">
-      <img onClick={handleMapProp} className="w-[30px] h-[30px]" src={arrowright}></img>
-    </div>
+    <>
+      {/* <div className="w-[20px] min-h-[400px] h-full sticky top-5 self-start">
+        <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
+        </div>
+      </div> */}
+            <img onClick={handleMapProp} className="absolute w-[30px] h-[30px] z-50 mt-[100px]" src={arrowright}></img>
+    </>
   }
 
 
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <Header /> 
       <EditToolbar />
       {/* <Map/> */}
-      <div className="flex">
+      <div className="flex grow min-h-[400px]">
         <div>
           {mapProps}
         </div>
-        <div className="w-full min-h-[400px] h-screen z-0" id="map" ref={handleInitMapLoad}>
+        <div className="w-full min-h-[400px] h-full z-0 overflow-hidden" id="map" ref={handleInitMapLoad}>
         </div>
         <div>
           {tmp}
         </div>
       </div>      
-      <br></br>
     </div>
   );
 }
