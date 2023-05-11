@@ -64,7 +64,7 @@ export default function ShareMapModal() {
     return (
       <div className="fixed inset-x-0 inset-y-0 flex items-center justify-center mx-2 z-50">
         <div className="bg-brownshade-700 border-modalborder border-solid border rounded-lg min-w-[450px] max-w-md text-center mx-12">
-          <h1 className="text-xl mt-4 mb-4 mx-12">Share '{store.selectedMap.title}'</h1>
+          <h1 className="text-xl mt-4 mb-4 mx-12 text-ellipsis overflow-hidden">Share '{store.selectedMap.title}'</h1>
           <div className="flex justify-between mx-12 mb-3 min-w-[360px]">
             <input id="add-collaborator" className="w-[220px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="Add Collaborators" onKeyDown={handleKeyPress}></input>
             <button id="addCollaboratorBtn" className="bg-brownshade-800 text-white px-3 py-2 rounded-md border-brownshade-850" onClick={handleAddCollaborator}>ADD</button>

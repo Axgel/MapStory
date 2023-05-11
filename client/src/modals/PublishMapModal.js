@@ -17,11 +17,11 @@ export default function PublishMapModal(props) {
     }); 
   }
 
-  let titleElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.title}</p> : <></>; 
+  let titleElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext text-ellipsis overflow-hidden">{mapInfo.title}</p> : <></>; 
   let ownerElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.ownerName}</p> : <></>; 
   let collaboratorElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{(mapInfo.collaborators.length === 0) ? "There are no collaborators for this map" : collaboratorsUsernames.join(", ")}</p> : <></>; 
   let tagElement = mapInfo ? <p className="mb-4 text-publishmodalsubtext">{(mapInfo.tags.length === 0) ? "There are currently no tags for this map" : mapInfo.tags.join(", ")}</p> : <></>;
-  let messageElement = mapInfo ? <h1 className="mx-6 my-2 ">Are you sure you want to publish '{mapInfo.title}'. This action cannot be undone.</h1> : <></>;
+  let messageElement = mapInfo ? <h1 className="mx-6 my-2 text-ellipsis overflow-hidden">Are you sure you want to publish '{mapInfo.title}'. This action cannot be undone.</h1> : <></>;
 
   function handleCloseModal(e){
     e.stopPropagation();
