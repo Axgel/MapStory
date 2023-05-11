@@ -30,6 +30,7 @@ function GlobalFileContextProvider(props) {
     editModeOptions: [true, true, true],
     editModeAction: EditMode.NONE,
     editChangeType: EditMode.NONE,
+    editToolbarBridge: EditMode.NONE,
     hasUndo: false,
     hasRedo: false,
   })
@@ -75,7 +76,14 @@ function GlobalFileContextProvider(props) {
           editModeAction: EditMode.NONE,
           editChangeType: EditMode.NONE,
           hasUndo: false,
-          hasRedo: false
+          hasRedo: false,
+          editToolbarBridge: EditMode.NONE
+        })
+      }
+      case GlobalFileActionType.SET_EDIT_TOOLBAR_BRIDGE: {
+        return setFile({
+          ...file,
+          editToolbarBridge: payload.editToolbarBridge
         })
       }
       default:
@@ -106,6 +114,27 @@ function GlobalFileContextProvider(props) {
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_MODE_OPTION,
       payload: {editModeOption: arr, editChangeType: EditMode.EDIT_TOOLBAR}
+    })
+  }
+
+  file.setEditToolbarBridge = function (editMode){
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_TOOLBAR_BRIDGE,
+      payload: {editToolbarBridge: editMode}
+    })
+  }
+
+  file.handleMerge = function() {
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
+      payload: {editModeAction: EditMode.MERGING, editChangeType: EditMode.EDIT_TOOLBAR}
+    })
+  }
+
+  file.finishAction = function() {
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
+      payload: {editModeAction: EditMode.NONE, editChangeType: EditMode.EDIT_TOOLBAR}
     })
   }
 

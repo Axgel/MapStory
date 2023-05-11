@@ -13,9 +13,12 @@ import { DetailView , EditMode } from "../enums";
 import * as Y from 'yjs';
 import { parsePolygon, parseMultiPolygon } from "../utils/geojsonParser";
 import * as turf from '@turf/turf';
+import * as turfHelpers from '@turf/helpers'
+import newUnion from '@turf/union';
 import { union } from 'turf5'
 import jsTPS from "../common/jsTPS";
 import api from "../file/file-request-api";
+import { convertGeojsonToInternalFormat, convertGeojsonToInternalFormatNoSwap } from "../utils/geojsonParser";
 
 
 let ydoc = new Y.Doc({ autoLoad: true });
@@ -58,6 +61,8 @@ export default function MapScreen() {
     else if(file.editChangeType === EditMode.EDIT_TOOLBAR){
       mapItem.pm.disableDraw();
       if(editRegionId) reloadLayers([editRegionId]);  
+      if(file.currentEditMode !== EditMode.MERGE_SUBREGION) clearMergeRegionIds();
+
       switch(file.currentEditMode) {
         case EditMode.EDIT_VERTEX: {
           // if(!editRegionId) break;
@@ -75,6 +80,16 @@ export default function MapScreen() {
         }
         case EditMode.REMOVE_SUBREGION: {
           if(editRegionId) setStaleBridgeId(editRegionId)
+          break;
+        }
+        case EditMode.MERGE_SUBREGION: {
+          if(file.editModeAction === EditMode.MERGING){
+            applyMergeSubregion();
+            setMergeRegionId([]);
+            file.finishAction();
+            break;
+          }
+          if(editRegionId) setStaleBridgeId(editRegionId);
           break;
         }
         case EditMode.VIEW: {
@@ -98,6 +113,13 @@ export default function MapScreen() {
     store.loadMapById(mapId);
   }, [])
 
+  useEffect(() => {
+    if(mergeRegionId.length === 2){
+      file.setEditToolbarBridge(EditMode.MERGE_READY);
+    } else {
+      file.setEditToolbarBridge(EditMode.NONE);
+    }
+  }, [mergeRegionId])
   // useEffect(() => {
   //   if(!mapItem) return;
   //   switch(file.currentEditMode){
@@ -211,6 +233,13 @@ export default function MapScreen() {
         setEditRegionId(null);
       } else {
         applyRemoveSubregion(staleBridgeId);
+      }
+    } else if(file.currentEditMode === EditMode.MERGE_SUBREGION){
+      if(editRegionId){
+        setMergeRegionId([editRegionId]);
+        setEditRegionId(null);
+      } else {
+        setRegionsToMerge(staleBridgeId);
       }
     } else {
       if(editRegionId === staleBridgeId){
@@ -327,7 +356,6 @@ export default function MapScreen() {
 
   useEffect(() => {
     if(!staleSubregionIds) return;
-
     reloadLayers([...staleSubregionIds]);
     setStaleSubregionIds(null);
   }, [staleSubregionIds])
@@ -370,6 +398,10 @@ export default function MapScreen() {
       if(subregionId === editRegionId){
         newLayer.setStyle({fillColor: 'red'});
         enableEditing(newLayer);
+      }
+
+      if(mergeRegionId.includes(subregionId)){
+        newLayer.setStyle({fillColor: 'red'});
       }
     }
 
@@ -460,30 +492,28 @@ export default function MapScreen() {
 
   async function applyAddSubregion(geoJsonItem){
     const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
-    //console.log(coords);
+    console.log(coords);
     const response = await api.createSubregion(mapId, coords);
     if(response.status === 201) {
       const subregionId = response.data.subregion._id;
       const coords = response.data.subregion.coordinates;
 
-      // initNewLayer(subregionId, coords);
       tps.addTransaction([subregionId]);
       ydoc.transact(() => {
         const ymapData = new Y.Map();
+        
         const yArr0 = new Y.Array();
-        const yArr1 = new Y.Array()
-        const yArr2 = new Y.Array();
-
         for(let i=0; i<coords.length; i++){
+          const yArr1 = new Y.Array()
           for(let j=0; j<coords[i].length; j++){
-            // const yArr3 = ymapData.get("coords").get(i).get(j);
+            const yArr2 = new Y.Array();
             for(let k=0; k<coords[i][j].length; k++){
               yArr2.push([coords[i][j][k]]);
             }
+            yArr1.push([yArr2]);
           }
+          yArr0.push([yArr1]);
         }
-        yArr1.push([yArr2]);
-        yArr0.push([yArr1]);
         ymapData.set("coords", yArr0);
         const pMap = new Y.Map();
         ymapData.set("properties", pMap);
@@ -503,12 +533,95 @@ export default function MapScreen() {
     }, 42);
   }
 
-  function initNewLayer(subregionId, coords){
-    const regions = {...subregionLayerMap};
-    const layer = L.polygon(coords).addTo(mapItem);
-    regions[subregionId] = layer;
-    initLayerHandlers(layer, subregionId);
-    setSubregionLayerMap(regions);
+  async function applyMergeSubregion(){
+    const ymap = ydoc.getMap("regions");
+    const ySubregion1 = ymap.get(mergeRegionId[0], Y.Map).get("coords").toJSON();
+    const ySubregion2 = ymap.get(mergeRegionId[1], Y.Map).get("coords").toJSON();
+
+    const ySubregion11 = ymap.get(mergeRegionId[0], Y.Map);
+    const ySubregion22 = ymap.get(mergeRegionId[1], Y.Map);
+
+
+    const newLayer = newUnion(turfHelpers.multiPolygon(ySubregion1), turfHelpers.multiPolygon(ySubregion2));
+    const fakeGeoJSON = {
+      features: [newLayer]
+    }
+    const internalData = await convertGeojsonToInternalFormatNoSwap(fakeGeoJSON);
+    const tmpCoords = internalData[0]["coords"];
+
+    const response = await api.createSubregion(mapId, tmpCoords);
+    if(response.status === 201) {
+      const subregionId = response.data.subregion._id;
+      const coords = response.data.subregion.coordinates;
+      console.log(coords);
+      tps.addTransaction([subregionId, mergeRegionId[0], mergeRegionId[1]]);
+      ydoc.transact(() => {
+        ySubregion11.set("isStale", true);
+        ySubregion22.set("isStale", true);
+
+        const ymapData = new Y.Map();
+        
+        const yArr0 = new Y.Array();
+        for(let i=0; i<coords.length; i++){
+          const yArr1 = new Y.Array()
+          for(let j=0; j<coords[i].length; j++){
+            const yArr2 = new Y.Array();
+            for(let k=0; k<coords[i][j].length; k++){
+              yArr2.push([coords[i][j][k]]);
+            }
+            yArr1.push([yArr2]);
+          }
+          yArr0.push([yArr1]);
+        }
+        ymapData.set("coords", yArr0);
+        const pMap = new Y.Map();
+        ymapData.set("properties", pMap);
+        ymapData.set("isStale", false);
+        ymap.set(subregionId, ymapData);
+        console.log(ymap.get(subregionId).toJSON());
+        undoManager.stopCapturing();
+      }, 42);
+    }
+  }
+
+  function setRegionsToMerge(subregionId){
+    if(mergeRegionId.length === 0){
+      addRegionToMerge(subregionId);
+    } else if (mergeRegionId.length === 1){
+      if(mergeRegionId[0] === subregionId) removeRegionToMerge(0);
+      else addRegionToMerge(subregionId);
+    } else {
+      if(mergeRegionId[0] === subregionId) removeRegionToMerge(0);
+      else if(mergeRegionId[1] === subregionId) removeRegionToMerge(1);
+      else {
+        removeAndAddRegionToMerge(subregionId);
+      }
+    }
+  }
+
+  function addRegionToMerge(subregionId){
+    subregionLayerMap[subregionId].setStyle({ fillColor: 'red'})
+    setMergeRegionId([...mergeRegionId, subregionId]);
+  }
+
+  function removeRegionToMerge(idx){
+    const subregionId = mergeRegionId[idx];
+    subregionLayerMap[subregionId].setStyle({ fillColor: '#3387FF'});
+    const newMergeRegionId = [...mergeRegionId];
+    if(idx === 0){
+      newMergeRegionId.shift();
+    } else if (idx === 1){
+      newMergeRegionId.pop();
+    }
+
+    setMergeRegionId(newMergeRegionId);
+  }
+  function removeAndAddRegionToMerge(subregionId){
+    subregionLayerMap[mergeRegionId[0]].setStyle({ fillColor: '#3387FF'});
+    const newMergeRegionId = [...mergeRegionId];
+    newMergeRegionId.shift();
+    subregionLayerMap[subregionId].setStyle({ fillColor: 'red'})
+    setMergeRegionId([...newMergeRegionId, subregionId]);
   }
 
   function addVertexValidate(){
@@ -529,6 +642,13 @@ export default function MapScreen() {
 
   function handleRedo(){
     undoManager.redo();
+  }
+
+  function clearMergeRegionIds(){
+    if(mergeRegionId.length !== 2) return;
+    subregionLayerMap[mergeRegionId[0]].setStyle({ fillColor: '#3387FF'});
+    subregionLayerMap[mergeRegionId[1]].setStyle({ fillColor: '#3387FF'});
+    setMergeRegionId([]);
   }
 
   function getTPSSubregionId(){

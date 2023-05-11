@@ -67,6 +67,12 @@ export default function EditToolbar() {
     if(file.editChangeType === EditMode.UNDO_REDO || !file.hasRedo) return
     file.handleRedo();
   }
+
+  function handleMerge(){
+    console.log(file.editModeAction);
+    if(file.editToolbarBridge !== EditMode.MERGE_READY) return;
+    file.handleMerge();
+  }
   
   function handleUpdateTitle(e){
       e.stopPropagation();
@@ -105,6 +111,7 @@ export default function EditToolbar() {
   let splitSubregionClass = baseIconClass;
   let mergeSubregionClass = baseIconClass;
   let addSubregionClass = baseIconClass;
+  let mergeSubregionTextClass = baseTextClass;
   let removeSubregionClass = "w-[25px] h-[25px] px-[6px] py-[6px] rounded-md " + toggledOffClass;
   switch(file.currentEditMode) {
     case(EditMode.EDIT_VERTEX):
@@ -118,6 +125,9 @@ export default function EditToolbar() {
       break
     case(EditMode.MERGE_SUBREGION):
       mergeSubregionClass = mergeSubregionClass.replace(toggledOffClass, toggledOnClass);
+      if(file.editToolbarBridge === EditMode.MERGE_READY){
+        mergeSubregionTextClass = mergeSubregionTextClass.replace(disabledClass, toggledOffClass);
+      }
       break
     case(EditMode.ADD_SUBREGION):
       addSubregionClass = addSubregionClass.replace(toggledOffClass, toggledOnClass);
@@ -165,6 +175,8 @@ export default function EditToolbar() {
       <div className="flex gap-4 px-3">
         <img id="split-subregion" className={splitSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION)} src={SplitSubregionIcon} alt=""></img>
         <img id="merge-subregion" className={mergeSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION)} src={MergeSubregionIcon} alt=""></img>
+        <div id="merge-subregion-text" className={mergeSubregionTextClass} onClick={handleMerge}>Merge</div>
+
         <img id="add-subregion" className={addSubregionClass}  src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_SUBREGION)} alt=""></img>
         <img id="remove-subregion" className={removeSubregionClass} src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_SUBREGION)} alt=""></img>
       </div>
