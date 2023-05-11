@@ -95,6 +95,7 @@ export default function MapScreen() {
     ymap = ydoc.getMap("regions")
     undoManager = new Y.UndoManager(ymap,  {trackedOrigins: new Set([42])})
     tps = new jsTPS();
+    store.loadMapById(mapId);
   }, [])
 
   // useEffect(() => {
@@ -122,11 +123,6 @@ export default function MapScreen() {
   //   reloadLayers();
   // }, [file])
 
-  // useEffect(() => {
-  //   // connect to server backend
-  //   if (!auth.user || !auth.socket) return;
-  //   auth.socket.emit('openProject', {mapId: mapId})
-  // }, [auth])
 
   useEffect(() => {
     // load map container
@@ -566,7 +562,7 @@ export default function MapScreen() {
 
   let tmp = <></>;
   if(store.selectedMap && (store.detailView !== DetailView.NONE)){
-    tmp = <div className="flex flex-col h-full sticky top-5 self-start z-10">
+    tmp = <div className="w-[300px] h-[600px] flex flex-col gap-5 sticky top-5 self-start">
             <MapDetailCard mapDetails={store.selectedMap} />
           </div>
   }
