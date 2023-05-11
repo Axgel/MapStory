@@ -147,7 +147,6 @@ function createYjsData(ymap, jsonItems){
 
     const coords = subregionData["coords"];
     const properties = subregionData["properties"];
-
     const yArr0 = new Y.Array();
     for(let i=0; i<coords.length; i++){
       const yArr1 = new Y.Array();
@@ -164,10 +163,10 @@ function createYjsData(ymap, jsonItems){
     ymapData.set("coords", yArr0);
 
     const pMap = new Y.Map();
+    ymapData.set("properties", pMap);
     for(const [k, v] of Object.entries(properties)){
       pMap.set(k, v);
     }
-    ymapData.set("properties", pMap);
 
     ymapData.set("isStale", subregionData["isStale"]);
     ymap.set(subregionId, ymapData);

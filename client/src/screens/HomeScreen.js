@@ -75,7 +75,7 @@ export default function HomeScreen() {
         </div>
         
         {store.selectedMap && (store.detailView !== DetailView.NONE) ?
-        <div className="w-[300px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
+        <div className="w-[300px]  h-[600px] flex flex-col gap-5 mt-16 pr-10 sticky top-5 self-start">
           <MapDetailCard mapDetails={store.selectedMap} />
         </div> : 
         <></>}
