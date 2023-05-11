@@ -10,18 +10,22 @@ export default function ExportMapModal() {
   const { auth } = useContext(AuthContext);
 
   const [fileType, setFileType] = useState("GeoJSON");
+  const [simplifyPercent, setSimplifyPercent] = useState(50);
 
   function handleExport(e){
-    let compression = document.getElementById("compression").value
+    let compression = document.getElementById("compression").value;
+    compression = compression/100;
     if (fileType === "GeoJSON")
       exportGeoJSON(store.selectedMap._id, compression, store.selectedMap.title);
     else
       exportSHPDBF(store.selectedMap._id, compression, store.selectedMap.title);
     store.setCurrentModal(CurrentModal.NONE);
+    setSimplifyPercent(50);
   }
 
   function handleCloseModal(e){
     e.stopPropagation();
+    setSimplifyPercent(50);
     store.setCurrentModal(CurrentModal.NONE);
   }
 
@@ -35,6 +39,9 @@ export default function ExportMapModal() {
     toggleFileTypeDD(e);
   }
 
+  function compressionOnChange(e){
+    setSimplifyPercent(document.getElementById("compression").value);
+  }
 
 
   if(store.currentModal === CurrentModal.EXPORT_MAP){
@@ -56,9 +63,20 @@ export default function ExportMapModal() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px]">
-            <p>Compression %</p>
-            <input id="compression" className="w-[100px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-4 text-lg" type="text" placeholder="-"></input>
+          <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px] gap-5">
+            <p>Simplification %</p>
+            <input
+              type="range"
+              className="transparent h-1.5 w-full cursor-pointer appearance-none rounded-lg border-transparent bg-neutral-200"
+              min="0"
+              max="100"
+              id="compression"
+              onChange={compressionOnChange} />
+          </div>
+          
+          <div className="flex justify-between items-center mx-12 mb-3 min-w-[360px] gap-5">
+            <p className="text-left">0%: No simplification<br/>100%: Total Simplification</p>
+            <p>Simplification: {simplifyPercent}%</p>
           </div>
 
 
