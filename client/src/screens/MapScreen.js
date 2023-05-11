@@ -58,15 +58,13 @@ export default function MapScreen() {
     else if(file.editChangeType === EditMode.EDIT_TOOLBAR){
       mapItem.pm.disableDraw();
       if(editRegionId) reloadLayers([editRegionId]);  
-      
-      switch(file.currentEditMode){
+      switch(file.currentEditMode) {
         case EditMode.EDIT_VERTEX: {
           // if(!editRegionId) break;
           // reloadLayers([editRegionId]);     
           break; 
         }
         case EditMode.ADD_SUBREGION: {
-          
           mapItem.pm.enableDraw('Polygon', {
             snappable: true,
             snapDistance: 20,
@@ -74,15 +72,19 @@ export default function MapScreen() {
             finishOn: "contextmenu"            
           })
         break;
-      }
-      case EditMode.VIEW: {
-        break;
-      }
-      default:
-        // mapItem.pm.disableDraw();
-        if(editRegionId){
-          subregionLayerMap[editRegionId].pm.disable();
         }
+        case EditMode.REMOVE_SUBREGION: {
+          if(editRegionId) setStaleBridgeId(editRegionId)
+          break;
+        }
+        case EditMode.VIEW: {
+          break;
+        }
+        default:
+          // mapItem.pm.disableDraw();
+          if(editRegionId){
+            subregionLayerMap[editRegionId].pm.disable();
+          }
       }
     }
   }, [file])
@@ -148,14 +150,17 @@ export default function MapScreen() {
     const regions = {};
     const bounds = L.latLngBounds();
     for(const [subregionId, subregionData] of Object.entries(yjsRegions)){
-      if(subregionData["stale"]) continue;
+      if(subregionData["isStale"]) continue;
       const coordinates = subregionData["coords"];
       const layer = L.polygon(coordinates).addTo(mapItem);
       bounds.extend(layer.getBounds());
       regions[subregionId] = layer;
       initLayerHandlers(layer, subregionId);
     }
-    mapItem.fitBounds(bounds);
+    mapItem.on('pm:create', (e) => setTransaction([EditMode.ADD_OR_SPLIT_SUBREGION, e]));
+    if(bounds.isValid()) {
+      mapItem.fitBounds(bounds);
+    }
     setInitLoad(1);
     setSubregionLayerMap(regions);
   }, [mapItem, initLoad])
@@ -204,15 +209,24 @@ export default function MapScreen() {
   useEffect(() => {
     if(!staleBridgeId) return;
     // layer clicked, change color, enable/disable editing
-    if(editRegionId === staleBridgeId){
-      // already click, change selected subregion back to normal
-      disableLayer(editRegionId);
-      setEditRegionId(null);
+    if(file.currentEditMode === EditMode.REMOVE_SUBREGION) {
+      if(editRegionId) {
+        disableLayer(editRegionId);
+        setEditRegionId(null);
+      } else {
+        applyRemoveSubregion(staleBridgeId);
+      }
     } else {
-      // set current one to clicked
-      if(editRegionId) disableLayer(editRegionId);
-      enableLayer(staleBridgeId);
-      setEditRegionId(staleBridgeId);
+      if(editRegionId === staleBridgeId){
+        // already click, change selected subregion back to normal
+        disableLayer(editRegionId);
+        setEditRegionId(null);
+      } else {
+        // set current one to clicked
+        if(editRegionId) disableLayer(editRegionId);
+        enableLayer(staleBridgeId);
+        setEditRegionId(staleBridgeId);
+      }
     }
         
     setStaleBridgeId(null);
@@ -349,7 +363,7 @@ export default function MapScreen() {
         mapItem.removeLayer(oldLayer);
         const ymap = ydoc.getMap("regions");
         if(!ymap.get(subregionId) || !ymap.get(subregionId).get("coords")) continue;
-        if(ymap.get(subregionId).get("stale")) continue;
+        if(ymap.get(subregionId).get("isStale")) continue;
       }
 
       const coords = ymap.get(subregionId).get("coords").toJSON();
@@ -372,7 +386,6 @@ export default function MapScreen() {
     layer.on('pm:vertexadded', (e) => setTransaction([EditMode.ADD_VERTEX, e, subregionId]));
     layer.on('pm:markerdragend', (e) => setTransaction([EditMode.MOVE_VERTEX, e, subregionId]));
     layer.on('pm:vertexremoved', (e) => setTransaction([EditMode.REMOVE_VERTEX, e, subregionId]));
-    mapItem.on('pm:create', (e) => setTransaction([EditMode.ADD_OR_SPLIT_SUBREGION, e]));
   }
 
 
@@ -461,13 +474,10 @@ export default function MapScreen() {
       tps.addTransaction([subregionId]);
       ydoc.transact(() => {
         const ymapData = new Y.Map();
-        ymap.set(subregionId, ymapData);
         const yArr0 = new Y.Array();
         const yArr1 = new Y.Array()
         const yArr2 = new Y.Array();
-        yArr0.push([yArr1]);
-        yArr1.push([yArr2])
-        ymapData.set("coords", yArr0);
+
         for(let i=0; i<coords.length; i++){
           for(let j=0; j<coords[i].length; j++){
             // const yArr3 = ymapData.get("coords").get(i).get(j);
@@ -476,8 +486,25 @@ export default function MapScreen() {
             }
           }
         }
+        yArr1.push([yArr2]);
+        yArr0.push([yArr1]);
+        ymapData.set("coords", yArr0);
+        const pMap = new Y.Map();
+        ymapData.set("properties", pMap);
+        ymapData.set("isStale", false);
+        ymap.set(subregionId, ymapData);
       }, 42);
     }
+  }
+
+  function applyRemoveSubregion(subregionId) {
+    const ymap = ydoc.getMap("regions");
+    const ySubregion = ymap.get(subregionId, Y.Map);
+    tps.addTransaction([subregionId]);
+    ydoc.transact(() => {
+      ySubregion.set("isStale", true);
+      undoManager.stopCapturing();
+    }, 42);
   }
 
   function initNewLayer(subregionId, coords){
