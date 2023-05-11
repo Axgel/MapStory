@@ -10,8 +10,8 @@ export default function DeleteMapModal(props) {
   const navigate = useNavigate();
 
   const mapInfo = store.mapMarkedForAction;
-  let titleElement = mapInfo ? <h1 className="text-xl text-center mt-4 mb-2 mx-9">{mapInfo.title}</h1> : <></>;
-  let message = mapInfo ? <h1 className="mx-6 my-2 text-center"> Are you sure you want to permanently delete '{mapInfo.title}'? </h1> : <></>;
+  let titleElement = mapInfo ? <h1 className="text-xl text-center mt-4 mb-2 mx-9 text-ellipsis overflow-hidden">{mapInfo.title}</h1> : <></>;
+  let message = mapInfo ? <h1 className="mx-6 my-2 text-center text-ellipsis overflow-hidden"> Are you sure you want to permanently delete '{mapInfo.title}'? </h1> : <></>;
 
   function handleCloseModal(e){
     e.stopPropagation();
