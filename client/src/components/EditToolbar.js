@@ -59,10 +59,12 @@ export default function EditToolbar() {
   }
   
   function handleUndo() {
+    if(file.editChangeType === EditMode.UNDO_REDO || !file.hasUndo) return
     file.handleUndo();
   }
   
   function handleRedo() {
+    if(file.editChangeType === EditMode.UNDO_REDO || !file.hasRedo) return
     file.handleRedo();
   }
   
@@ -92,6 +94,10 @@ export default function EditToolbar() {
   let baseIconClass = "w-[30px] h-[30px] px-1 py-1 rounded-md " + toggledOffClass;
   let baseTextClass = "text-lg py-1 px-2 rounded-md " + disabledClass;
 
+  let undoClass = baseIconClass;
+  if(file.editChangeType === EditMode.UNDO_REDO || !file.hasUndo) undoClass = undoClass.replace(toggledOffClass, disabledClass);
+  let redoClass = baseIconClass;
+  if(file.editChangeType === EditMode.UNDO_REDO || !file.hasRedo) redoClass = redoClass.replace(toggledOffClass, disabledClass);
   let editVertexClass = baseIconClass;
   let addVertexClass = baseTextClass;
   let moveVertexClass = baseTextClass;
@@ -141,8 +147,8 @@ export default function EditToolbar() {
       <div className="w-[1px] bg-black h-full"></div>
 
       <div className="flex gap-2 px-3">
-        <img className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill hover:bg-opacity-50" src={UndoIcon} onClick={handleUndo} alt=""></img>
-        <img className="w-[30px] h-[30px] px-1 py-1 rounded-md hover:bg-mapselectedfill hover:bg-opacity-50" src={RedoIcon} onClick={handleRedo} alt=""></img>
+        <img className={undoClass} src={UndoIcon} onClick={handleUndo} alt=""></img>
+        <img className={redoClass} src={RedoIcon} onClick={handleRedo} alt=""></img>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>

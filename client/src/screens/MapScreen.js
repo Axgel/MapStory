@@ -11,7 +11,9 @@ import GlobalFileContext from "../file";
 import { CreateVertexTransaction } from "../transactions";
 import { DetailView , EditMode } from "../enums";
 import * as Y from 'yjs';
-import { parseMultiPolygon } from "../utils/geojsonParser";
+import { parsePolygon, parseMultiPolygon } from "../utils/geojsonParser";
+import * as turf from '@turf/turf';
+import { union } from 'turf5'
 import jsTPS from "../common/jsTPS";
 import api from "../file/file-request-api";
 
@@ -36,6 +38,7 @@ export default function MapScreen() {
   const [mergeRegionId, setMergeRegionId] = useState([]);
   const [editRegionId, setEditRegionId] = useState(null);
   const [staleSubregionIds, setStaleSubregionIds] = useState(null);
+  const [clearingUndoRedo, setClearingUndoRedo] = useState(false);
 
   useEffect(() => {
     if(!mapItem) return;
@@ -44,12 +47,10 @@ export default function MapScreen() {
       switch(file.editModeAction){
         case EditMode.UNDO: {
           handleUndo();
-          file.clearUndoRedo();
           return;
         }
         case EditMode.REDO: {
           handleRedo();
-          file.clearUndoRedo();
           return;
         }
       }
@@ -68,7 +69,9 @@ export default function MapScreen() {
           
           mapItem.pm.enableDraw('Polygon', {
             snappable: true,
-            snapDistance: 20
+            snapDistance: 20,
+            continueDrawing: true,
+            finishOn: "contextmenu"            
           })
         break;
       }
@@ -89,13 +92,39 @@ export default function MapScreen() {
     ydoc = new Y.Doc();
     ymap = ydoc.getMap("regions")
     undoManager = new Y.UndoManager(ymap,  {trackedOrigins: new Set([42])})
+    tps = new jsTPS();
   }, [])
 
-  useEffect(() => {
-    // connect to server backend
-    if (!auth.user || !auth.socket) return;
-    auth.socket.emit('openProject', {mapId: mapId,})
-  }, [auth, ydoc])
+  // useEffect(() => {
+  //   if(!mapItem) return;
+  //   switch(file.currentEditMode){
+  //     case EditMode.ADD_SUBREGION: {
+  //       mapItem.pm.enableDraw('Polygon', {
+  //         snappable: true,
+  //         snapDistance: 20,
+  //         finishOn: 'contextmenu'
+  //       });
+  //       break;
+  //     }
+  //     case EditMode.SPLIT_SUBREGION: {
+  //       mapItem.pm.enableDraw('Line', {
+  //         snappable: true,
+  //         snapDistance: 20,
+  //         finishOn: 'contextmenu'
+  //       });
+  //       break;
+  //     }
+  //     default:
+  //       mapItem.pm.disableDraw();
+  //   }
+  //   reloadLayers();
+  // }, [file])
+
+  // useEffect(() => {
+  //   // connect to server backend
+  //   if (!auth.user || !auth.socket) return;
+  //   auth.socket.emit('openProject', {mapId: mapId})
+  // }, [auth])
 
   useEffect(() => {
     // load map container
@@ -134,6 +163,8 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (!auth.user || !auth.socket) return;
+    auth.socket.emit('openProject', {mapId: mapId})
+
     // init map project open
     auth.socket.on('sync', (data) => {
       const parsed = JSON.parse(data);
@@ -156,7 +187,7 @@ export default function MapScreen() {
         const arr = Array.from(update);
         const op = JSON.stringify(arr);
         auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, op: op});
-        console.log(JSON.stringify(ymap));
+        //console.log(JSON.stringify(ymap));
         setStaleSubregionIds(subregionIds);
       } 
     })
@@ -165,14 +196,15 @@ export default function MapScreen() {
       auth.socket.emit('closeProject', {
         mapId: mapId,
       });
+      auth.socket.removeAllListeners();
     }
-  }, [auth, ydoc]);
+  }, [auth]);
 
 
   useEffect(() => {
     if(!staleBridgeId) return;
     // layer clicked, change color, enable/disable editing
-    if(editRegionId == staleBridgeId){
+    if(editRegionId === staleBridgeId){
       // already click, change selected subregion back to normal
       disableLayer(editRegionId);
       setEditRegionId(null);
@@ -190,6 +222,38 @@ export default function MapScreen() {
     if(!transaction) return;
     let transactionType, e, subregionId;
     // create a vertex transaction
+
+    // if(!regionTransaction) return;
+    // const e = regionTransaction;
+    // mapItem.removeLayer(e.layer);
+    // const geoJsonItem = e.layer.toGeoJSON();
+    // console.log(geoJsonItem)
+    // console.log(file.currentEditMode);
+    // if(file.currentEditMode === EditMode.ADD_SUBREGION) {
+    //   const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
+    //   const coordsStr = JSON.stringify(coords);
+    //   auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
+    // } else if (file.currentEditMode === EditMode.SPLIT_SUBREGION) {
+    //   console.log(editRegions);
+    //   for(const property in editRegions) {
+    //     const region = editRegions[property].toGeoJSON();
+    //     const split = polygonSlice(region, geoJsonItem);
+    //     for(const temp of split) {
+    //       console.log(temp.geometry);
+    //       if(temp.geometry.type === "MultiPolygon") {
+    //         console.log("Multipolgyon");
+    //         const coords = parseMultiPolygon(temp.geometry.coordinates);
+    //         const coordsStr = JSON.stringify(coords);
+    //         auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
+    //       } else if (temp.geometry.type === "Polygon") {
+    //         console.log("Polgyon");
+    //         const coords = parsePolygon(temp.geometry.coordinates);
+    //         const coordsStr = JSON.stringify(coords);
+    //         auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
+    //       }
+    //     }
+    //   }
+    // }
     switch(transaction[0]){
       case EditMode.ADD_VERTEX:
       case EditMode.MOVE_VERTEX:
@@ -197,11 +261,10 @@ export default function MapScreen() {
         [transactionType, e, subregionId] = transaction;
         const trans = CreateVertexTransaction(transactionType, e, subregionId);
         trans.splice(1, 0, mapId);
-        applyTransaction(trans);
+        applyVertexTransaction(trans);
         break;
       case EditMode.ADD_OR_SPLIT_SUBREGION:
         [transactionType, e] = transaction;
-        console.log(e);
         mapItem.removeLayer(e.layer);
         const geoJsonItem = e.layer.toGeoJSON();
         geoJsonItem.geometry.coordinates[0].pop();
@@ -215,6 +278,43 @@ export default function MapScreen() {
     setTransaction(null);
   }, [transaction])
 
+  // function polygonSlice(poly, line) {
+  //   if (poly.geometry.type === 'MultiPolygon') {
+  //     const polygons = poly.geometry.coordinates.map((c) => turf.polygon(c));
+  
+  //     let larger = [];
+  //     let smaller = [];
+  
+  //     //keep the larger parts of the polygon together
+  //     for (const p of polygons) {
+  //       const slices = polygonSlice(p, line);
+
+  //       if(slices.length === 0) {
+  //         continue;
+  //       } else if (slices.length === 1) {
+  //         larger.push(...slices);
+  //       } else {
+  //         const [largest, ...rest] = slices.sort((a, b) => turf.area(b) - turf.area(a));
+  //         larger.push(largest);
+  //         smaller.push(...rest);
+  //       }
+  //     }
+
+  //     const multi = turf.combine(turf.featureCollection(larger)).features;
+  
+  //     return [...smaller, ...multi];
+  //   }
+  
+  //   const polyAsLine = turf.polygonToLine(poly);
+  //   const unionedLines = union(polyAsLine, line);
+  //   const polygonized = turf.polygonize(unionedLines);
+  //   return polygonized.features.filter((ea) => {
+  //     const point = turf.pointOnFeature(ea);
+  //     const isInPoly = turf.booleanPointInPolygon(point.geometry.coordinates, poly.geometry);
+  //     return isInPoly;
+  //   });
+  // }
+
   useEffect(() => {
     if(!staleSubregionIds) return;
 
@@ -222,6 +322,14 @@ export default function MapScreen() {
     setStaleSubregionIds(null);
   }, [staleSubregionIds])
 
+  useEffect(() => {
+    if(!clearingUndoRedo) return;
+    const changeType = file.editChangeType === EditMode.UNDO_REDO ?  EditMode.NONE : file.editChangeType;
+    const hasUndo = tps.undoStack.length > 0;
+    const hasRedo = tps.redoStack.length > 0;
+    file.clearUndoRedo(changeType, hasUndo, hasRedo);
+    setClearingUndoRedo(false);
+  }, [clearingUndoRedo]);
 
   function disableLayer(subregionId){
     subregionLayerMap[subregionId].setStyle({ fillColor: '#3387FF'});
@@ -267,6 +375,7 @@ export default function MapScreen() {
     mapItem.on('pm:create', (e) => setTransaction([EditMode.ADD_OR_SPLIT_SUBREGION, e]));
   }
 
+
   function enableEditing(layer){
     if(file.currentEditMode !== EditMode.EDIT_VERTEX) return;
     layer.pm.enable({
@@ -284,7 +393,7 @@ export default function MapScreen() {
 
 
 
-  function applyTransaction(data){
+  function applyVertexTransaction(data){
     const [transactionType, mapId, subregionId, indexPath, newCoords] = data;
     switch(transactionType){
       case EditMode.ADD_VERTEX:
@@ -305,10 +414,10 @@ export default function MapScreen() {
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
     const coords2 = coords.get(i).get(j);
   
+    tps.addTransaction([subregionId]);
     ydoc.transact(() => {
       coords2.insert(k, [newCoords]);
       undoManager.stopCapturing()
-      tps.addTransaction([subregionId]);
     }, 42);
   }
 
@@ -317,13 +426,13 @@ export default function MapScreen() {
     const ymap = ydoc.getMap("regions");
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
     const coords2 = coords.get(i).get(j);
-    console.log(subregionId, indexPath, newCoords, JSON.stringify(ymap));
+    //console.log(subregionId, indexPath, newCoords, JSON.stringify(ymap));
     
+    tps.addTransaction([subregionId]);
     ydoc.transact(() => {
       coords2.delete(k, 1);
       coords2.insert(k, [newCoords]);
       undoManager.stopCapturing()
-      tps.addTransaction([subregionId]);
     }, 42);
   }
 
@@ -332,24 +441,24 @@ export default function MapScreen() {
     const ymap = ydoc.getMap("regions");
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
     const coords2 = coords.get(i).get(j);
-
+    
+    tps.addTransaction([subregionId]);
     ydoc.transact(() => {
       coords2.delete(k, 1);
       undoManager.stopCapturing();
-      tps.addTransaction([subregionId])
     }, 42);
   }
 
   async function applyAddSubregion(geoJsonItem){
     const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
-    console.log(coords);
+    //console.log(coords);
     const response = await api.createSubregion(mapId, coords);
-    if(response.status === 201){
+    if(response.status === 201) {
       const subregionId = response.data.subregion._id;
       const coords = response.data.subregion.coordinates;
 
       // initNewLayer(subregionId, coords);
-
+      tps.addTransaction([subregionId]);
       ydoc.transact(() => {
         const ymapData = new Y.Map();
         ymap.set(subregionId, ymapData);
@@ -367,7 +476,6 @@ export default function MapScreen() {
             }
           }
         }
-        tps.addTransaction([subregionId])
       }, 42);
     }
   }
@@ -401,17 +509,26 @@ export default function MapScreen() {
   }
 
   function getTPSSubregionId(){
-    if(tps.undoStack.length == undoManager.undoStack.length){
-      // grab subregion from undoStacl
-      return tps.undoPeek();
-    }
-    else if(tps.undoStack.length > undoManager.undoStack.length){
+    let subregionIds = [];
+    if(tps.undoStack.length === undoManager.undoStack.length){
+      // grab subregion from undoStack
+      subregionIds = tps.undoPeek();
+    } else if(tps.undoStack.length > undoManager.undoStack.length) {
       // move item to redostack // is an undo op
-      const subregionIds = tps.undoTransaction();
-      return subregionIds;
+      subregionIds = tps.undoTransaction();
     } else {
       // move item to undo stack, is an redo op
-      const subregionIds = tps.redoTransaction();
+      subregionIds = tps.redoTransaction();
+    }
+    if(undoManager.undoStack.length !== tps.undoStack.length || undoManager.redoStack.length !== tps.redoStack.length) {
+      console.log("Mismatched Stacks")
+      console.log(undoManager.undoStack)
+      console.log(tps.undoStack);
+      console.log(undoManager.redoStack);
+      console.log(tps.redoStack);
+    } else {
+      //console.log("Matching Stacks")
+      setClearingUndoRedo(true);
       return subregionIds;
     }
   }

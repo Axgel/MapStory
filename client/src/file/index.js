@@ -30,6 +30,8 @@ function GlobalFileContextProvider(props) {
     editModeOptions: [true, true, true],
     editModeAction: EditMode.NONE,
     editChangeType: EditMode.NONE,
+    hasUndo: false,
+    hasRedo: false,
   })
   
   const fileReducer = (action) => {
@@ -56,7 +58,26 @@ function GlobalFileContextProvider(props) {
           editChangeType: payload.editChangeType
         })
       }
-
+      case GlobalFileActionType.SET_UNDO_REDO_ACCESS: {
+        return setFile({
+          ...file, 
+          editModeAction: payload.editModeAction,
+          editChangeType: payload.editChangeType,
+          hasUndo: payload.hasUndo,
+          hasRedo: payload.hasRedo
+        })
+      }
+      case GlobalFileActionType.RESET_DEFAULT: {
+        return setFile({
+          ...file, 
+          currentEditMode: EditMode.NONE,
+          editModeOptions: [true, true, true],
+          editModeAction: EditMode.NONE,
+          editChangeType: EditMode.NONE,
+          hasUndo: false,
+          hasRedo: false
+        })
+      }
       default:
         return file;
     }
@@ -103,10 +124,10 @@ function GlobalFileContextProvider(props) {
     })
   }
 
-  file.clearUndoRedo = function(){
+  file.clearUndoRedo = function(changeType, hasUndo, hasRedo) {
     fileReducer({
-      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
-      payload: {editModeAction: EditMode.NONE, editChangeType: EditMode.UNDO_REDO}
+      type: GlobalFileActionType.SET_UNDO_REDO_ACCESS,
+      payload: {editModeAction: EditMode.NONE, editChangeType: changeType, hasUndo: hasUndo, hasRedo: hasRedo}
     })
   }
   

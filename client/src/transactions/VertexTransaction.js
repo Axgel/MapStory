@@ -1,4 +1,4 @@
-import { EditMode} from "../enums"
+import { EditMode } from "../enums"
 export function CreateVertexTransaction(transaction, e, subregionId){
   switch(transaction){
     case EditMode.ADD_VERTEX:
