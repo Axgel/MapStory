@@ -318,7 +318,7 @@ export default function MapScreen() {
         mapItem.removeLayer(e.layer);
         const geoJsonItem = e.layer.toGeoJSON();
         if(file.currentEditMode === EditMode.ADD_SUBREGION){
-          geoJsonItem.geometry.coordinates[0].pop();
+          //geoJsonItem.geometry.coordinates[0].pop();
           applyAddSubregion(geoJsonItem);
         } else {
           applySliceSubregion(geoJsonItem);
