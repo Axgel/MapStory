@@ -147,7 +147,11 @@ export default function MapScreen() {
     if(splitRegionId){
       file.setEditToolbarBridge(EditMode.SPLIT_READY);
     } else {
-      file.setEditToolbarBridge(EditMode.NONE);
+      if(file.currentEditMode === EditMode.SLICE_SUBREGION) {
+        file.resetSliceBridge();
+      } else {
+        file.setEditToolbarBridge(EditMode.NONE);
+      }
     }
   }, [splitRegionId]);
 
@@ -363,8 +367,8 @@ export default function MapScreen() {
         const ymap = ydoc.getMap("regions");
         if(!ymap.get(subregionId) || !ymap.get(subregionId).get("coords") || ymap.get(subregionId).get("isStale")) {
           if (editRegionId === subregionId) setEditRegionId(null);
-          if (mergeRegionId.includes(subregionId)) setRegionsToMerge(subregionId);
-          if (splitRegionId === subregionId) setRegionToSplit(subregionId);
+          if (mergeRegionId.includes(subregionId)) setMergeRegionId([]);
+          if (splitRegionId === subregionId) setSplitRegionId(null);
           continue
         }
       }
