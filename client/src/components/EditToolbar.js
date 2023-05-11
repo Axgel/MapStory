@@ -47,8 +47,8 @@ export default function EditToolbar() {
   
   function setCurrentEditMode(e, currentEditMode){
     e.stopPropagation();
-    if(currentEditMode === file.currentEditMode){
-      currentEditMode = EditMode.NONE;
+    if(currentEditMode === file.currentEditMode || (file.currentEditMode === EditMode.SLICE_SUBREGION && currentEditMode === EditMode.SPLIT_SUBREGION)) {
+        currentEditMode = EditMode.NONE;
     }
     file.setCurrentEditMode(currentEditMode);
   }
@@ -69,11 +69,20 @@ export default function EditToolbar() {
   }
 
   function handleMerge(){
-    console.log(file.editModeAction);
     if(file.editToolbarBridge !== EditMode.MERGE_READY) return;
     file.handleMerge();
   }
   
+  function handleSlice() {
+    if(file.editToolbarBridge !== EditMode.SPLIT_READY) return;
+    if(file.currentEditMode === EditMode.SLICE_SUBREGION) {
+      file.setCurrentEditMode(EditMode.SPLIT_SUBREGION);
+    } else {
+      if(file.currentEditMode !== EditMode.SPLIT_SUBREGION) console.log("Slice check bug");
+      file.setCurrentEditMode(EditMode.SLICE_SUBREGION);
+    }
+  }
+
   function handleUpdateTitle(e){
       e.stopPropagation();
       store.updateMapTitle(e.target.value);
@@ -109,9 +118,11 @@ export default function EditToolbar() {
   let moveVertexClass = baseTextClass;
   let removeVertexClass = baseTextClass;
   let splitSubregionClass = baseIconClass;
+  let sliceSubregionClass = baseTextClass;
+  let separateSubregionClass = baseTextClass;
   let mergeSubregionClass = baseIconClass;
-  let addSubregionClass = baseIconClass;
   let mergeSubregionTextClass = baseTextClass;
+  let addSubregionClass = baseIconClass;
   let removeSubregionClass = "w-[25px] h-[25px] px-[6px] py-[6px] rounded-md " + toggledOffClass;
   switch(file.currentEditMode) {
     case(EditMode.EDIT_VERTEX):
@@ -122,6 +133,15 @@ export default function EditToolbar() {
       break
     case(EditMode.SPLIT_SUBREGION):
       splitSubregionClass = splitSubregionClass.replace(toggledOffClass, toggledOnClass);
+      if(file.editToolbarBridge === EditMode.SPLIT_READY){
+        sliceSubregionClass = sliceSubregionClass.replace(disabledClass, toggledOffClass);
+        separateSubregionClass = separateSubregionClass.replace(disabledClass, toggledOffClass);
+      }
+      break
+    case(EditMode.SLICE_SUBREGION):
+      splitSubregionClass = splitSubregionClass.replace(toggledOffClass, toggledOnClass);
+      sliceSubregionClass = sliceSubregionClass.replace(disabledClass, toggledOnClass);
+      separateSubregionClass = separateSubregionClass.replace(disabledClass, toggledOffClass);
       break
     case(EditMode.MERGE_SUBREGION):
       mergeSubregionClass = mergeSubregionClass.replace(toggledOffClass, toggledOnClass);
@@ -156,14 +176,14 @@ export default function EditToolbar() {
     <>
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-2 px-3">
+      <div className="flex gap-2 px-2">
         <img className={undoClass} src={UndoIcon} onClick={handleUndo} alt=""></img>
         <img className={redoClass} src={RedoIcon} onClick={handleRedo} alt=""></img>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-4 px-2">
+      <div className="flex gap-2 px-2">
         <img id="editVertex" className={editVertexClass} src={EditVertexIcon} onClick={(e) => setCurrentEditMode(e, EditMode.EDIT_VERTEX)} alt=""></img>
         <div id="add-vertex" className={addVertexClass} onClick={(e) => setCurrentEditModeOption(0)}>Add</div>
         <div id="move-vertex" className={moveVertexClass} onClick={(e) => setCurrentEditModeOption(1)}>Move</div>
@@ -172,11 +192,22 @@ export default function EditToolbar() {
 
       <div className="w-[1px] bg-black h-full"></div>
 
-      <div className="flex gap-4 px-3">
+      <div className="flex gap-2 px-2">
         <img id="split-subregion" className={splitSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION)} src={SplitSubregionIcon} alt=""></img>
+        <div id="slice-subregion-text" className={sliceSubregionClass} onClick={handleSlice}>Slice</div>
+        <div id="separate-subregion-text" className={separateSubregionClass} onClick={(e)=>{}}>Separate</div>
+      </div>
+
+      <div className="w-[1px] bg-black h-full"></div>
+      
+      <div className="flex gap-2 px-2">
         <img id="merge-subregion" className={mergeSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.MERGE_SUBREGION)} src={MergeSubregionIcon} alt=""></img>
         <div id="merge-subregion-text" className={mergeSubregionTextClass} onClick={handleMerge}>Merge</div>
-
+      </div>
+      
+      <div className="w-[1px] bg-black h-full"></div>
+      
+      <div className="flex gap-4 px-4">
         <img id="add-subregion" className={addSubregionClass}  src={AddSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.ADD_SUBREGION)} alt=""></img>
         <img id="remove-subregion" className={removeSubregionClass} src={RemoveSubregionIcon} onClick={(e) => setCurrentEditMode(e, EditMode.REMOVE_SUBREGION)} alt=""></img>
       </div>

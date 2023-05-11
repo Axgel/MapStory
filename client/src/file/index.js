@@ -86,6 +86,13 @@ function GlobalFileContextProvider(props) {
           editToolbarBridge: payload.editToolbarBridge
         })
       }
+      case GlobalFileActionType.RESET_SLICE_BRIDGE: {
+        return setFile({
+          ...file,
+          currentEditMode: payload.currentEditMode,
+          editToolbarBridge: payload.editToolbarBridge
+        })
+      }
       default:
         return file;
     }
@@ -121,6 +128,13 @@ function GlobalFileContextProvider(props) {
     fileReducer({
       type: GlobalFileActionType.SET_EDIT_TOOLBAR_BRIDGE,
       payload: {editToolbarBridge: editMode}
+    })
+  }
+
+  file.resetSliceBridge = function () {
+    fileReducer({
+      type: GlobalFileActionType.RESET_SLICE_BRIDGE,
+      payload: {currentEditMode: EditMode.SPLIT_SUBREGION, editToolbarBridge: EditMode.NONE}
     })
   }
 

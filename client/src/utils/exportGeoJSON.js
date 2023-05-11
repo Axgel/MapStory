@@ -4,7 +4,7 @@ import * as server from "topojson-server";
 import * as simplify from "topojson-simplify";
 import download from "downloadjs";
 import api from "../file/file-request-api/index.js"
-
+import { parsePolygon } from "../utils/geojsonParser";
 export async function exportGeoJSON(mapId, compressionPercent, mapTitle){
     //create geojson obj
     let simplifiedGeojson = await createGeoJSON(mapId, compressionPercent);
@@ -69,7 +69,7 @@ function addSubregion(subregion){ //convert from subregion schema into GEOJSON f
     // console.log(subregion.coordinates);
     const coordinates = []
     for(let i = 0; i < subregion.coordinates.length; i++){
-        let coordinate = parsePolygon(subregion.coordinates[i]);
+        let coordinate = parsePolygon(subregion.coordinates[i], 0);
         coordinates.push(coordinate);
     }
     // console.log(coordinates)
@@ -78,15 +78,15 @@ function addSubregion(subregion){ //convert from subregion schema into GEOJSON f
     return feature;
 }
 
-function parsePolygon(coordinates){
-    const regionCoords = [];
-    for(let i=0; i<coordinates.length; i++){
-      const newCoords = [];
-      for(let j=0; j<coordinates[i].length; j++){
-        newCoords.push([coordinates[i][j][1], coordinates[i][j][0]]);
-      }
-      regionCoords.push(newCoords);
-    }
+// function parsePolygon(coordinates){
+//     const regionCoords = [];
+//     for(let i=0; i<coordinates.length; i++){
+//       const newCoords = [];
+//       for(let j=0; j<coordinates[i].length; j++){
+//         newCoords.push([coordinates[i][j][1], coordinates[i][j][0]]);
+//       }
+//       regionCoords.push(newCoords);
+//     }
   
-    return regionCoords;
-  }
+//     return regionCoords;
+//   }
