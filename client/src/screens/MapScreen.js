@@ -817,8 +817,12 @@ export default function MapScreen() {
     </div>
   if(mapPropOpen){
     if(editRegionId){
-      const tmpProperties = ydoc.getMap('regions').get(editRegionId).get('properties').toJSON();
-
+      let tmpProperties = {};
+      try{
+        ydoc.getMap('regions').get(editRegionId).get('properties').toJSON();
+      } catch (e){
+        tmpProperties = {};
+      }
 
       let editPropInput =
         <div>
