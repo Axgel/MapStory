@@ -11,13 +11,18 @@ describe('Tags', () => {
         cy.contains("Add Tags") 
     });
     
-    //tag already exists
-    
     //add 
     it('add success', () => {
         cy.get('#input_tag').type("rare usa")
         cy.get('#addTagBtn').click()
         cy.contains("rare usa")
+    });
+    
+    //tag already exists
+    it('add success', () => {
+        cy.get('#input_tag').type("rare usa")
+        cy.get('#addTagBtn').click()
+        cy.contains("Tag already exists")
     });
 
     //remove
