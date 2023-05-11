@@ -47,6 +47,7 @@ describe('Import Map', () => {
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
+
         //delete file
         cy.get('#mapFileBtn').click() //click on file
         cy.get('#deleteBtn').click()
@@ -57,22 +58,28 @@ describe('Import Map', () => {
     //success json
     it('json success', () => {
         cy.get('#fileUpload').selectFile('./cypress/fixtures/squares.json')
-        cy.get('#upload-map-title').clear().type("Testing geojson")
+        cy.get('#upload-map-title').clear().type("TestingGeojson")
         cy.get('#uploadFileBtn').click()
         cy.wait(1000)
         cy.url().should('include', '/map')
-    });
 
-    // cy.contains("Sort By:")
-        // cy.contains("Search By:")
-        // cy.intercept("GET", '/store/publishedmaps').as('getPublishedMaps')
-        
-        // cy.wait('@getPublishedMaps').its('response.statusCode').should('eq', 200)
-        // cy.wait('@getPublishedMaps').then((response) => {
-        //     cy.contains("Upload File")
-        //     cy.get('#fileUpload').click()
-        // })
-        // cy.wait(5000)
-        // cy.wait('@getPublishedMaps')
+        //test exporting geojson
+        cy.get("#exportMapBtn").click()
+        cy.contains("File Type")
+        cy.get('#fileTypeSelect').click()
+        cy.get('#geojsonFile').click()
+        cy.get('#compression').type("0.2")
+        cy.get('#okBtn').click()
+        cy.readFile('cypress/downloads/TestingGeojson.json')
+
+        //test exporting shp
+        cy.get("#exportMapBtn").click()
+        cy.contains("File Type")
+        cy.get('#fileTypeSelect').click()
+        cy.get('#shpFile').click()
+        cy.get('#compression').type("0.2")
+        cy.get('#okBtn').click()
+        cy.readFile('cypress/downloads/TestingGeojson.zip')
+    });
 
 })

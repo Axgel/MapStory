@@ -17,12 +17,12 @@ export default function ForkMapModal(props) {
     }); 
   }
 
-  let titleElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.title}</p> : <></>; 
+  let titleElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext text-ellipsis overflow-hidden">{mapInfo.title}</p> : <></>; 
   let ownerElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{mapInfo.ownerName}</p> : <></>; 
   let collaboratorElement = mapInfo ? <p className="mb-2 text-publishmodalsubtext">{(mapInfo.collaborators.length === 0) ? "N/A" : collaboratorsUsernames.join(", ")}</p> : <></>; 
   let tagElement = mapInfo ? <p className="mb-4 text-publishmodalsubtext">{(mapInfo.tags.length === 0) ? "N/A" : mapInfo.tags.join(", ")}</p> : <></>;
   let messageElement = mapInfo ? 
-    <h1 className="mx-6 my-2 "> 
+    <h1 className="mx-6 my-2 text-ellipsis overflow-hidden"> 
       Are you sure you want to fork the map '{mapInfo.title}'? The new map will be titled 'Copy of {mapInfo.title}'
     </h1> : <></>;
 
