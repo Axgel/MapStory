@@ -200,7 +200,7 @@ function GlobalStoreContextProvider(props) {
 
   store.parseFileUpload = async function(files, mapTitle) {
     let geojsonFile = await convertToGeojson(files);
-    let subregions = await convertGeojsonToInternalFormat(geojsonFile);
+    let subregions = await convertGeojsonToInternalFormat(geojsonFile, 0);
     let response = await api.createMap(auth.user, mapTitle);
     if(response.status === 201){
       await store.createMapSubregions(subregions, response.data.map._id);

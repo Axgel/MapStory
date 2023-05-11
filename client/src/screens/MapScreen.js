@@ -11,14 +11,13 @@ import GlobalFileContext from "../file";
 import { CreateVertexTransaction } from "../transactions";
 import { DetailView , EditMode } from "../enums";
 import * as Y from 'yjs';
-import { parsePolygon, parseMultiPolygon } from "../utils/geojsonParser";
+import { convertGeojsonToInternalFormat, parseMultiPolygon, parsePolygon } from "../utils/geojsonParser";
 import * as turf from '@turf/turf';
 import * as turfHelpers from '@turf/helpers'
 import newUnion from '@turf/union';
 import { union } from 'turf5'
 import jsTPS from "../common/jsTPS";
 import api from "../file/file-request-api";
-import { convertGeojsonToInternalFormat, convertGeojsonToInternalFormatNoSwap } from "../utils/geojsonParser";
 
 
 let ydoc = new Y.Doc({ autoLoad: true });
@@ -478,7 +477,7 @@ export default function MapScreen() {
   }
 
   async function applyAddSubregion(geoJsonItem){
-    const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
+    const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates], 0);
     const response = await api.createSubregion(mapId, coords);
     if(response.status === 201) {
       const subregionId = response.data.subregion._id;
@@ -549,14 +548,14 @@ export default function MapScreen() {
     const ySubregion = ymap.get(splitRegionId, Y.Map);
     const subregion = turfHelpers.multiPolygon(ySubregion.get("coords").toJSON());
 
-    const split = polygonSlice(turf.flip(subregion), geoJsonItem);
+    const split = polygonSlice(subregion, turf.flip(geoJsonItem));
     const arr = [];
     for(const temp of split) {
       if(temp.geometry.type === "MultiPolygon") {
         console.log("Multipolgyon From Split!");
       } else if (temp.geometry.type === "Polygon") {
-        console.log("Polgyon");
-        const coords = parseMultiPolygon([temp.geometry.coordinates]);
+        const coords = [temp.geometry.coordinates]
+        // const coords = parseMultiPolygon([temp.geometry.coordinates]);
         arr.push(coords);
       }
     }
@@ -565,8 +564,6 @@ export default function MapScreen() {
     ydoc.transact(() => {
       ySubregion.set("isStale", true);
       for(const [subregionId, coordinates] of Object.entries(coordsMap)){
-        console.log(subregionId);
-        console.log(coordinates);
         addSubregionToYDoc(subregionId, coordinates);
       }
       undoManager.stopCapturing();
@@ -574,9 +571,13 @@ export default function MapScreen() {
   }
 
   function polygonSlice(poly, line) {
-    console.log(poly);
     if (poly.geometry.type === 'MultiPolygon') {
-      const polygons = poly.geometry.coordinates.map((c) => turf.polygon(c));
+      const fakeGeoJSON = {
+        features: [poly]
+      }
+      const internalData = convertGeojsonToInternalFormat(fakeGeoJSON, 3);
+      const tmpCoords = internalData[0]["coords"];
+      const polygons = tmpCoords.map((c) => turf.polygon(c));
   
       const arr = [];
       for (const p of polygons) {
@@ -595,61 +596,6 @@ export default function MapScreen() {
       return isInPoly;
     });
   }
-    //   let larger = [];
-    //   let smaller = [];
-  
-    //   //keep the larger parts of the polygon together
-    //   for (const p of polygons) {
-    //     const slices = polygonSlice(p, line);
-
-    //     if(slices.length === 0) {
-    //       continue;
-    //     } else if (slices.length === 1) {
-    //       larger.push(...slices);
-    //     } else {
-    //       const [largest, ...rest] = slices.sort((a, b) => turf.area(b) - turf.area(a));
-    //       larger.push(largest);
-    //       smaller.push(...rest);
-    //     }
-    //   }
-
-    //   const multi = turf.combine(turf.featureCollection(larger)).features;
-  
-    //   return [...smaller, ...multi];
-    // }
-  
-
-    // if(!regionTransaction) return;
-    // const e = regionTransaction;
-    // mapItem.removeLayer(e.layer);
-    // const geoJsonItem = e.layer.toGeoJSON();
-    // console.log(geoJsonItem)
-    // console.log(file.currentEditMode);
-    // if(file.currentEditMode === EditMode.ADD_SUBREGION) {
-    //   const coords = parseMultiPolygon([geoJsonItem.geometry.coordinates]);
-    //   const coordsStr = JSON.stringify(coords);
-    //   auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
-    // } else if (file.currentEditMode === EditMode.SPLIT_SUBREGION) {
-    //   console.log(editRegions);
-    //   for(const property in editRegions) {
-    //     const region = editRegions[property].toGeoJSON();
-    //     const split = polygonSlice(region, geoJsonItem);
-    //     for(const temp of split) {
-    //       console.log(temp.geometry);
-    //       if(temp.geometry.type === "MultiPolygon") {
-    //         console.log("Multipolgyon");
-    //         const coords = parseMultiPolygon(temp.geometry.coordinates);
-    //         const coordsStr = JSON.stringify(coords);
-    //         auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
-    //       } else if (temp.geometry.type === "Polygon") {
-    //         console.log("Polgyon");
-    //         const coords = parsePolygon(temp.geometry.coordinates);
-    //         const coordsStr = JSON.stringify(coords);
-    //         auth.socket.emit("add-region", {mapId: mapId, coords: coordsStr});
-    //       }
-    //     }
-    //   }
-    // }
 
   async function applyMergeSubregion(){
     const ymap = ydoc.getMap("regions");
@@ -659,16 +605,18 @@ export default function MapScreen() {
     const ySubregion11 = ymap.get(mergeRegionId[0], Y.Map);
     const ySubregion22 = ymap.get(mergeRegionId[1], Y.Map);
 
-    console.log(turfHelpers.multiPolygon(ySubregion1))
-    console.log(turfHelpers.multiPolygon(ySubregion2))
     const newLayer = newUnion(turfHelpers.multiPolygon(ySubregion1), turfHelpers.multiPolygon(ySubregion2));
-    const tmpCoords = newLayer.geometry.coordinates;
-    console.log(newLayer);
+    const fakeGeoJSON = {
+      features: [newLayer]
+    }
+    const internalData = convertGeojsonToInternalFormat(fakeGeoJSON, 2);
+    const tmpCoords = internalData[0]["coords"];
+
     const response = await api.createSubregion(mapId, tmpCoords);
     if(response.status === 201) {
       const subregionId = response.data.subregion._id;
       const coords = response.data.subregion.coordinates;
-      console.log(coords);
+
       tps.addTransaction([subregionId, mergeRegionId[0], mergeRegionId[1]]);
       ydoc.transact(() => {
         ySubregion11.set("isStale", true);
