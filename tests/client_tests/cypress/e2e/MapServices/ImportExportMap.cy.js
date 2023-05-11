@@ -70,7 +70,7 @@ describe('Import Map', () => {
         cy.get('#geojsonFile').click()
         cy.get('#compression').type("0.2")
         cy.get('#okBtn').click()
-        cy.readFile('cypress/downloads/TesingGeojson.json')
+        cy.readFile('cypress/downloads/TestingGeojson.json')
 
         //test exporting shp
         cy.get("#exportMapBtn").click()
@@ -79,7 +79,7 @@ describe('Import Map', () => {
         cy.get('#shpFile').click()
         cy.get('#compression').type("0.2")
         cy.get('#okBtn').click()
-        cy.readFile('cypress/downloads/TesingGeojson.zip')
+        cy.readFile('cypress/downloads/TestingGeojson.zip')
     });
 
 })
