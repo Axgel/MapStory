@@ -144,6 +144,13 @@ function GlobalFileContextProvider(props) {
       payload: {editModeAction: EditMode.MERGING, editChangeType: EditMode.EDIT_TOOLBAR}
     })
   }
+  
+  file.handleSeparate = function() {
+    fileReducer({
+      type: GlobalFileActionType.SET_EDIT_MODE_ACTION,
+      payload: {editModeAction: EditMode.SEPARATING, editChangeType: EditMode.EDIT_TOOLBAR}
+    })
+  }
 
   file.finishAction = function() {
     fileReducer({

@@ -53,7 +53,10 @@ export function parsePolygon(coordinates, opcode){
     } else {
       if(JSON.stringify(first) !== JSON.stringify(last)) {
         newCoords.push([...first]);
+      } else if (newCoords.length === 3) {
+        newCoords.push([...first]);
       } else {
+        console.log(newCoords);
         console.log("bug with parse assumption");
       }
     }

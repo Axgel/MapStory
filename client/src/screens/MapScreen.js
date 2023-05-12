@@ -99,6 +99,12 @@ export default function MapScreen() {
           break;
         }
         case EditMode.SPLIT_SUBREGION: {
+          if(file.editModeAction === EditMode.SEPARATING){
+            applySeparateSubregion();
+            setSplitRegionId(null);
+            file.finishAction();
+            break;
+          }
           if(editRegionId) setStaleBridgeId(editRegionId);
           break;
         }
@@ -144,12 +150,21 @@ export default function MapScreen() {
   }, [mergeRegionId]);
 
   useEffect(() => {
+    //clearing bridge when not in split/slice
     if(file.currentEditMode !== EditMode.SPLIT_SUBREGION && file.currentEditMode !== EditMode.SLICE_SUBREGION) {
       if (file.editToolbarBridge !== EditMode.NONE) file.setEditToolbarBridge(EditMode.NONE);
       return;
     }
+
     if(splitRegionId){
-      file.setEditToolbarBridge(EditMode.SPLIT_READY);
+      const ymap = ydoc.getMap("regions");
+      const ySubregion = ymap.get(splitRegionId);
+      if(ySubregion && ySubregion.get("coords").toJSON().length > 1) {
+        console.log(ySubregion.get("coords").toJSON().length);
+        file.setEditToolbarBridge(EditMode.SPLIT_READY);
+      } else {
+        file.setEditToolbarBridge(EditMode.SLICE_READY);
+      }
     } else {
       if(file.currentEditMode === EditMode.SLICE_SUBREGION) {
         file.resetSliceBridge();
@@ -564,8 +579,8 @@ export default function MapScreen() {
       if(temp.geometry.type === "MultiPolygon") {
         console.log("Multipolgyon From Split!");
       } else if (temp.geometry.type === "Polygon") {
-        const coords = [temp.geometry.coordinates]
-        // const coords = parseMultiPolygon([temp.geometry.coordinates]);
+        // const coords = [temp.geometry.coordinates]
+        const coords = parseMultiPolygon([temp.geometry.coordinates], 2);
         arr.push(coords);
       }
     }
@@ -605,6 +620,22 @@ export default function MapScreen() {
       const isInPoly = turf.booleanPointInPolygon(point.geometry.coordinates, poly.geometry);
       return isInPoly;
     });
+  }
+
+  async function applySeparateSubregion(){
+    const ymap = ydoc.getMap("regions");
+    const ySubregion = ymap.get(splitRegionId, Y.Map);
+    const temp = ySubregion.get("coords").toJSON();
+    const coordsArr = temp.map((coords) => [coords]);
+    const coordsMap = await createSubregions(coordsArr);
+    tps.addTransaction([splitRegionId, ...Object.keys(coordsMap)]);
+    ydoc.transact(() => {
+      ySubregion.set("isStale", true);
+      for(const [subregionId, coordinates] of Object.entries(coordsMap)){
+        addSubregionToYDoc(subregionId, coordinates);
+      }
+      undoManager.stopCapturing();
+    }, 42);
   }
 
   async function applyMergeSubregion(){
