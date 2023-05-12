@@ -74,13 +74,18 @@ export default function EditToolbar() {
   }
   
   function handleSlice() {
-    if(file.editToolbarBridge !== EditMode.SPLIT_READY) return;
+    if(file.editToolbarBridge !== EditMode.SPLIT_READY && file.editToolbarBridge !== EditMode.SLICE_READY) return;
     if(file.currentEditMode === EditMode.SLICE_SUBREGION) {
       file.setCurrentEditMode(EditMode.SPLIT_SUBREGION);
     } else {
       if(file.currentEditMode !== EditMode.SPLIT_SUBREGION) console.log("Slice check bug");
       file.setCurrentEditMode(EditMode.SLICE_SUBREGION);
     }
+  }
+
+  function handleSeparate() {
+    if(file.editToolbarBridge !== EditMode.SPLIT_READY) return;
+    file.handleSeparate();
   }
 
   function handleUpdateTitle(e){
@@ -136,12 +141,14 @@ export default function EditToolbar() {
       if(file.editToolbarBridge === EditMode.SPLIT_READY){
         sliceSubregionClass = sliceSubregionClass.replace(disabledClass, toggledOffClass);
         separateSubregionClass = separateSubregionClass.replace(disabledClass, toggledOffClass);
+      } else if(file.editToolbarBridge === EditMode.SLICE_READY){
+        sliceSubregionClass = sliceSubregionClass.replace(disabledClass, toggledOffClass);
       }
       break
     case(EditMode.SLICE_SUBREGION):
       splitSubregionClass = splitSubregionClass.replace(toggledOffClass, toggledOnClass);
       sliceSubregionClass = sliceSubregionClass.replace(disabledClass, toggledOnClass);
-      separateSubregionClass = separateSubregionClass.replace(disabledClass, toggledOffClass);
+      //separateSubregionClass = separateSubregionClass.replace(disabledClass, toggledOffClass);
       break
     case(EditMode.MERGE_SUBREGION):
       mergeSubregionClass = mergeSubregionClass.replace(toggledOffClass, toggledOnClass);
@@ -195,7 +202,7 @@ export default function EditToolbar() {
       <div className="flex gap-2 px-2">
         <img id="split-subregion" className={splitSubregionClass} onClick={(e) => setCurrentEditMode(e, EditMode.SPLIT_SUBREGION)} src={SplitSubregionIcon} alt=""></img>
         <div id="slice-subregion-text" className={sliceSubregionClass} onClick={handleSlice}>Slice</div>
-        <div id="separate-subregion-text" className={separateSubregionClass} onClick={(e)=>{}}>Separate</div>
+        <div id="separate-subregion-text" className={separateSubregionClass} onClick={handleSeparate}>Separate</div>
       </div>
 
       <div className="w-[1px] bg-black h-full"></div>
