@@ -34,8 +34,10 @@ export default function Comments(props) {
   }
 
   return (
+    <div>
     <div id="commentView" className="flex flex-col pl-5 pr-2 py-3 gap-2">
-      <div className="overflow-auto h-[400px] mb-2">{commentCard}</div>
+      <div id="commentCards" className="mb-3 pb-8">{commentCard}</div>
+    </div>
       {auth.loggedIn ?
         <div className="absolute bottom-2 left-3">
           <input id="input_comment" onKeyDown={handleKeyPress} className="w-[230px] h-[35px] rounded-lg shadow-lg bg-white outline-none border-none pl-2 text-base" type="text"></input>

@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect} from "react";
 import closeIcon from "../assets/closeIcon.png"
 import Properties from "./Properties";
 import Comments from "./Comments";
@@ -12,6 +12,11 @@ export default function MapDetailCard(props) {
   const { store } = useContext(GlobalStoreContext);
   const { mapDetails } = props;
   const [editActive, setEditActive] = useState(false);
+
+  useEffect(() => {
+    const container = document.getElementById("commentCardItems");
+    container.scrollTop = container.scrollHeight;
+  }, [store])
 
   let propertyTabCSS = "px-9 py-2.5 font-semibold ";
   let commentTabCSS = "px-9 py-2.5 font-semibold ";
@@ -77,7 +82,7 @@ export default function MapDetailCard(props) {
   if(store.detailView !== DetailView.NONE){
     return (
       <div className="w-[300px] h-full border-solid rounded-lg border flex flex-col bg-brownshade-700">
-        <div className="h-12 flex items-center px-2 gap-4 ">
+        <div className="h-12 flex items-center px-2 gap-4 py-2">
           <img src={closeIcon} alt="" onClick={closeDetailView}></img>
           {titleElement}
         </div>
@@ -92,7 +97,9 @@ export default function MapDetailCard(props) {
 
         <div className="h-[1px] bg-black"></div>
 
-        {detailTab}
+        <div id="commentCardItems" className="overflow-auto">
+          {detailTab}
+        </div>
 
       </div>
     );

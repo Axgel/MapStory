@@ -819,7 +819,7 @@ export default function MapScreen() {
     if(editRegionId){
       let tmpProperties = {};
       try{
-        ydoc.getMap('regions').get(editRegionId).get('properties').toJSON();
+        tmpProperties = ydoc.getMap('regions').get(editRegionId).get('properties').toJSON();
       } catch (e){
         tmpProperties = {};
       }
