@@ -75,6 +75,7 @@ export default function MapScreen() {
           break; 
         }
         case EditMode.ADD_SUBREGION: {
+          setMapPropOpen(false);
           mapItem.pm.enableDraw('Polygon', {
             snappable: true,
             snapDistance: 20,
@@ -85,10 +86,12 @@ export default function MapScreen() {
         break;
         }
         case EditMode.REMOVE_SUBREGION: {
+          setMapPropOpen(false);
           if(editRegionId) setStaleBridgeId(editRegionId)
           break;
         }
         case EditMode.MERGE_SUBREGION: {
+          setMapPropOpen(false);
           if(file.editModeAction === EditMode.MERGING){
             applyMergeSubregion();
             setMergeRegionId([]);
@@ -99,6 +102,7 @@ export default function MapScreen() {
           break;
         }
         case EditMode.SPLIT_SUBREGION: {
+          setMapPropOpen(false);
           if(file.editModeAction === EditMode.SEPARATING){
             applySeparateSubregion();
             setSplitRegionId(null);
@@ -109,6 +113,7 @@ export default function MapScreen() {
           break;
         }
         case EditMode.SLICE_SUBREGION: {
+          setMapPropOpen(false);
           mapItem.pm.enableDraw('Line', {
             snappable: true,
             snapDistance: 20,
@@ -892,13 +897,13 @@ export default function MapScreen() {
 
           {editPropInput}
 
-        <div className="flex flex-col overflow-scroll">
+        <div className="flex flex-col overflow-y-auto">
           {
             Object.keys(tmpProperties).map((k, index) => ( 
               <div className="bg-modalbgfill hover:bg-white">
-                <div onClick={(e) => handleEditProp(k, tmpProperties[k])} key={index} className="flex justify-between items-center px-3.5 py-2 ">
-                  <p className="text-sm font-extrabold">{k}</p>
-                  <p className="border-none bg-transparent outline-none text-sm">{tmpProperties[k]}</p>
+                <div onClick={(e) => handleEditProp(k, tmpProperties[k])} key={index} className="flex gap-[16px] justify-between items-center px-3.5 py-2 ">
+                  <p className="text-sm font-extrabold break-all">{k}</p>
+                  <p className="border-none bg-transparent outline-none text-sm break-all">{tmpProperties[k]}</p>
                 </div>
                 <div className="h-[1px] bg-modalborder border-opacity-60"></div>
               </div>
