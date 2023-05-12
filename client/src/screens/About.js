@@ -34,7 +34,7 @@ export default function About() {
   return (
     <div className="">
       <div className="flex justify-center">
-        <img onClick={handleSplashScreen} className="cursor-pointer w-18 h-18 p-1 mx-4 my-5 hover:w-20 hover:h-20" src={MushroomLogo} alt=""></img>
+        <img onClick={handleSplashScreen} className="cursor-pointer w-18 h-18 my-3 mx-2 p-3" src={MushroomLogo} alt=""></img>
         <h1 className="text-white text-7xl py-3 pt-6 text-center">
             MapStory
         </h1>
@@ -58,8 +58,10 @@ export default function About() {
         <div className="px-8">
           <p className="text-center text-2xl pb-2">Map Editing</p>
           <ul>
-            <li className={listClass}>Collaborative</li>
+            <li className={listClass}>Collaborative Editing</li>
+            <li className={listClass}>Auto-Save</li>
             <li className={listClass}>Editing Vertices</li>
+            <li className={listClass}>Add/Remove Subregion</li>
             <li className={listClass}>Merge/Split Subregions</li>
             <li className={listClass}>Subregion Properties</li>
           </ul>
@@ -68,7 +70,7 @@ export default function About() {
           <p className="text-center text-2xl pb-2">Supported File Types</p>
           <ul>
             <li className={listClass}>GeoJSON</li>
-            <li className={listClass}>Shapefile</li>
+            <li className={listClass}>Shapefile/DBF</li>
           </ul>
         </div>
         <div className="px-8">
