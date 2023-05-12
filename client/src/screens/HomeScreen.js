@@ -37,8 +37,8 @@ export default function HomeScreen() {
   }
 
   if (store.sortBy !== "") {
-    if(store.sortBy === "Name")
-      mapCards = mapCards.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0)); //TODO: alphabetical name
+    if(store.sortBy === "A to Z")
+      mapCards = mapCards.sort((a,b) => (a.title.toLowerCase() > b.title.toLowerCase()) ? 1 : ((b.title.toLowerCase() > a.title.toLowerCase()) ? -1 : 0)); //TODO: alphabetical name
     else if (store.sortBy === "Upvote")
       mapCards = mapCards.sort((a, b) => b.upvotes.length - a.upvotes.length);
     else 
