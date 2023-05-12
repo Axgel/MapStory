@@ -130,23 +130,27 @@ switch (process.env.ENVIRONMENT) {
     break;
 }
 
-function filterClient(mapId, socketId) {
+async function filterClient(mapId, socketId) {
   if(!mapProjects[mapId]) return;
+  if(mapProjects[mapId].clients.includes(socketId)){
+    await saveYdoc(mapProjects[mapId].text);
+  }
   mapProjects[mapId].clients = mapProjects[mapId].clients.filter(client => client !== socketId);
 }
 
-function filterClientFromAll(socketId) {
+async function filterClientFromAll(socketId) {
   for(const mapId in mapProjects) {
-    filterClient(mapId, socketId);
+    await filterClient(mapId, socketId);
   }
 }
 
 function createYjsData(ymap, jsonItems){
   for(const [subregionId, subregionData] of Object.entries(jsonItems)){
+    if(subregionData["isStale"]) continue;
     const ymapData = new Y.Map();
 
     const coords = subregionData["coords"];
-    const properties = subregionData["properties"];
+    const properties = subregionData["properties"]; 
     const yArr0 = new Y.Array();
     for(let i=0; i<coords.length; i++){
       const yArr1 = new Y.Array();
