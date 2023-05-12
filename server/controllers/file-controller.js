@@ -59,7 +59,7 @@ updateSubregions = async (subregionId) => {
 getAllSubregionsServer = async(mapId) => {
   try {
     const subregions = await Subregion.find({ mapId: mapId });
-    console.log(subregions);
+    // console.log(subregions);
     
     if(!subregions || subregions.length == 0) return false;
 

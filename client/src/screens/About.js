@@ -59,7 +59,6 @@ export default function About() {
           <p className="text-center text-2xl pb-2">Map Editing</p>
           <ul>
             <li className={listClass}>Collaborative Editing</li>
-            <li className={listClass}>Auto-Save</li>
             <li className={listClass}>Editing Vertices</li>
             <li className={listClass}>Add/Remove Subregion</li>
             <li className={listClass}>Merge/Split Subregions</li>
