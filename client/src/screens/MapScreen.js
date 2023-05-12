@@ -222,6 +222,11 @@ export default function MapScreen() {
     mapItem.eachLayer(function (layer) {
       mapItem.removeLayer(layer);
     });
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mapItem);
     
     const yjsRegions = ydoc.getMap('regions').toJSON();
     const regions = {};

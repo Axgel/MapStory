@@ -56,6 +56,11 @@ switch (process.env.ENVIRONMENT) {
         filterClientFromAll(socket.id);
       });
 
+      socket.on("saveProject", async (data) => {
+        const {mapId} = data;
+        await saveYdoc(mapProjects[mapId].text);
+      })
+
       socket.on("op", (data) => {
         const {mapId, subregionIds, op} = data;
         const parsed = JSON.parse(op);
@@ -109,6 +114,11 @@ switch (process.env.ENVIRONMENT) {
       socket.on("disconnect", async () => {
         filterClientFromAll(socket.id);
       });
+
+      socket.on("saveProject", async (data) => {
+        const {mapId} = data;
+        await saveYdoc(mapProjects[mapId].text);
+      })
 
       socket.on("op", (data) => {
         const {mapId, subregionIds, op} = data;
