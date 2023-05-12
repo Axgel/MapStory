@@ -22,6 +22,7 @@ export default function ChangeUsernameModal() {
 
   function handleChangeUsername(e) {
     e.stopPropagation();
+    setUsername(username.trim());
     if(username === auth.user.userName || document.getElementById("inputNewUsername").value === auth.user.userName){
       store.setCurrentModal(CurrentModal.NONE);
       return;
