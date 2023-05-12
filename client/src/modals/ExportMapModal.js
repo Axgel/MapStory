@@ -10,7 +10,7 @@ export default function ExportMapModal() {
   const { auth } = useContext(AuthContext);
 
   const [fileType, setFileType] = useState("GeoJSON");
-  const [simplifyPercent, setSimplifyPercent] = useState(0);
+  const [simplifyPercent, setSimplifyPercent] = useState(50);
 
   function handleExport(e){
     let compression = document.getElementById("compression").value;
@@ -20,12 +20,12 @@ export default function ExportMapModal() {
     else
       exportSHPDBF(store.selectedMap._id, compression, store.selectedMap.title);
     store.setCurrentModal(CurrentModal.NONE);
-    setSimplifyPercent(0);
+    setSimplifyPercent(50);
   }
 
   function handleCloseModal(e){
     e.stopPropagation();
-    setSimplifyPercent(0);
+    setSimplifyPercent(50);
     store.setCurrentModal(CurrentModal.NONE);
   }
 
@@ -71,7 +71,6 @@ export default function ExportMapModal() {
               min="0"
               max="100"
               id="compression"
-              value="0"
               onChange={compressionOnChange} />
           </div>
           
