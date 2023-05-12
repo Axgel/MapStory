@@ -1,6 +1,7 @@
 const User = require("../models/user-model");
 const Subregion = require("../models/subregion-model");
 const MapProject = require("../models/mapproject-model");
+const Y = require("yjs");
 
 getAllSubregions = async (req, res) => {
   try{
@@ -9,6 +10,7 @@ getAllSubregions = async (req, res) => {
     const subregionsDict = {};
 
     for(const subregion of subregions){
+      if(subregion.isStale) continue;
       subregionsDict[subregion._id] = subregion;
     }
     return res.status(200).json({
@@ -109,6 +111,15 @@ addSubregion = async(mapId, coords) => {
   }
 }
 
+saveYdoc = async(ydoc) => {
+  const regionsJSON = ydoc.getMap("regions").toJSON();
+  const asyncUpdateRegions = [];
+  for(const [k,v] of Object.entries(regionsJSON)){
+    asyncUpdateRegions.push(Subregion.findOneAndUpdate({ _id: k }, {properties: v["properties"], coordinates: v["coords"], isStale: v["isStale"]}, {new : true}));
+  }
+
+  await Promise.all(asyncUpdateRegions);
+}
 
 
 module.exports = {
