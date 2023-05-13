@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import UndoIcon from "../assets/UndoIcon.png"
 import RedoIcon from "../assets/RedoIcon.png"
-import AddVertexIcon from "../assets/AddVertexIcon.png"
 import EditVertexIcon from "../assets/EditVertexIcon.png"
 import SplitSubregionIcon from "../assets/SplitSubregionIcon.png"
 import MergeSubregionIcon from "../assets/MergeSubregionIcon.png"

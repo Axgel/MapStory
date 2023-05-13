@@ -47,7 +47,6 @@ function App() {
               <Route path="/profile" element={<ProfileScreen />} />
               <Route path="/map/:mapId" element={<MapScreen />} />
               <Route path="/about" element={<About />} />
-              <Route path="/all" element={<AllScreen />} />
             </Routes>
             <AccountFeedbackModal />
             <PublishMapModal />

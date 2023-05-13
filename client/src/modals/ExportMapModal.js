@@ -3,11 +3,9 @@ import { CurrentModal } from "../enums";
 import { exportSHPDBF } from "../utils/exportSHP";
 import{exportGeoJSON} from "../utils/exportGeoJSON";
 import { GlobalStoreContext } from "../store";
-import AuthContext from "../auth";
 
 export default function ExportMapModal() {
   const { store } = useContext(GlobalStoreContext);
-  const { auth } = useContext(AuthContext);
 
   const [fileType, setFileType] = useState("GeoJSON");
   const [simplifyPercent, setSimplifyPercent] = useState(50);

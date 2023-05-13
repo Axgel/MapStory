@@ -1,11 +1,9 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { CurrentModal } from "../enums";
 
-import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
 export default function ForgotPasswordModal() {
-  const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const [email, setEmail] = useState('');
 

@@ -2,11 +2,9 @@ import React, {useContext, useState} from "react";
 import { CurrentModal } from "../enums";
 
 import { GlobalStoreContext } from "../store";
-import AuthContext from "../auth";
 
 export default function CreateMapModal(props) {
   const { store } = useContext(GlobalStoreContext);
-  const { auth } = useContext(AuthContext);
   const [mapFile, setMapFile] = useState(null);
   const [errMsg, setErrMsg] = useState('');
 
