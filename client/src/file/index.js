@@ -10,9 +10,6 @@ import AuthContext from "../auth";
 import { GlobalFileActionType } from "../enums";
 import GlobalStoreContext from "../store";
 import { EditMode } from "../enums";
-import { Test_Transaction } from "../transactions";
-import { createVertexOperationPath } from "../utils/Map/CreateOperationPath";
-import * as Y from 'yjs'
 
 export const GlobalFileContext = createContext({});
 console.log("create GlobalFileContext");
