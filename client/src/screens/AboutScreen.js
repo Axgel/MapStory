@@ -9,7 +9,7 @@ import Tracy from '../assets/tracy.jpg';
 import Angel from '../assets/angel.jpg';
 import Arvin from '../assets/arvin.jpg';
 
-export default function About() {
+export default function AboutScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();

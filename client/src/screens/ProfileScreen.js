@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Header } from "../components";
 import EditIcon from "../assets/EditIcon.png";
 import { GlobalStoreContext } from "../store";

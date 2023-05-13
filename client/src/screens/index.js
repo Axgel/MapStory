@@ -4,8 +4,7 @@ import RegisterScreen from './RegisterScreen'
 import ProfileScreen from './ProfileScreen'
 import HomeScreen from './HomeScreen'
 import MapScreen from './MapScreen'
-import AllScreen from './AllScreen'
-import About from './About'
+import AboutScreen from './AboutScreen'
 
 export {
   SplashScreen,
@@ -14,6 +13,5 @@ export {
   ProfileScreen,
   HomeScreen,
   MapScreen,
-  AllScreen, 
-  About
+  AboutScreen,
 }

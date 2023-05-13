@@ -77,16 +77,3 @@ function addSubregion(subregion){ //convert from subregion schema into GEOJSON f
     // console.log(feature.geometry.coordinates)
     return feature;
 }
-
-// function parsePolygon(coordinates){
-//     const regionCoords = [];
-//     for(let i=0; i<coordinates.length; i++){
-//       const newCoords = [];
-//       for(let j=0; j<coordinates[i].length; j++){
-//         newCoords.push([coordinates[i][j][1], coordinates[i][j][0]]);
-//       }
-//       regionCoords.push(newCoords);
-//     }
-  
-//     return regionCoords;
-//   }

@@ -1,11 +1,9 @@
-import React, { useContext } from "react";
-import { GlobalStoreContext } from "../store";
+import React from "react";
 import { LogInForm } from "../forms";
 import BGImage from "../assets/BGImage.png"
 import { SplashScreenButtons } from "../components";
 
 export default function SplashScreen() {
-  const { store } = useContext(GlobalStoreContext);
 
   return (
     <div className="">
