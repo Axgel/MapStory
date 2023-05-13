@@ -123,19 +123,24 @@ saveYdoc = async(ydoc) => {
 
 saveYdocSubregion = async(ydoc, metadata) => {
   const {subregionIds, opType} = metadata;
-  console.log(metadata);
   const yMap = ydoc.getMap("regions");
   const asyncUpdateRegions = [];
   for(const subregionId of subregionIds) {
-    const subregionJSON = yMap.get(subregionId).toJSON();
-    switch(opType){
-      case "Vertex":
-        asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {coordinates: subregionJSON["coords"]}));
-        break;
-      case "Subregion":
-        asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {isStale: subregionJSON["isStale"]}));
-      case "Properties":
-        asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {properties: subregionJSON["properties"]}));
+    if(yMap.has(subregionId)) {
+      const subregionJSON = yMap.get(subregionId).toJSON();
+      switch(opType){
+        case "VERTEX":
+          asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {coordinates: subregionJSON["coords"]}));
+          break;
+        case "SUBREGION":
+          asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {isStale: subregionJSON["isStale"]}));
+          break;
+        case "PROPERTIES":
+          asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {properties: subregionJSON["properties"]}));
+          break;
+      }
+    } else {
+      asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {isStale: true}));
     }
   }
   await Promise.all(asyncUpdateRegions);
