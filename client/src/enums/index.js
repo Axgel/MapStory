@@ -7,7 +7,7 @@ import { SearchMode } from "./SearchMode"
 import { DetailView } from "./DetailView"
 import { AuthActionType } from "./AuthActionType"
 import { EditMode } from "./EditMode"
-import { OTOperations } from "./OTOperations"
+import { YdocOp } from "./YdocOp"
 
 export {
   GlobalStoreActionType,
@@ -19,5 +19,5 @@ export {
   DetailView,
   AuthActionType,
   EditMode,
-  OTOperations,
+  YdocOp ,
 }

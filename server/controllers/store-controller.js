@@ -219,6 +219,7 @@ forkMap = async (req, res) => {
     
     const oldSubregions = await Subregion.find({ mapId: req.params.mapId }).exec();
     for(const region of oldSubregions){
+      if(region.isStale) continue;
       const newSubregion = new Subregion({
         mapId: newMapProject._id,
         type: region.type,

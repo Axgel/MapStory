@@ -9,9 +9,9 @@ import SearchBy from './SearchBy';
 import MapCard from './MapCard';
 import MapDetailCard from './MapDetailCard';
 import Comments from './Comments';
-import Properties from './Properties';
-import EditToolbar from './EditToolbar';
 import MapProperties from './MapProperties';
+import EditToolbar from './EditToolbar';
+import SubregionProperties from './SubregionProperties';
 import CollaboratorCard from './CollaboratorCard';
 import TagCard from './TagCard';
 import FileButton from './FileButton';
@@ -28,9 +28,9 @@ export {
   MapCard,
   MapDetailCard,
   Comments,
-  Properties,
-  EditToolbar,
   MapProperties,
+  EditToolbar,
+  SubregionProperties,
   CollaboratorCard,
   TagCard,
   FileButton

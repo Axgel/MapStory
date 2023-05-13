@@ -1,39 +1,46 @@
-import React from "react";
-import closeIcon from "../assets/closeIcon.png"
-
-import { GlobalStoreContext } from "../store";
-import AuthContext from "../auth";
-
-
+import React, {useContext} from "react";
+import { GlobalStoreContext } from '../store'
 
 export default function MapProperties() {
-
+  const { store } = useContext(GlobalStoreContext);
+  const mapInfo = store.selectedMap;
   
+  //get usernames of all collaborators
+  const collaboratorsUsernames = [];
+  store.collaborators.forEach(collaborator => {
+    collaboratorsUsernames.push(collaborator.userName)
+  });    
+
   return (
-    <div className="h-48 w-80 border-solid border bg-modalbgfill">
-      <p className="text-center py-1 text-lg font-semibold ">New York</p>
-      <div className="flex flex-col mx-2 gap-3">
-        <div className="flex gap-2 items-center border-solid border-modalborder border-opacity-60 bg-modalbgfill px-0.5 ">
-          <p className="text-xs font-semibold px-2">Population</p>
-          <div className="w-[1px] h-[30px] bg-black"></div>
-          <div>
-            <label htmlFor="email"></label>
-            <input className="border-none bg-transparent outline-none  w-[160px] text-base" type="email" name="email" defaultValue="john.smith@gmail.com"></input>
-          </div>
-          <img className="w-[15px] h-[15px] ml-auto pr-1" src={closeIcon} alt=""></img>
-        </div>
+    <div className="flex flex-col pl-5 pt-4 gap-2">
+      <div>
+        <p className="font-semibold text-base">Owner</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.ownerName}</p>
+      </div>
 
+      <div>
+        <p className="font-semibold text-base">Collaborators</p>
+        <p className="text-sm text-publishmodalsubtext">{(mapInfo.collaborators.length === 0) ? "No Collaborators" : collaboratorsUsernames.join(", ")}</p>
+      </div>
 
-        <div className="flex gap-2 items-center border-solid border-modalborder border-opacity-60 bg-modalbgfill px-0.5 ">
-          <p className="text-xs font-semibold px-2">Population</p>
-          <div className="w-[1px] h-[30px] bg-black"></div>
-          <div>
-            <label htmlFor="email"></label>
-            <input className="border-none bg-transparent outline-none  w-[160px] text-base" type="email" name="email" defaultValue="john.smith@gmail.com"></input>
-          </div>
-          <img className="w-[15px] h-[15px] ml-auto pr-1" src={closeIcon} alt=""></img>
-        </div>
+      <div>
+        <p className="font-semibold text-base">Published</p>
+        <p className="text-sm text-publishmodalsubtext">{(mapInfo.isPublished) ? mapInfo.publishedDate : "Map Not Published"}</p>
+      </div>
 
+      <div>
+        <p className="font-semibold text-base">Upvotes</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.isPublished ? mapInfo.upvotes.length : "-"}</p>
+      </div>
+
+      <div>
+        <p className="font-semibold text-base">Downvotes</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.isPublished ? mapInfo.downvotes.length : "-"}</p>
+      </div>
+
+      <div>
+        <p className="font-semibold text-base">Tags</p>
+        <p className="text-sm text-publishmodalsubtext">{mapInfo.tags.join(", ")}</p>
       </div>
     </div>
   );

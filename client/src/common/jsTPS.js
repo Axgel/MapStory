@@ -44,15 +44,15 @@ export default class jsTPS {
     }
 
 
-    addTransaction(subregionId){
-        this.undoStack.push(subregionId);
+    addTransaction(subregionIds, opType){
+        this.undoStack.push({subregionIds: subregionIds, opType: opType});
         this.redoStack = [];
     }
 
     redoTransaction() {
-        const subregionIds = this.redoStack.pop();
-        this.undoStack.push(subregionIds);
-        return subregionIds;
+        const metadata = this.redoStack.pop();
+        this.undoStack.push(metadata);
+        return metadata;
     }
 
     /**
@@ -60,9 +60,9 @@ export default class jsTPS {
      * TPS stack and undoes it, moving the TPS counter accordingly.
      */
     undoTransaction() {
-        const subregionIds = this.undoStack.pop();
-        this.redoStack.push(subregionIds);
-        return subregionIds;
+        const metadata = this.undoStack.pop();
+        this.redoStack.push(metadata);
+        return metadata;
     }
 
     undoPeek(){
