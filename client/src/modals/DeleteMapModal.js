@@ -2,11 +2,9 @@ import React, { useContext } from "react";
 import { CurrentModal } from "../enums";
 import { useNavigate } from "react-router-dom";
 import { GlobalStoreContext } from "../store";
-import AuthContext from "../auth";
 
 export default function DeleteMapModal(props) {
   const { store } = useContext(GlobalStoreContext);
-  const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const mapInfo = store.mapMarkedForAction;

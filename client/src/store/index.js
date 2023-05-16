@@ -1,11 +1,9 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import jsTPS from "../common/jsTPS";
 import api from "./store-request-api";
 import AuthContext from "../auth";
-import GlobalFileContext from "../file";
 import { GlobalStoreActionType, ViewMode, DetailView, CurrentModal } from "../enums";
-import { tempData } from "../data/tempData";
 import { convertToGeojson } from "../utils/geojsonConverter";
 import { convertGeojsonToInternalFormat } from "../utils/geojsonParser";
 

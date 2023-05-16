@@ -1,16 +1,8 @@
 import React, {useContext} from "react";
-import { CurrentModal } from "../enums";
-import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 
 export default function CreateAccountForm() {
-  const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
-
-  function setCurrentModal(e, currentModal){
-    e.stopPropagation();
-    // store.setCurrentModal(currentModal);
-  }
 
   function handleSubmit(event){
     event.preventDefault();

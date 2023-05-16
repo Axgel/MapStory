@@ -121,6 +121,31 @@ saveYdoc = async(ydoc) => {
   await Promise.all(asyncUpdateRegions);
 }
 
+saveYdocSubregion = async(ydoc, metadata) => {
+  const {subregionIds, opType} = metadata;
+  const yMap = ydoc.getMap("regions");
+  const asyncUpdateRegions = [];
+  for(const subregionId of subregionIds) {
+    if(yMap.has(subregionId)) {
+      const subregionJSON = yMap.get(subregionId).toJSON();
+      switch(opType){
+        case "VERTEX":
+          asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {coordinates: subregionJSON["coords"]}));
+          break;
+        case "SUBREGION":
+          asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {isStale: subregionJSON["isStale"]}));
+          break;
+        case "PROPERTY":
+          asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {properties: subregionJSON["properties"]}));
+          break;
+      }
+    } else {
+      asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {isStale: true}));
+    }
+  }
+  await Promise.all(asyncUpdateRegions);
+}
+
 
 module.exports = {
   getAllSubregions,

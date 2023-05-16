@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect} from "react";
 import closeIcon from "../assets/closeIcon.png"
-import Properties from "./Properties";
+import MapProperties from "./MapProperties";
 import Comments from "./Comments";
 import { DetailView } from "../enums";
 import AuthContext from "../auth";
@@ -26,7 +26,7 @@ export default function MapDetailCard(props) {
     // add to properties, show properties
     propertyTabCSS += "bg-mapselectedfill";
     commentTabCSS += mapDetails.isPublished ? "hover:bg-mapselectedfill hover:bg-opacity-40" : "cursor-not-allowed opacity-30"
-    detailTab = <Properties />;
+    detailTab = <MapProperties />;
 
   } else if(store.detailView === DetailView.COMMENTS){
     propertyTabCSS += "hover:bg-mapselectedfill hover:bg-opacity-40"

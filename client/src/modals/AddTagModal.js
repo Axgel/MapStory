@@ -3,11 +3,9 @@ import { CurrentModal } from "../enums";
 import { TagCard } from "../components";
 
 import { GlobalStoreContext } from "../store";
-import AuthContext from "../auth";
 
 export default function AddTagModal() {
   const { store } = useContext(GlobalStoreContext);
-  const { auth } = useContext(AuthContext);
 
   const [errMsg, setErrMsg] = useState('');
   

@@ -9,7 +9,7 @@ import Tracy from '../assets/tracy.jpg';
 import Angel from '../assets/angel.jpg';
 import Arvin from '../assets/arvin.jpg';
 
-export default function About() {
+export default function AboutScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -43,11 +43,11 @@ export default function About() {
       <h1 className={sectionClass}>
           About Us
       </h1>
-      <p className="mx-48 mb-10 text-xl text-center"> 
-        MapStory is a web application that designed to streamline and enhance your map editing experience! Maps are a fundamental  <br/>
-        invention that helps visualize geographic data. Digital file formats such as Shapefile and GeoJSON have been created to represent them. <br/>
-        However, current online tools for editing and sharing map data are inadequate or unintuitive. Our goal is to consolidate these tools <br/> 
-        and functions under one application that allows users to share and collaboratively edit maps in real-time, export files in various <br/>
+      <p className="mx-80 mb-10 text-xl indent-12 text-justify"> 
+        MapStory is a web application that designed to streamline and enhance your map editing experience! Maps are a fundamental
+        invention that helps visualize geographic data. Digital file formats such as Shapefile and GeoJSON have been created to represent them. 
+        However, current online tools for editing and sharing map data are inadequate or unintuitive. Our goal is to consolidate these tools 
+        and functions under one application that allows users to share and collaboratively edit maps in real-time, export files in various 
         formats, and save map data into a database.
       </p>
 

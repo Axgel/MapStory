@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from "react";
 import { MapCard, Header, NavBar, MapDetailCard } from "../components";
-import { useNavigate } from "react-router-dom";
 import { CurrentModal } from "../enums";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
@@ -9,7 +8,6 @@ import { ViewMode, DetailView } from "../enums";
 export default function HomeScreen() {
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     store.loadAllMaps();

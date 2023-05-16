@@ -18,15 +18,6 @@ export default function CollaboratorCard(props) {
   if((auth.user && store.selectedMapOwner) && (auth.user.email === store.selectedMapOwner.email && collaborator.email !== store.selectedMapOwner.email)){
     removeCollabIcon = <img id="removeCollab" className="w-[25px] h-[25px]" src={closeIcon} alt="" onClick={handleRemoveCollaborator}></img>;
   }
-  
-  // console.log(auth.user.email, store.selectedMapOwner.email);
-  // if(auth.user && store.selectedMapOwner && auth.user.email !== store.selectedMapOwner.email){
-  //   removeCollabIcon = <></>;
-  // }
-  // if((store.selectedMapOwner && auth.user) && (collaborator.email === store.selectedMapOwner.email || auth.user.email !== store.selectedMapOwner.email)){
-  //   removeCollabIcon = <></>;
-  // }
-
 
   return (
     <div className="flex items-center gap-5">

@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import { Header, EditToolbar, Map, MapProperties, MapDetailCard } from "../components";
+import { Header, EditToolbar, Map, MapDetailCard } from "../components";
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css';
 import '@geoman-io/leaflet-geoman-free';  
@@ -9,7 +9,7 @@ import { GlobalStoreContext } from '../store'
 import AuthContext from "../auth";
 import GlobalFileContext from "../file";
 import { CreateVertexTransaction } from "../transactions";
-import { DetailView , EditMode } from "../enums";
+import { DetailView , EditMode, YdocOp } from "../enums";
 import * as Y from 'yjs';
 import { convertGeojsonToInternalFormat, parseMultiPolygon, parsePolygon } from "../utils/geojsonParser";
 import * as turf from '@turf/turf';
@@ -24,7 +24,7 @@ import closeIcon from "../assets/closeIcon.png"
 
 let ydoc = new Y.Doc({ autoLoad: true });
 let ymap = ydoc.getMap("regions");
-let undoManager = new Y.UndoManager(ymap, {trackedOrigins: new Set([42])})
+let undoManager = new Y.UndoManager(ymap, {trackedOrigins: new Set([YdocOp.OP])})
 let tps = new jsTPS();
 
 export default function MapScreen() {
@@ -137,7 +137,7 @@ export default function MapScreen() {
     // init yjs items
     ydoc = new Y.Doc();
     ymap = ydoc.getMap("regions")
-    undoManager = new Y.UndoManager(ymap,  {trackedOrigins: new Set([42])})
+    undoManager = new Y.UndoManager(ymap,  {trackedOrigins: new Set([YdocOp.OP])})
     tps = new jsTPS();
     store.loadMapById(mapId);
   }, [])
@@ -165,7 +165,6 @@ export default function MapScreen() {
       const ymap = ydoc.getMap("regions");
       const ySubregion = ymap.get(splitRegionId);
       if(ySubregion && ySubregion.get("coords").toJSON().length > 1) {
-        console.log(ySubregion.get("coords").toJSON().length);
         file.setEditToolbarBridge(EditMode.SPLIT_READY);
       } else {
         file.setEditToolbarBridge(EditMode.SLICE_READY);
@@ -178,32 +177,6 @@ export default function MapScreen() {
       }
     }
   }, [splitRegionId]);
-
-  // useEffect(() => {
-  //   if(!mapItem) return;
-  //   switch(file.currentEditMode){
-  //     case EditMode.ADD_SUBREGION: {
-  //       mapItem.pm.enableDraw('Polygon', {
-  //         snappable: true,
-  //         snapDistance: 20,
-  //         finishOn: 'contextmenu'
-  //       });
-  //       break;
-  //     }
-  //     case EditMode.SPLIT_SUBREGION: {
-  //       mapItem.pm.enableDraw('Line', {
-  //         snappable: true,
-  //         snapDistance: 20,
-  //         finishOn: 'contextmenu'
-  //       });
-  //       break;
-  //     }
-  //     default:
-  //       mapItem.pm.disableDraw();
-  //   }
-  //   reloadLayers();
-  // }, [file])
-
 
   useEffect(() => {
     // load map container
@@ -256,7 +229,7 @@ export default function MapScreen() {
     auth.socket.on('sync', (data) => {
       const parsed = JSON.parse(data);
       const uintArray = Uint8Array.from(parsed);
-      Y.applyUpdate(ydoc, uintArray, -1);
+      Y.applyUpdate(ydoc, uintArray, YdocOp.NO_OP);
       setInitLoad(-1);
     })
 
@@ -264,20 +237,40 @@ export default function MapScreen() {
       const {subregionIds, op} = data;
       const parsed = JSON.parse(op);
       const uintArray = Uint8Array.from(parsed);
-      Y.applyUpdate(ydoc, uintArray, -1);
+      Y.applyUpdate(ydoc, uintArray, YdocOp.NO_OP);
       setStaleSubregionIds(subregionIds);
     })
 
     ydoc.on('update', (update, origin) => {
-      if(origin !== -1){
-        const subregionIds = getTPSSubregionId();
-        const arr = Array.from(update);
-        const op = JSON.stringify(arr);
-        auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, op: op});
-        //console.log(JSON.stringify(ymap));
-        setStaleSubregionIds(subregionIds);
-      } 
+      switch(origin) {
+        case YdocOp.NO_OP:
+          //inital load + remote changes
+          break;
+        case YdocOp.OP:
+          //vertex + subregion
+          const { subregionIds, opType } = getTPSMetadata();
+          sendOp(subregionIds, opType, update);
+          break;
+        default:
+          //undo manager
+          if(typeof origin === 'object') {
+            const { subregionIds, opType } = getTPSMetadata();
+            sendOp(subregionIds, opType, update);
+          } else {
+            //property
+            const subregionIds = [origin];
+            const opType = YdocOp.PROPERTY;
+            sendOp(subregionIds, opType, update);
+          }
+      }
     })
+
+    function sendOp(subregionIds, opType, update) {
+      const arr = Array.from(update);
+      const op = JSON.stringify(arr);
+      auth.socket.emit('op', {mapId: mapId, subregionIds: subregionIds, opType: opType, op: op});
+      setStaleSubregionIds(subregionIds);
+    }
 
     return () => {
       auth.socket.emit('closeProject', {
@@ -476,11 +469,11 @@ export default function MapScreen() {
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
     const coords2 = coords.get(i).get(j);
   
-    tps.addTransaction([subregionId]);
+    tps.addTransaction([subregionId], YdocOp.VERTEX);
     ydoc.transact(() => {
       coords2.insert(k, [newCoords]);
-      undoManager.stopCapturing()
-    }, 42);
+      undoManager.stopCapturing();
+    }, YdocOp.OP);
   }
 
   function applyVertexMove(subregionId, indexPath, newCoords){
@@ -490,12 +483,12 @@ export default function MapScreen() {
     const coords2 = coords.get(i).get(j);
     //console.log(subregionId, indexPath, newCoords, JSON.stringify(ymap));
     
-    tps.addTransaction([subregionId]);
+    tps.addTransaction([subregionId], YdocOp.VERTEX);
     ydoc.transact(() => {
       coords2.delete(k, 1);
       coords2.insert(k, [newCoords]);
       undoManager.stopCapturing()
-    }, 42);
+    }, YdocOp.OP);
   }
 
   function applyVertexRemove(subregionId, indexPath, newCoords){
@@ -504,11 +497,11 @@ export default function MapScreen() {
     const coords = ymap.get(subregionId, Y.Map).get("coords", Y.Array);
     const coords2 = coords.get(i).get(j);
     
-    tps.addTransaction([subregionId]);
+    tps.addTransaction([subregionId], YdocOp.VERTEX);
     ydoc.transact(() => {
       coords2.delete(k, 1);
       undoManager.stopCapturing();
-    }, 42);
+    }, YdocOp.OP);
   }
 
   async function applyAddSubregion(geoJsonItem){
@@ -518,11 +511,11 @@ export default function MapScreen() {
       const subregionId = response.data.subregion._id;
       const coords = response.data.subregion.coordinates;
 
-      tps.addTransaction([subregionId]);
+      tps.addTransaction([subregionId], YdocOp.SUBREGION);
       ydoc.transact(() => {
         addSubregionToYDoc(subregionId, coords);
         undoManager.stopCapturing();
-      }, 42);
+      }, YdocOp.OP);
     }
   }
 
@@ -552,11 +545,11 @@ export default function MapScreen() {
   function applyRemoveSubregion(subregionId) {
     const ymap = ydoc.getMap("regions");
     const ySubregion = ymap.get(subregionId, Y.Map);
-    tps.addTransaction([subregionId]);
+    tps.addTransaction([subregionId], YdocOp.SUBREGION);
     ydoc.transact(() => {
       ySubregion.set("isStale", true);
       undoManager.stopCapturing();
-    }, 42);
+    }, YdocOp.OP);
   }
 
   async function createSubregions(subregions) {
@@ -595,14 +588,14 @@ export default function MapScreen() {
       }
     }
     const coordsMap = await createSubregions(arr);
-    tps.addTransaction([splitRegionId, ...Object.keys(coordsMap)]);
+    tps.addTransaction([splitRegionId, ...Object.keys(coordsMap)], YdocOp.SUBREGION);
     ydoc.transact(() => {
       ySubregion.set("isStale", true);
       for(const [subregionId, coordinates] of Object.entries(coordsMap)){
         addSubregionToYDoc(subregionId, coordinates);
       }
       undoManager.stopCapturing();
-    }, 42);
+    }, YdocOp.OP);
   }
 
   function polygonSlice(poly, line) {
@@ -638,14 +631,14 @@ export default function MapScreen() {
     const temp = ySubregion.get("coords").toJSON();
     const coordsArr = temp.map((coords) => [coords]);
     const coordsMap = await createSubregions(coordsArr);
-    tps.addTransaction([splitRegionId, ...Object.keys(coordsMap)]);
+    tps.addTransaction([splitRegionId, ...Object.keys(coordsMap)], YdocOp.SUBREGION);
     ydoc.transact(() => {
       ySubregion.set("isStale", true);
       for(const [subregionId, coordinates] of Object.entries(coordsMap)){
         addSubregionToYDoc(subregionId, coordinates);
       }
       undoManager.stopCapturing();
-    }, 42);
+    }, YdocOp.OP);
   }
 
   async function applyMergeSubregion(){
@@ -668,13 +661,13 @@ export default function MapScreen() {
       const subregionId = response.data.subregion._id;
       const coords = response.data.subregion.coordinates;
 
-      tps.addTransaction([subregionId, mergeRegionId[0], mergeRegionId[1]]);
+      tps.addTransaction([subregionId, mergeRegionId[0], mergeRegionId[1]], YdocOp.SUBREGION);
       ydoc.transact(() => {
         ySubregion11.set("isStale", true);
         ySubregion22.set("isStale", true);
         addSubregionToYDoc(subregionId, coords);
         undoManager.stopCapturing();
-      }, 42);
+      }, YdocOp.OP);
     }
   }
 
@@ -765,17 +758,17 @@ export default function MapScreen() {
     setSplitRegionId(null);
   }
 
-  function getTPSSubregionId(){
-    let subregionIds = [];
+  function getTPSMetadata(){
+    let metadata = {};
     if(tps.undoStack.length === undoManager.undoStack.length){
       // grab subregion from undoStack
-      subregionIds = tps.undoPeek();
+      metadata = tps.undoPeek();
     } else if(tps.undoStack.length > undoManager.undoStack.length) {
       // move item to redostack // is an undo op
-      subregionIds = tps.undoTransaction();
+      metadata = tps.undoTransaction();
     } else {
       // move item to undo stack, is an redo op
-      subregionIds = tps.redoTransaction();
+      metadata = tps.redoTransaction();
     }
     if(undoManager.undoStack.length !== tps.undoStack.length || undoManager.redoStack.length !== tps.redoStack.length) {
       console.log("Mismatched Stacks")
@@ -784,9 +777,8 @@ export default function MapScreen() {
       console.log(undoManager.redoStack);
       console.log(tps.redoStack);
     } else {
-      //console.log("Matching Stacks")
       setClearingUndoRedo(true);
-      return subregionIds;
+      return metadata;
     }
   }
 
@@ -802,6 +794,7 @@ export default function MapScreen() {
   }
 
   function handleMapProp(){
+    if (!editRegionId && !mapPropOpen) return
     setMapPropOpen(!mapPropOpen);
   }
 
@@ -830,7 +823,8 @@ export default function MapScreen() {
 
     ydoc.transact(() => {
       props.set(newTextKey, newTextValue)
-    }, 99)
+      undoManager.stopCapturing();
+    }, editRegionId)
     handleEditProp(newTextKey, newTextValue);
   }
 
@@ -842,7 +836,8 @@ export default function MapScreen() {
 
     ydoc.transact(() => {
       props.delete(newTextKey);
-    }, 99)
+      undoManager.stopCapturing();
+    }, editRegionId)
     handleNewEditProp();
   }
 
@@ -850,7 +845,7 @@ export default function MapScreen() {
     <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
       <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
         <div className="h-12 flex items-center px-2 gap-4 ">
-          <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
+          <img src={arrowleft} className="w-[30px] h-[30px] cursor-pointer" alt="" onClick={handleMapProp}></img>
           Region Properties
         </div>
         <div className="h-[1px] bg-black"></div>
@@ -895,7 +890,7 @@ export default function MapScreen() {
       <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
         <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
           <div className="h-12 flex items-center px-2 gap-4 ">
-            <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
+            <img src={arrowleft} className="w-[30px] h-[30px] cursor-pointer" alt="" onClick={handleMapProp}></img>
             Region Properties
           </div>
           <div className="h-[1px] bg-black"></div>
@@ -925,7 +920,7 @@ export default function MapScreen() {
         <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
         </div>
       </div> */}
-            <img onClick={handleMapProp} className="absolute w-[30px] h-[30px] z-50 mt-[100px]" src={arrowright}></img>
+            <img onClick={handleMapProp} className={editRegionId !== null ? "absolute w-[30px] h-[30px] z-50 mt-[100px] cursor-pointer" : "absolute w-[30px] h-[30px] z-50 mt-[100px] opacity-30 cursor-not-allowed"} src={arrowright}></img>
     </>
   }
 

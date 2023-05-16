@@ -5,8 +5,6 @@ const https = require("https");
 const fs = require("fs");
 const { Server } = require("socket.io");
 const Y = require("yjs");
-const WebSocket = require('ws')
-const {v4: uuidv4} = require('uuid');
 
 const mapProjects = {};
 
@@ -56,22 +54,24 @@ switch (process.env.ENVIRONMENT) {
         filterClientFromAll(socket.id);
       });
 
-      socket.on("saveProject", async (data) => {
-        const {mapId} = data;
-        await saveYdoc(mapProjects[mapId].text);
-      })
+      // socket.on("saveProject", async (data) => {
+      //   const {mapId} = data;
+      //   await saveYdoc(mapProjects[mapId].text);
+      // })
 
       socket.on("op", (data) => {
-        const {mapId, subregionIds, op} = data;
+        const {mapId, subregionIds, opType, op} = data;
+
         const parsed = JSON.parse(op);
         const uintArray = Uint8Array.from(parsed);
         const ydoc = mapProjects[mapId].text
-        Y.applyUpdate(ydoc, uintArray);
+        Y.applyUpdate(ydoc, uintArray, {subregionIds: subregionIds, opType: opType});
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
           socketIO.to(client).emit('others-update', {subregionIds: subregionIds, op: op});
         }
       });
+
     })
     
 
@@ -115,17 +115,18 @@ switch (process.env.ENVIRONMENT) {
         filterClientFromAll(socket.id);
       });
 
-      socket.on("saveProject", async (data) => {
-        const {mapId} = data;
-        await saveYdoc(mapProjects[mapId].text);
-      })
+      // socket.on("saveProject", async (data) => {
+      //   const {mapId} = data;
+      //   await saveYdoc(mapProjects[mapId].text);
+      // })
 
       socket.on("op", (data) => {
-        const {mapId, subregionIds, op} = data;
+        const {mapId, subregionIds, opType, op} = data;
+
         const parsed = JSON.parse(op);
         const uintArray = Uint8Array.from(parsed);
         const ydoc = mapProjects[mapId].text
-        Y.applyUpdate(ydoc, uintArray);
+        Y.applyUpdate(ydoc, uintArray, {subregionIds: subregionIds, opType: opType});
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
           socketIO.to(client).emit('others-update', {subregionIds: subregionIds, op: op});
@@ -142,9 +143,9 @@ switch (process.env.ENVIRONMENT) {
 
 async function filterClient(mapId, socketId) {
   if(!mapProjects[mapId]) return;
-  if(mapProjects[mapId].clients.includes(socketId)){
-    await saveYdoc(mapProjects[mapId].text);
-  }
+  // if(mapProjects[mapId].clients.includes(socketId)){
+  //   await saveYdoc(mapProjects[mapId].text);
+  // }
   mapProjects[mapId].clients = mapProjects[mapId].clients.filter(client => client !== socketId);
 }
 
@@ -206,6 +207,10 @@ async function loadDocFromDb(socketid, mapId){
     createYjsData(ymap, state);
   }
 
+  ydoc.on('update', (update, origin) => {
+    saveYdocSubregion(ydoc, origin);
+  })
+
   mapProjects[mapId] = {
     text: ydoc,
     clients: [socketid],
@@ -215,41 +220,4 @@ async function loadDocFromDb(socketid, mapId){
   let arr = Array.from(state);
   let str = JSON.stringify(arr);
   return str;
-}
-
-function applyOp(data){
-  const [transaction, mapId, subregionId, indexPath, newCoords] = data;
-  let ydoc = mapProjects[mapId].text
-  switch(transaction){
-    case "MOVE_VERTEX":
-      moveVertex(ydoc, subregionId, indexPath, newCoords);
-      break;
-    case "ADD_VERTEX":
-      addVertex(ydoc, subregionId, indexPath, newCoords);
-      break;
-    case "REMOVE_VERTEX":
-      removeVertex(ydoc, subregionId, indexPath, newCoords);
-      break;
-  }
-}
-
-function moveVertex(ydoc, subregionId, indexPath, newCoords){
-  const [i,j] = indexPath
-  const ymap = ydoc.getMap("regions");
-  const oldCoords = ymap.get(subregionId).get("coords");
-  oldCoords.get(i)[j] = newCoords;
-}
-
-function addVertex(ydoc, subregionId, indexPath, newCoords){
-  const [i,j] = indexPath;
-  const ymap = ydoc.getMap("regions");
-  const coords = ymap.get(subregionId).get("coords");
-  coords.get(i).splice(j, 0, newCoords);
-}
-
-function removeVertex(ydoc, subregionId, indexPath, newCoords){
-  const [i,j] = indexPath;
-  const ymap = ydoc.getMap("regions");
-  const coords = ymap.get(subregionId).get("coords");
-  coords.get(i).splice(j, 1);
 }

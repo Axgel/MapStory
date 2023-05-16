@@ -1,11 +1,8 @@
 import React, {useContext} from "react";
 import { CurrentModal } from "../enums";
-
-import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
 export default function AccountFeedbackModal(props) {
-  const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   
   function handleCloseModal(e){
