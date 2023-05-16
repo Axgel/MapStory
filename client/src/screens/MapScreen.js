@@ -222,7 +222,7 @@ export default function MapScreen() {
 
 
   useEffect(() => {
-    if (!auth.user || !auth.socket) return;
+    if ((!auth.isGuest && !auth.user) || !auth.socket) return;
     auth.socket.emit('openProject', {mapId: mapId})
 
     // init map project open
