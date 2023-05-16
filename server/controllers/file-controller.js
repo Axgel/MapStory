@@ -135,7 +135,7 @@ saveYdocSubregion = async(ydoc, metadata) => {
         case "SUBREGION":
           asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {isStale: subregionJSON["isStale"]}));
           break;
-        case "PROPERTIES":
+        case "PROPERTY":
           asyncUpdateRegions.push(Subregion.updateOne({ _id: subregionId }, {properties: subregionJSON["properties"]}));
           break;
       }

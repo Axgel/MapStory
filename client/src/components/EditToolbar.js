@@ -234,12 +234,12 @@ export default function EditToolbar() {
     store.updateVotes(store.selectedMap, 1);
   }
 
-  function saveCurrentMap(e){
-    e.stopPropagation();
-    if(auth.loggedIn && auth.socket){
-      auth.socket.emit('saveProject', {mapId: store.selectedMap._id})
-    }
-  }
+  // function saveCurrentMap(e){
+  //   e.stopPropagation();
+  //   if(auth.loggedIn && auth.socket){
+  //     auth.socket.emit('saveProject', {mapId: store.selectedMap._id})
+  //   }
+  // }
   
 
   let upvoteImg = (auth.user && store.selectedMap && store.selectedMap.upvotes.includes(auth.user._id)) ? upvoteFilledIcon : upvoteOutlineIcon;
@@ -269,7 +269,7 @@ export default function EditToolbar() {
   let shareClassName = fileButtonClass
   let saveClassName = fileButtonClass
   shareClassName += ((auth.loggedIn && store.selectedMap && auth.user._id === store.selectedMap.owner) ? "hover:bg-opacity-50" : "cursor-not-allowed opacity-30");
-  saveClassName += ((auth.loggedIn && store.selectedMap) ? "hover:bg-opacity-50" : "cursor-not-allowed opacity-30");
+  // saveClassName += ((auth.loggedIn && store.selectedMap) ? "hover:bg-opacity-50" : "cursor-not-allowed opacity-30");
   return (
     <div className="flex-none h-16 flex border-solid border bg-modalbgfill justify-between">
       <div className="flex">
@@ -287,9 +287,9 @@ export default function EditToolbar() {
       <div className="flex">
         {voting}
         <div className="w-[1px] bg-black h-full"></div>
-        <div id="saveMapBtn" className={saveClassName} onClick={saveCurrentMap}>
+        {/* <div id="saveMapBtn" className={saveClassName} onClick={saveCurrentMap}>
           Save
-        </div>
+        </div> */}
         <div id="shareMapBtn" className={shareClassName} onClick={(e) => setCurrentModal(e, CurrentModal.SHARE_MAP)}>
           Share
         </div>

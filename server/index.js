@@ -5,8 +5,6 @@ const https = require("https");
 const fs = require("fs");
 const { Server } = require("socket.io");
 const Y = require("yjs");
-const WebSocket = require('ws')
-const {v4: uuidv4} = require('uuid');
 
 const mapProjects = {};
 
@@ -56,22 +54,24 @@ switch (process.env.ENVIRONMENT) {
         filterClientFromAll(socket.id);
       });
 
-      socket.on("saveProject", async (data) => {
-        const {mapId} = data;
-        await saveYdoc(mapProjects[mapId].text);
-      })
+      // socket.on("saveProject", async (data) => {
+      //   const {mapId} = data;
+      //   await saveYdoc(mapProjects[mapId].text);
+      // })
 
       socket.on("op", (data) => {
-        const {mapId, subregionIds, op} = data;
+        const {mapId, subregionIds, opType, op} = data;
+
         const parsed = JSON.parse(op);
         const uintArray = Uint8Array.from(parsed);
         const ydoc = mapProjects[mapId].text
-        Y.applyUpdate(ydoc, uintArray);
+        Y.applyUpdate(ydoc, uintArray, {subregionIds: subregionIds, opType: opType});
         for (const client of mapProjects[mapId].clients) {
           if (client === socket.id) continue;
           socketIO.to(client).emit('others-update', {subregionIds: subregionIds, op: op});
         }
       });
+
     })
     
 
@@ -115,10 +115,10 @@ switch (process.env.ENVIRONMENT) {
         filterClientFromAll(socket.id);
       });
 
-      socket.on("saveProject", async (data) => {
-        const {mapId} = data;
-        await saveYdoc(mapProjects[mapId].text);
-      })
+      // socket.on("saveProject", async (data) => {
+      //   const {mapId} = data;
+      //   await saveYdoc(mapProjects[mapId].text);
+      // })
 
       socket.on("op", (data) => {
         const {mapId, subregionIds, opType, op} = data;
