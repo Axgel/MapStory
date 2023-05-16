@@ -794,6 +794,7 @@ export default function MapScreen() {
   }
 
   function handleMapProp(){
+    if (!editRegionId && !mapPropOpen) return
     setMapPropOpen(!mapPropOpen);
   }
 
@@ -844,7 +845,7 @@ export default function MapScreen() {
     <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
       <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
         <div className="h-12 flex items-center px-2 gap-4 ">
-          <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
+          <img src={arrowleft} className="w-[30px] h-[30px] cursor-pointer" alt="" onClick={handleMapProp}></img>
           Region Properties
         </div>
         <div className="h-[1px] bg-black"></div>
@@ -889,7 +890,7 @@ export default function MapScreen() {
       <div className="w-[300px] min-h-[400px] h-full sticky top-5 self-start">
         <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
           <div className="h-12 flex items-center px-2 gap-4 ">
-            <img src={arrowleft} className="w-[30px] h-[30px]" alt="" onClick={handleMapProp}></img>
+            <img src={arrowleft} className="w-[30px] h-[30px] cursor-pointer" alt="" onClick={handleMapProp}></img>
             Region Properties
           </div>
           <div className="h-[1px] bg-black"></div>
@@ -919,7 +920,7 @@ export default function MapScreen() {
         <div className="border-solid h-full rounded-lg border flex flex-col bg-brownshade-700">
         </div>
       </div> */}
-            <img onClick={handleMapProp} className="absolute w-[30px] h-[30px] z-50 mt-[100px]" src={arrowright}></img>
+            <img onClick={handleMapProp} className={editRegionId !== null ? "absolute w-[30px] h-[30px] z-50 mt-[100px] cursor-pointer" : "absolute w-[30px] h-[30px] z-50 mt-[100px] opacity-30 cursor-not-allowed"} src={arrowright}></img>
     </>
   }
 
