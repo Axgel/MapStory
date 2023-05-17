@@ -1,4 +1,3 @@
-import React, {useEffect, useRef, useState} from 'react';
 import * as client from "topojson-client";
 import * as server from "topojson-server";
 import * as simplify from "topojson-simplify";
@@ -8,7 +7,6 @@ import { parsePolygon } from "../utils/geojsonParser";
 export async function exportGeoJSON(mapId, compressionPercent, mapTitle){
     //create geojson obj
     let simplifiedGeojson = await createGeoJSON(mapId, compressionPercent);
-    
     //at the end download the object
     // console.log(geojson);
     download(JSON.stringify(simplifiedGeojson), mapTitle+".json", "application/json");
@@ -69,7 +67,7 @@ function addSubregion(subregion){ //convert from subregion schema into GEOJSON f
     // console.log(subregion.coordinates);
     const coordinates = []
     for(let i = 0; i < subregion.coordinates.length; i++){
-        let coordinate = parsePolygon(subregion.coordinates[i], 0);
+        let coordinate = parsePolygon(subregion.coordinates[i], 1);
         coordinates.push(coordinate);
     }
     // console.log(coordinates)
