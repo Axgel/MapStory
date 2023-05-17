@@ -31,9 +31,9 @@ export async function convertToGeojson(files) {
         //throw an error (something wrong with the files)
     }
 
-    for(let i=0; i<geoJSONFile.features.length; i++){
-        geoJSONFile.features[i].properties.GEN_ID = i;
-    }
+    // for(let i=0; i<geoJSONFile.features.length; i++){
+    //     geoJSONFile.features[i].properties.GEN_ID = i;
+    // }
 
 
     //reduce all the coordinates to only 5 decimal places
