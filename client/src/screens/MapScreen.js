@@ -882,7 +882,7 @@ export default function MapScreen() {
           <div className="h-[1px] bg-black"></div>
         </div>
       
-      if(store.selectedMap.isPublished){
+      if(store.selectedMap.isPublished || file.currentEditMode === EditMode.VIEW){
         editPropInput = <></>;
       }
 
