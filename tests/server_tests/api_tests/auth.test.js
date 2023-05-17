@@ -37,7 +37,7 @@ describe ("POST /register", () => {
     describe("Attempt to register with an existing email", () => {
         it("should respond with status 400", async () => {
             const response = await request(app).post("/auth/register").send({
-                userName: "fet",
+                userName: "fett",
                 email: "testing123@gmail.com",
                 password: "12345678",
                 passwordVerify: "12345678",
